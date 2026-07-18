@@ -1,0 +1,1352 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proto Claude Cowork - MailFlow</title>
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🧭</text></svg>'>
+<style>
+  :root {
+  --bg: #ffffff;
+  --bg-soft: #f7f4fa;
+  --surface: #ffffff;
+  --surface-soft: #fbf8fd;
+
+  --black: #05070d;
+  --ink: #0b1220;
+  --text: #111827;
+  --text-soft: #334155;
+  --muted: #64748b;
+
+  --accent: #CFAFE7;
+  --accent-2: #8C6AA8;
+  --accent-soft: rgba(207, 175, 231, 0.22);
+  --accent-border: rgba(140, 106, 168, 0.42);
+
+  --border: #ded8e6;
+  --border-strong: #c9bdd4;
+
+  --code-bg: #05070d;
+  --code-bg-2: #09111f;
+  --code-text: #f4f0ff;
+  --code-muted: #d8d2ff;
+  --code-border: rgba(207, 175, 231, 0.38);
+
+  --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+  --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.07);
+
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  line-height: 1.6;
+  background:
+    radial-gradient(circle at top left, rgba(207, 175, 231, 0.20), transparent 28rem),
+    radial-gradient(circle at top right, rgba(140, 106, 168, 0.12), transparent 30rem),
+    linear-gradient(180deg, #ffffff 0%, #ffffff 48%, #f7f4fa 100%);
+}
+
+.wrap {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* HEADER */
+
+header {
+  position: relative;
+  overflow: hidden;
+  padding: 46px 0 30px;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(207, 175, 231, 0.30), transparent 25rem),
+    linear-gradient(135deg, #05070d 0%, #07111f 58%, #151124 100%);
+  border-bottom: 1px solid rgba(207, 175, 231, 0.34);
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(207, 175, 231, 0.95), transparent);
+}
+
+header .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  margin: 0 0 8px;
+  max-width: 100%;
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  font-weight: 880;
+  white-space: nowrap;
+  color: #ffffff;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 760px;
+  color: #f2eaff;
+  font-size: clamp(17px, 2vw, 21px);
+  letter-spacing: -0.02em;
+}
+
+.subtitle::before {
+  content: "— ";
+  color: var(--accent);
+  font-weight: 900;
+}
+
+/* BACK BUTTON */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid rgba(207, 175, 231, 0.50);
+  border-radius: var(--radius-pill);
+  background: rgba(207, 175, 231, 0.12);
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.back-btn:hover {
+  background: rgba(207, 175, 231, 0.22);
+  border-color: rgba(207, 175, 231, 0.70);
+}
+
+/* NAVIGATION */
+
+.top-nav,
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.nav-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.nav-grid a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--black);
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: -0.01em;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #ffffff;
+  box-shadow: none;
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.nav-grid a:hover {
+  transform: translateY(-1px);
+  color: var(--black);
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+
+.nav-grid a.nav-copied {
+  color: #ffffff;
+  background: #8c6aa8;
+  border: 0;
+  box-shadow: none;
+}
+
+/* MAIN */
+
+main {
+  padding: 30px 0 68px;
+}
+
+.card {
+  position: relative;
+  margin: 0 0 22px;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  scroll-margin-top: 112px;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--black), var(--accent-2), var(--accent));
+  opacity: 0.95;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+h2 {
+  margin: 0 0 14px;
+  color: var(--black);
+  font-size: clamp(24px, 3vw, 33px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+h3 {
+  margin: 0;
+  color: var(--black);
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 14px;
+  color: var(--text);
+}
+
+strong {
+  color: var(--black);
+}
+
+/* TEXTES À LIRE — NOIR SUR BLANC */
+
+.plain {
+  margin: 14px 0 0;
+  padding: 16px;
+  color: var(--black);
+  white-space: pre-wrap;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  font-size: 15px;
+  box-shadow: inset 0 0 0 1px rgba(5, 7, 13, 0.02);
+}
+
+/* WORKFLOW / FLUX CIBLE */
+
+.workflow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 8px;
+  padding: 18px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at top left, rgba(207, 175, 231, 0.16), transparent 22rem),
+    #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.workflow-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 6px 10px;
+  color: var(--black);
+  font-weight: 750;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(207, 175, 231, 0.14);
+  box-shadow: none;
+  cursor: default;
+}
+
+.workflow-step:hover {
+  border: 0;
+  background: rgba(207, 175, 231, 0.14);
+  box-shadow: none;
+  transform: none;
+}
+
+.workflow-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  font-size: 16px;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+}
+
+.workflow-arrow {
+  color: var(--accent-2);
+  font-weight: 850;
+  font-size: 16px;
+  opacity: 0.65;
+}
+
+/* PROMPTS — BLANC / LAVANDE SUR NOIR */
+
+.prompt-card {
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-lg);
+  background: var(--code-bg);
+  box-shadow: 0 18px 42px rgba(5, 7, 13, 0.22);
+}
+
+.prompt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(207, 175, 231, 0.34);
+  background:
+    linear-gradient(90deg, rgba(207, 175, 231, 0.18), rgba(140, 106, 168, 0.16)),
+    #09111f;
+}
+
+.prompt-head h3 {
+  color: #ffffff;
+}
+
+/* BOUTONS */
+
+.copy-btn {
+  appearance: none;
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 8px 13px;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #8c6aa8;
+  box-shadow: none;
+  transition:
+    transform 150ms ease,
+    filter 150ms ease,
+    background 150ms ease;
+}
+
+.copy-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: none;
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+}
+
+.copy-btn.copied {
+  color: #ffffff;
+  background: #8c6aa8;
+  box-shadow: none;
+}
+
+/* PROMPT CODE */
+
+pre.prompt {
+  margin: 0;
+  padding: 19px;
+  overflow: auto;
+  color: var(--code-text);
+  background:
+    radial-gradient(circle at top right, rgba(207, 175, 231, 0.12), transparent 18rem),
+    linear-gradient(180deg, var(--code-bg-2), var(--code-bg));
+  font-size: 14px;
+  line-height: 1.58;
+  white-space: pre-wrap;
+}
+
+pre.prompt code {
+  color: var(--code-text);
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* FOOTER */
+
+footer {
+  padding: 0 0 44px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ACCESSIBILITY */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(207, 175, 231, 0.70);
+  outline-offset: 3px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  h1 {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 920px) {
+  .wrap {
+    width: min(100% - 28px, 1120px);
+  }
+
+  .nav-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  header {
+    padding: 42px 0 28px;
+  }
+
+  .nav-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nav-grid a {
+    min-height: 40px;
+    font-size: 12.5px;
+  }
+
+  .card {
+    border-radius: 20px;
+  }
+
+  .prompt-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .copy-btn {
+    width: 100%;
+  }
+
+  .workflow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .workflow-arrow {
+    display: none;
+  }
+
+  .workflow-step {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: var(--radius-md);
+  }
+}
+
+@media (max-width: 440px) {
+  .nav-grid {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    letter-spacing: -0.045em;
+  }
+}
+
+/* PRINT */
+
+@media print {
+  body {
+    color: #111827;
+    background: #ffffff;
+  }
+
+  header {
+    color: #111827;
+    background: #ffffff;
+    border-bottom: 1px solid #dddddd;
+  }
+
+  nav,
+  .copy-btn,
+  .back-btn {
+    display: none !important;
+  }
+
+  .card {
+    color: #111827;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  .subtitle {
+    color: #111827;
+  }
+
+  .plain {
+    color: #111827;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+  }
+
+  pre.prompt {
+    color: #111827;
+    background: #f3f4f6;
+    border: 1px solid #dddddd;
+  }
+}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="back-btn" href="index.html">← Changer de fournisseur</a>
+      <h1 id="page-title">🧭 Proto Claude Cowork - MailFlow</h1>
+      <p class="subtitle" id="page-subtitle">Automatisation des mails non répondus</p>
+    </div>
+  </header>
+
+  <nav class="top-nav">
+    <div class="wrap nav-grid">
+      <a href="#step-1">1. Projet</a>
+      <a href="#step-2">2. Accès</a>
+      <a href="#step-3">3. Excel</a>
+      <a href="#step-4">4. Import</a>
+      <a href="#step-5">5. Détection</a>
+      <a href="#step-6">6. Priorité</a>
+      <a href="#step-7">7. Réponses</a>
+      <a href="#step-8">8. PDF</a>
+      <a href="#step-9">9. Synthèse</a>
+      <a href="#step-10">10. Skill</a>
+      <a href="#step-11">11. Test</a>
+      <a href="#step-12">12. Route</a>
+    </div>
+  </nav>
+
+<main class="wrap">
+
+    <section class="card" id="intro">
+      <h2>🎯 Objectif</h2>
+      <p>Créer une base de suivi des mails {{provider}} dans un fichier Excel du projet.</p>
+<p>Flux cible :</p>
+<div class="workflow">
+  <div class="workflow-step">
+    <span class="workflow-icon">📥</span>
+    <span>{{provider}}</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">📊</span>
+    <span>{{fileName}}</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🔎</span>
+    <span>Analyse des mails non répondus</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🚦</span>
+    <span>Priorisation</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">✍️</span>
+    <span>Propositions de réponse</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">📄</span>
+    <span>Rapport PDF</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🧩</span>
+    <span>Skill métier</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🛣️</span>
+    <span>Route finale</span>
+  </div>
+  <br/>
+  </div><p><b> Règle centrale : Claude ne doit jamais envoyer d'e-mail automatiquement.</b></p>
+
+
+    </section>
+
+
+
+    <section class="card" id="step-1">
+      <h2>1. 🧱 Créer le projet</h2>
+      <p>Nom proposé : Proto Claude Cowork - MailFlow</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Instructions projet</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Ce projet sert à prototyper la gestion des mails {{provider}} non répondus.
+
+Règles générales :
+- ne jamais envoyer d'e-mail automatiquement ;
+- ne jamais promettre une action non validée par un humain ;
+- travailler par étapes simples ;
+- tenir un fichier Excel comme base de suivi ;
+- ne pas créer de {{cloudAlt}} ;
+- utiliser des colonnes et valeurs en anglais dans le fichier Excel ;
+- traiter uniquement les nouveaux éléments ou les éléments modifiés ;
+- limiter les volumes traités à chaque exécution ;
+- produire un rapport court à chaque run ;
+- utiliser la skill {{skillXlsx}} pour créer, lire et modifier le fichier Excel ;
+- utiliser la skill {{skillPdf}} pour générer les rapports PDF ;
+- ne créer la Skill métier qu'après plusieurs étapes testées dans ce fil ;
+- créer la route finale seulement après validation du workflow et de la Skill métier.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-2">
+      <h2>2. 🔌 Vérifier {{provider}}, le projet et les skills</h2>
+      <p>Objectif : vérifier {{connector}}, le répertoire projet, {{skillXlsx}} et {{skillPdf}} avant toute action.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Vérification des accès</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Vérifie que tu as accès aux éléments nécessaires pour ce projet :
+
+1. Connecteur {{connector}} :
+- peux-tu lire les mails {{provider}} ?
+- peux-tu retrouver les fils de discussion {{provider}} ?
+- peux-tu identifier les mails entrants et sortants ?
+
+2. Répertoire du projet :
+- peux-tu créer un fichier dans le répertoire du projet ?
+- peux-tu retrouver ce fichier ensuite ?
+- peux-tu le modifier lors d'un prochain run ?
+
+3. Skill tableur :
+- la skill {{skillXlsx}} est-elle disponible ?
+- peux-tu l'utiliser pour créer, lire et modifier un fichier .xlsx dans le projet ?
+
+4. Skill PDF :
+- la skill {{skillPdf}} est-elle disponible ?
+- peux-tu l'utiliser pour créer un rapport PDF à partir d'un fichier Excel ou d'un résumé de run ?
+
+Ne lance pas encore le traitement des mails.
+Ne crée pas encore de brouillon.
+Ne crée pas encore de fichier PDF.
+Ne modifie rien sans confirmation.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-3">
+      <h2>3. 📊 Créer le fichier Excel</h2>
+      <p>Fichier cible : {{fileName}}</p>
+<pre class='plain'>Colonnes minimales :
+email_id, thread_id, received_at, sender, subject, snippet, has_attachment, status, priority, signal, suggested_reply, human_check</pre>
+<pre class='plain'>Valeurs autorisées :
+status = to_analyze / unanswered / draft_proposed / done / ignored
+priority = critical / high / medium / low
+signal = urgency / client_frustration / budget_issue / operational_blocker / sales_request / follow_up / none
+has_attachment = yes / no
+human_check = required / not_required</pre>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Création du fichier Excel</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Utilise la skill {{skillXlsx}} pour créer un fichier Excel intitulé "{{fileName}}" dans le répertoire du projet.
+
+Le fichier doit contenir un tableau structuré avec les colonnes suivantes, en anglais :
+- email_id
+- thread_id
+- received_at
+- sender
+- subject
+- snippet
+- has_attachment
+- status
+- priority
+- signal
+- suggested_reply
+- human_check
+
+Règles :
+- ne pas encore importer les mails ;
+- créer seulement la structure du fichier ;
+- utiliser uniquement ces colonnes pour le prototype ;
+- ne pas créer de {{cloudAlt}} ;
+- vérifier que le fichier est bien sauvegardé dans le répertoire du projet ;
+- indiquer le chemin du fichier créé.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-4">
+      <h2>4. 📥 Importer {{provider}} dans Excel</h2>
+      <p>Objectif : lire {{provider}} via {{connector}} et écrire les mails utiles dans le fichier Excel.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Import {{provider}} vers Excel</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Utilise {{provider}} via le connecteur {{connector}} pour lire les mails présents dans la boîte de réception.
+
+Utilise la skill {{skillXlsx}} pour remplir le fichier Excel "{{fileName}}" situé dans le répertoire du projet.
+
+Pour chaque mail utile, ajoute une ligne avec :
+- email_id si disponible ;
+- thread_id si disponible ;
+- received_at ;
+- sender ;
+- subject ;
+- snippet court ;
+- has_attachment = yes/no ;
+- status = to_analyze.
+
+Pour les colonnes non encore analysées, laisse vide :
+- priority ;
+- signal ;
+- suggested_reply ;
+- human_check.
+
+Ne rédige aucune réponse.
+Ne classe pas encore les mails.
+Ne crée aucun brouillon.
+Ignore les newsletters, no-reply et notifications automatiques si tu les identifies clairement.
+Ne crée pas de {{cloudAlt}}.
+
+À la fin, indique :
+- chemin du fichier Excel ;
+- nombre de mails ajoutés ;
+- nombre de mails ignorés ;
+- limites rencontrées ;
+- erreurs éventuelles.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-5">
+      <h2>5. 🔎 Détecter les mails non répondus</h2>
+      <p>Colonne mise à jour : status.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Détection des mails non répondus</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>À partir du fichier Excel "{{fileName}}", identifie les fils de discussion où le dernier message vient d'un client ou contact externe, et où aucune réponse sortante n'a été envoyée après ce dernier message.
+
+Utilise la skill {{skillXlsx}} pour mettre à jour uniquement la colonne :
+- status
+
+Valeurs autorisées :
+- unanswered
+- ignored
+- to_analyze
+
+Ne crée pas de nouvelles colonnes.
+Ne génère pas de brouillon.
+Ne rédige pas encore de réponse.
+Ne modifie pas les mails dans {{provider}}.
+Ne crée pas de {{cloudAlt}}.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-6">
+      <h2>6. 🚦 Prioriser les mails</h2>
+      <p>Colonnes mises à jour : priority et signal.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Priorisation</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Analyse uniquement les lignes où status = unanswered dans le fichier Excel "{{fileName}}".
+
+Classe chaque mail avec la colonne :
+- priority
+
+Valeurs autorisées :
+- critical
+- high
+- medium
+- low
+
+Détecte le signal principal avec la colonne :
+- signal
+
+Valeurs autorisées :
+- urgency
+- client_frustration
+- budget_issue
+- operational_blocker
+- sales_request
+- follow_up
+- none
+
+Utilise la skill {{skillXlsx}} pour mettre à jour uniquement :
+- priority
+- signal
+
+Ne prépare pas encore de brouillon.
+Limite l'analyse aux 30 mails les plus récents.
+Ne crée pas de {{cloudAlt}}.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-7">
+      <h2>7. ✍️ Proposer des réponses à valider</h2>
+      <p>Uniquement pour status = unanswered et priority = critical ou high.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Propositions de réponse</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Pour les lignes où status = unanswered et priority = critical ou high, prépare une proposition de réponse courte, professionnelle et factuelle.
+
+Maximum 10 propositions.
+
+Ne jamais envoyer d'e-mail automatiquement.
+
+Utilise la skill {{skillXlsx}} pour mettre à jour uniquement :
+- suggested_reply
+- human_check
+- status
+
+Règles :
+- suggested_reply doit être court ;
+- human_check = required ;
+- status = draft_proposed ;
+- ne promets jamais une action non confirmée ;
+- signale dans la réponse les points à vérifier si nécessaire ;
+- ne crée pas de nouvelles colonnes ;
+- ne crée pas de {{cloudAlt}}.
+
+Si possible, crée un {{draftLabel}}, mais ne l'envoie jamais.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-8">
+      <h2>8. 📄 Générer le rapport PDF</h2>
+      <p>Objectif : générer un PDF court, lisible et auditable avec {{skillPdf}}.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Rapport PDF</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>À partir du fichier Excel "{{fileName}}", utilise la skill {{skillPdf}} pour générer un rapport PDF court du run.
+
+Le rapport doit contenir :
+- date du run ;
+- nombre de mails scannés ;
+- nombre de mails ajoutés ;
+- nombre de mails ignorés ;
+- nombre de mails avec status = unanswered ;
+- nombre de priorités critical / high / medium / low ;
+- principaux signaux détectés ;
+- 3 exemples anonymisés de cas critical ou high ;
+- propositions de réponse à valider ;
+- limites rencontrées ;
+- actions humaines recommandées.
+
+Règles :
+- ne jamais inclure de données sensibles inutiles ;
+- ne jamais inclure le contenu complet d'un e-mail ;
+- anonymiser les exemples si possible ;
+- ne jamais envoyer ce rapport automatiquement ;
+- sauvegarder le PDF dans le répertoire du projet ;
+- indiquer le chemin du PDF généré.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-9">
+      <h2>9. 🧠 Synthétiser le workflow final depuis le fil réel</h2>
+      <p>But : nettoyer le fil avant création de Skill.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Synthèse du workflow final</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Relis ce fil de discussion et produis une synthèse du workflow final réellement validé.
+
+Ignore les variantes abandonnées.
+
+Ne garde que la dernière décision stabilisée :
+- {{provider}} comme source ;
+- fichier Excel "{{fileName}}" dans le répertoire du projet ;
+- pas de {{cloudAlt}} ;
+- pas d'import manuel ;
+- {{skillXlsx}} pour créer, lire et modifier le fichier Excel ;
+- {{skillPdf}} pour générer les rapports PDF ;
+- pas d'envoi automatique ;
+- création de brouillons uniquement si possible et uniquement pour les cas critical ou high ;
+- Skill métier créée seulement après validation du workflow.
+
+Produis une synthèse courte avec :
+1. objectif du workflow ;
+2. connecteurs requis ;
+3. skills outils requises ;
+4. nom du fichier Excel ;
+5. colonnes autorisées ;
+6. valeurs autorisées ;
+7. étapes du workflow ;
+8. règles de sécurité ;
+9. limites de volume ;
+10. cas où Claude doit s'arrêter et demander validation.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-10">
+      <h2>10. 🧩 Créer la Skill métier</h2>
+      <p>Nom proposé : {{skillName}}.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Création de la Skill métier</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>À partir de la synthèse validée ci-dessus, crée une Skill Claude métier.
+
+Nom de la Skill :
+{{skillName}}
+
+La Skill doit décrire uniquement le workflow final validé.
+
+Contraintes :
+- ne pas reprendre les anciennes variantes du fil ;
+- ne pas utiliser de {{cloudAlt}} ;
+- ne pas inclure d'import manuel ;
+- utiliser {{provider}} via {{connector}} ;
+- utiliser {{skillXlsx}} pour écrire dans "{{fileName}}" ;
+- utiliser {{skillPdf}} pour générer le rapport PDF ;
+- ne jamais envoyer d'e-mail automatiquement ;
+- ne jamais créer de brouillon sauf pour priority = critical ou high ;
+- ne pas ajouter de colonnes non prévues ;
+- ne pas inventer de données manquantes ;
+- limiter le traitement à 50 mails scannés, 30 analysés, 10 propositions.
+
+Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-11">
+      <h2>11. 🧪 Relire et tester la Skill</h2>
+      <p>Objectif : vérifier que la Skill respecte le workflow final.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Relecture critique de la Skill</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Relis le SKILL.md que tu viens de créer.
+
+Vérifie strictement :
+- qu'il ne mentionne pas de {{cloudAlt}} ;
+- qu'il ne mentionne pas d'import manuel ;
+- qu'il utilise bien {{provider}} ;
+- qu'il utilise bien {{connector}} ;
+- qu'il utilise bien {{skillXlsx}} pour le fichier Excel ;
+- qu'il utilise bien {{skillPdf}} pour le rapport PDF ;
+- qu'il interdit l'envoi automatique ;
+- qu'il limite les volumes ;
+- qu'il respecte les colonnes autorisées ;
+- qu'il reste concis.
+
+Si une règle est ambiguë, corrige-la.
+Ne rajoute pas de script.
+Ne rajoute pas de secret.</code></pre>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Test de la Skill</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Utilise le Skill métier {{skillName}}.
+
+Mets à jour la {{fileName}}.
+Traite uniquement les 20 derniers mails {{provider}}.
+Ne crée pas de brouillon.
+Ne jamais envoyer d'e-mail.
+Ne crée pas de {{cloudAlt}}.
+Génère un rapport court à la fin.
+Génère aussi un rapport PDF avec {{skillPdf}} si le test est concluant.
+
+Objectif du test :
+vérifier que le Skill respecte les colonnes, les valeurs autorisées, les limites, les exclusions, le connecteur {{connector}}, {{skillXlsx}}, {{skillPdf}} et les règles de sécurité.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-12">
+      <h2>12. 🛣️ Créer la route finale</h2>
+      <p>La route rejoue le workflow validé.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Création de la route finale</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Crée une route opérationnelle pour le projet "Proto Claude Cowork - MailFlow".
+
+Cette route doit utiliser la Skill métier :
+{{skillName}}
+
+Objectif de la route :
+mettre à jour le fichier Excel "{{fileName}}" dans le répertoire du projet à partir des nouveaux mails {{provider}} ou des fils modifiés.
+
+La route doit exécuter les étapes suivantes :
+1. vérifier l'accès {{provider}} via {{connector}} ;
+2. vérifier l'accès au fichier "{{fileName}}" ;
+3. utiliser {{skillXlsx}} pour lire et mettre à jour le fichier Excel ;
+4. scanner uniquement les nouveaux mails ou fils modifiés ;
+5. ignorer newsletters, no-reply, notifications automatiques et alertes système ;
+6. ajouter les nouveaux mails utiles avec status = to_analyze ;
+7. détecter les mails probablement non répondus avec status = unanswered ;
+8. prioriser les cas avec priority = critical / high / medium / low ;
+9. renseigner le signal principal avec signal ;
+10. proposer une réponse uniquement pour les cas critical ou high ;
+11. mettre human_check = required pour toute proposition ;
+12. ne jamais envoyer d'e-mail ;
+13. ne créer aucun {{cloudAlt}} ;
+14. générer un rapport court dans Claude ;
+15. générer un rapport PDF avec {{skillPdf}} dans le répertoire du projet.
+
+Limites :
+- maximum 50 mails scannés ;
+- maximum 30 mails analysés ;
+- maximum 10 propositions de réponse ;
+- ne pas retraiter tout l'historique ;
+- demander validation humaine en cas d'ambiguïté.
+
+À la fin de chaque exécution, la route doit indiquer :
+- nombre de mails scannés ;
+- nombre de mails ajoutés ;
+- nombre de mails ignorés ;
+- nombre de mails avec status = unanswered ;
+- nombre de cas critical / high ;
+- nombre de propositions générées ;
+- chemin du fichier Excel mis à jour ;
+- chemin du rapport PDF généré ;
+- actions humaines à valider.</code></pre>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Test de la route finale</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Teste la route {{skillName}} sur un périmètre réduit.
+
+Contraintes de test :
+- traiter uniquement les 20 derniers mails {{provider}} ;
+- ne créer aucun brouillon ;
+- ne jamais envoyer d'e-mail ;
+- ne créer aucun {{cloudAlt}} ;
+- utiliser {{skillXlsx}} pour écrire dans "{{fileName}}" ;
+- utiliser {{skillPdf}} pour générer le rapport PDF uniquement si le test est concluant.
+
+Objectif du test :
+vérifier que la route respecte :
+- les colonnes autorisées ;
+- les valeurs autorisées ;
+- les limites de volume ;
+- les exclusions ;
+- le connecteur {{connector}} ;
+- {{skillXlsx}} ;
+- {{skillPdf}} ;
+- l'interdiction d'envoi automatique ;
+- l'interdiction de {{cloudAlt}}.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card">
+      <h2>✅ Synthèse finale</h2>
+      <pre class='plain'>1. Créer le projet.
+2. Vérifier les accès.
+3. Créer le fichier Excel.
+4. Importer {{provider}}.
+5. Détecter les mails non répondus.
+6. Prioriser.
+7. Proposer des réponses.
+8. Générer le PDF.
+9. Synthétiser le workflow final depuis le fil réel.
+10. Créer la Skill métier.
+11. Relire et tester la Skill.
+12. Créer et tester la route finale.</pre>
+
+
+    </section>
+
+  </main>
+
+  <footer>
+
+  </footer>
+
+  <script src="config.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var providerKey = params.get("provider");
+
+      if (!providerKey || !PROVIDERS[providerKey]) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      var p = PROVIDERS[providerKey];
+
+      document.title = "Proto Claude Cowork - MailFlow — " + p.name;
+      document.getElementById("page-title").textContent = "🧭 Proto Claude Cowork - MailFlow — " + p.name;
+      document.getElementById("page-subtitle").textContent = "Automatisation des mails " + p.name + " non répondus";
+
+      var replacements = {
+        "{{provider}}": p.name,
+        "{{connector}}": p.connector,
+        "{{fileName}}": p.fileName,
+        "{{skillName}}": p.skillName,
+        "{{skillXlsx}}": p.skillXlsx,
+        "{{skillPdf}}": p.skillPdf,
+        "{{cloudAlt}}": p.cloudAlt,
+        "{{draftLabel}}": p.draftLabel
+      };
+
+      function applyTemplate(text) {
+        for (var key in replacements) {
+          text = text.split(key).join(replacements[key]);
+        }
+        return text;
+      }
+
+      var elements = document.querySelectorAll("main *");
+      elements.forEach(function (el) {
+        if (el.nodeType === 1) {
+          el.childNodes.forEach(function (node) {
+            if (node.nodeType === 3 && node.textContent.indexOf("{{") !== -1) {
+              node.textContent = applyTemplate(node.textContent);
+            }
+          });
+        }
+      });
+
+      document.querySelectorAll("pre.prompt code").forEach(function (code) {
+        code.textContent = applyTemplate(code.textContent);
+      });
+
+      document.querySelectorAll("pre.plain").forEach(function (pre) {
+        pre.textContent = applyTemplate(pre.textContent);
+      });
+    })();
+  </script>
+
+  <script>
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.top = "0";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      let ok = false;
+      try {
+        ok = document.execCommand("copy");
+      } finally {
+        document.body.removeChild(textarea);
+      }
+
+      return ok;
+    }
+
+    function highlightNavForButton(button) {
+      const section = button.closest("section[id^='step-']");
+      if (!section) return;
+
+      const sectionId = section.id;
+      const navLink = document.querySelector(`.nav-grid a[href="#${sectionId}"]`);
+      if (!navLink) return;
+
+      navLink.classList.add("nav-copied");
+    }
+
+    document.querySelectorAll(".copy-btn").forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const promptCard = button.closest(".prompt-card");
+        const code = promptCard ? promptCard.querySelector("pre.prompt code") : null;
+        const text = code ? code.textContent.trim() : "";
+
+        if (!text) {
+          button.textContent = "Erreur";
+          setTimeout(() => {
+            button.textContent = "Copier";
+          }, 1200);
+          return;
+        }
+
+        try {
+          const copied = await copyTextToClipboard(text);
+          if (!copied) throw new Error("copy failed");
+
+          button.textContent = "Copié";
+          button.classList.add("copied");
+
+          highlightNavForButton(button);
+
+          setTimeout(() => {
+            button.textContent = "Copier";
+            button.classList.remove("copied");
+          }, 1200);
+        } catch (error) {
+          const range = document.createRange();
+          range.selectNodeContents(code);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+
+          button.textContent = "Sélectionné";
+
+          highlightNavForButton(button);
+
+          setTimeout(() => {
+            button.textContent = "Copier";
+          }, 1400);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
