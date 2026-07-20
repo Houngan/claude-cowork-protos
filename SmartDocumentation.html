@@ -1,0 +1,1363 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proto Claude SmartDocumentation</title>
+  <meta name="description" content="Transformer un fonds documentaire en mémoire structurée et interrogeable">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📚</text></svg>'>
+<style>
+  :root {
+  --bg: #ffffff;
+  --bg-soft: #f7f4fa;
+  --surface: #ffffff;
+  --surface-soft: #fbf8fd;
+
+  --black: #05070d;
+  --ink: #0b1220;
+  --text: #111827;
+  --text-soft: #334155;
+  --muted: #64748b;
+
+  --accent: #CFAFE7;
+  --accent-2: #8C6AA8;
+  --accent-soft: rgba(207, 175, 231, 0.22);
+  --accent-border: rgba(140, 106, 168, 0.42);
+
+  --border: #ded8e6;
+  --border-strong: #c9bdd4;
+
+  --code-bg: #05070d;
+  --code-bg-2: #09111f;
+  --code-text: #f4f0ff;
+  --code-muted: #d8d2ff;
+  --code-border: rgba(207, 175, 231, 0.38);
+
+  --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+  --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.07);
+
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  line-height: 1.6;
+  background:
+    radial-gradient(circle at top left, rgba(207, 175, 231, 0.20), transparent 28rem),
+    radial-gradient(circle at top right, rgba(140, 106, 168, 0.12), transparent 30rem),
+    linear-gradient(180deg, #ffffff 0%, #ffffff 48%, #f7f4fa 100%);
+}
+
+.wrap {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* HEADER */
+
+header {
+  position: relative;
+  overflow: hidden;
+  padding: 46px 0 30px;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(207, 175, 231, 0.30), transparent 25rem),
+    linear-gradient(135deg, #05070d 0%, #07111f 58%, #151124 100%);
+  border-bottom: 1px solid rgba(207, 175, 231, 0.34);
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(207, 175, 231, 0.95), transparent);
+}
+
+header .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  margin: 0 0 8px;
+  max-width: 100%;
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  font-weight: 880;
+  white-space: nowrap;
+  color: #ffffff;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 760px;
+  color: #f2eaff;
+  font-size: clamp(17px, 2vw, 21px);
+  letter-spacing: -0.02em;
+}
+
+.subtitle::before {
+  content: "— ";
+  color: var(--accent);
+  font-weight: 900;
+}
+
+/* BACK BUTTON */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid rgba(207, 175, 231, 0.50);
+  border-radius: var(--radius-pill);
+  background: rgba(207, 175, 231, 0.12);
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.back-btn:hover {
+  background: rgba(207, 175, 231, 0.22);
+  border-color: rgba(207, 175, 231, 0.70);
+}
+
+/* NAVIGATION */
+
+.top-nav,
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.nav-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.nav-grid a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--black);
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: -0.01em;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #ffffff;
+  box-shadow: none;
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.nav-grid a:hover {
+  transform: translateY(-1px);
+  color: var(--black);
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+
+.nav-grid a.nav-copied {
+  color: #ffffff;
+  background: #8c6aa8;
+  border: 0;
+  box-shadow: none;
+}
+
+/* MAIN */
+
+main {
+  padding: 30px 0 68px;
+}
+
+.card {
+  position: relative;
+  margin: 0 0 22px;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  scroll-margin-top: 112px;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--black), var(--accent-2), var(--accent));
+  opacity: 0.95;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+h2 {
+  margin: 0 0 14px;
+  color: var(--black);
+  font-size: clamp(24px, 3vw, 33px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+h3 {
+  margin: 0;
+  color: var(--black);
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 14px;
+  color: var(--text);
+}
+
+strong {
+  color: var(--black);
+}
+
+/* TEXTES À LIRE — NOIR SUR BLANC */
+
+.plain {
+  margin: 14px 0 0;
+  padding: 16px;
+  color: var(--black);
+  white-space: pre-wrap;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  font-size: 15px;
+  box-shadow: inset 0 0 0 1px rgba(5, 7, 13, 0.02);
+}
+
+/* WORKFLOW / FLUX CIBLE */
+
+.workflow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 8px;
+  padding: 18px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at top left, rgba(207, 175, 231, 0.16), transparent 22rem),
+    #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.workflow-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 6px 10px;
+  color: var(--black);
+  font-weight: 750;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(207, 175, 231, 0.14);
+  box-shadow: none;
+  cursor: default;
+}
+
+.workflow-step:hover {
+  border: 0;
+  background: rgba(207, 175, 231, 0.14);
+  box-shadow: none;
+  transform: none;
+}
+
+.workflow-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  font-size: 16px;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+}
+
+.workflow-arrow {
+  color: var(--accent-2);
+  font-weight: 850;
+  font-size: 16px;
+  opacity: 0.65;
+}
+
+/* PROMPTS — BLANC / LAVANDE SUR NOIR */
+
+.prompt-card {
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-lg);
+  background: var(--code-bg);
+  box-shadow: 0 18px 42px rgba(5, 7, 13, 0.22);
+}
+
+.prompt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(207, 175, 231, 0.34);
+  background:
+    linear-gradient(90deg, rgba(207, 175, 231, 0.18), rgba(140, 106, 168, 0.16)),
+    #09111f;
+}
+
+.prompt-head h3 {
+  color: #ffffff;
+}
+
+/* BOUTONS */
+
+.copy-btn {
+  appearance: none;
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 8px 13px;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #8c6aa8;
+  box-shadow: none;
+  transition:
+    transform 150ms ease,
+    filter 150ms ease,
+    background 150ms ease;
+}
+
+.copy-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: none;
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+}
+
+.copy-btn.copied {
+  color: #ffffff;
+  background: #8c6aa8;
+  box-shadow: none;
+}
+
+/* PROMPT CODE */
+
+pre.prompt {
+  margin: 0;
+  padding: 19px;
+  overflow: auto;
+  color: var(--code-text);
+  background:
+    radial-gradient(circle at top right, rgba(207, 175, 231, 0.12), transparent 18rem),
+    linear-gradient(180deg, var(--code-bg-2), var(--code-bg));
+  font-size: 14px;
+  line-height: 1.58;
+  white-space: pre-wrap;
+}
+
+pre.prompt code {
+  color: var(--code-text);
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* FOOTER */
+
+footer {
+  padding: 0 0 44px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ACCESSIBILITY */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(207, 175, 231, 0.70);
+  outline-offset: 3px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  h1 {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 920px) {
+  .wrap {
+    width: min(100% - 28px, 1120px);
+  }
+
+  .nav-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  header {
+    padding: 42px 0 28px;
+  }
+
+  .nav-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nav-grid a {
+    min-height: 40px;
+    font-size: 12.5px;
+  }
+
+  .card {
+    border-radius: 20px;
+  }
+
+  .prompt-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .copy-btn {
+    width: 100%;
+  }
+
+  .workflow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .workflow-arrow {
+    display: none;
+  }
+
+  .workflow-step {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: var(--radius-md);
+  }
+}
+
+@media (max-width: 440px) {
+  .nav-grid {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    letter-spacing: -0.045em;
+  }
+}
+
+/* PRINT */
+
+@media print {
+  body {
+    color: #111827;
+    background: #ffffff;
+  }
+
+  header {
+    color: #111827;
+    background: #ffffff;
+    border-bottom: 1px solid #dddddd;
+  }
+
+  nav,
+  .copy-btn,
+  .back-btn {
+    display: none !important;
+  }
+
+  .card {
+    color: #111827;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  .subtitle {
+    color: #111827;
+  }
+
+  .plain {
+    color: #111827;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+  }
+
+  pre.prompt {
+    color: #111827;
+    background: #f3f4f6;
+    border: 1px solid #dddddd;
+  }
+}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="back-btn" href="index.html">← Changer de cas d'usage</a>
+      <h1 id="page-title">📚 Proto Claude SmartDocumentation</h1>
+      <p class="subtitle" id="page-subtitle">Transformer un fonds documentaire en mémoire structurée et interrogeable</p>
+    </div>
+  </header>
+
+  <nav class="top-nav">
+    <div class="wrap nav-grid">
+      <a href="#step-1">1. Projet</a>
+      <a href="#step-2">2. Drive</a>
+      <a href="#step-3">3. Cadre</a>
+      <a href="#step-4">4. Registre</a>
+      <a href="#step-5">5. Audit</a>
+      <a href="#step-6">6. Doublons</a>
+      <a href="#step-7">7. Normalisation</a>
+      <a href="#step-8">8. Classement</a>
+      <a href="#step-9">9. Indexation</a>
+      <a href="#step-10">10. Questions</a>
+      <a href="#step-11">11. Skill</a>
+      <a href="#step-12">12. Visualisation</a>
+    </div>
+  </nav>
+
+<main class="wrap">
+
+    <section class="card" id="intro">
+      <h2>🎯 Objectif</h2>
+      <p>Transformer un dossier documentaire non structuré en mémoire sourcée, contextualisée et maintenue par une routine de classement incrémental.</p>
+<p>Flux cible :</p>
+<div class="workflow">
+  <div class="workflow-step">
+    <span class="workflow-icon">📥</span>
+    <span>Dépôt vrac Google Drive</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">📊</span>
+    <span>Registre Excel</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🔎</span>
+    <span>Audit & détection doublons</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🏷️</span>
+    <span>Normalisation & classement</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🧠</span>
+    <span>Indexation & questions</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🧩</span>
+    <span>Skill métier + route</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
+    <span class="workflow-icon">🌐</span>
+    <span>Visualisation HTML + Railway</span>
+  </div>
+  <br/>
+  </div><p><b> Règle centrale : Claude ne supprime jamais un fichier et ne déplace rien sans validation humaine explicite.</b></p>
+
+    </section>
+
+    <section class="card" id="step-1">
+      <h2>1. 🧱 Créer le projet</h2>
+      <p>Nom proposé : Proto Claude SmartDocumentation</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Instructions projet</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Ce projet sert à prototyper la gestion documentaire d'un fonds hétérogène (conférences, articles, notes, correspondances, documents institutionnels).
+
+Règles générales :
+- ne jamais supprimer un fichier ;
+- ne jamais modifier le contenu d'un document source ;
+- ne jamais renommer ou déplacer un document sans validation explicite du lot par l'archiviste ;
+- ne jamais inventer de métadonnée manquante ; utiliser unknown, laisser vide ou demander validation ;
+- enregistrer une date uniquement si elle est explicitement présente dans le document ou le nom de fichier, en indiquant son origine ;
+- ne jamais inscrire une date déduite par rapprochement sans validation explicite de l'archiviste ;
+- travailler par étapes simples ;
+- tenir un registre Excel comme mémoire documentaire ;
+- utiliser des colonnes et valeurs en anglais dans le fichier Excel ;
+- traiter uniquement les nouveaux éléments ou les éléments modifiés ;
+- limiter les volumes traités à chaque exécution ;
+- produire un rapport court à chaque run ;
+- utiliser la skill xlsx-proto pour créer, lire et modifier le fichier Excel ;
+- importer et vérifier la skill vizualise-documentation à l'étape 2 ;
+- ne créer la Skill métier documentation qu'après plusieurs étapes testées dans ce fil ;
+- créer la route finale seulement après validation du workflow et de la Skill métier.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-2">
+      <h2>2. 🔌 Connecter Google Drive et importer les outils</h2>
+      <p>Objectif : sélectionner le dossier Google Drive de travail, vérifier les accès aux zones client et système, puis importer les Skills tableur et vizualise-documentation.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Connexion Drive et vérification des outils</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Sélectionne le dossier Google Drive de travail pour ce projet.
+
+Vérifie que tu as accès aux éléments nécessaires :
+
+1. Connecteur Google Drive :
+- peux-tu lire les fichiers dans le dossier sélectionné ?
+- peux-tu créer un fichier dans ce dossier ?
+- peux-tu déplacer un fichier entre sous-dossiers ?
+
+2. Structure de dossiers à créer dans le dossier sélectionné :
+- 01_DEPOT_VRAC/ (où le client dépose les nouveaux documents)
+- 02_A_VALIDER/ (documents dont le classement requiert validation)
+- 03_ARCHIVES_CLASSEES/ avec les sous-dossiers :
+  - 01_CONFERENCES/ (avec sous-dossier YYYY/)
+  - 02_ARTICLES_ET_PUBLICATIONS/ (avec sous-dossier YYYY/)
+  - 03_NOTES_ET_BROUILLONS/
+  - 04_CORRESPONDANCES/
+  - 05_DOCUMENTS_INSTITUTIONNELS/
+  - 99_DATE_OU_TYPE_A_VALIDER/
+- 99_SYSTEME/ avec :
+  - journaux/
+
+3. Skill tableur :
+- la skill xlsx-proto est-elle disponible ?
+- peux-tu l'utiliser pour créer, lire et modifier un fichier .xlsx ?
+
+4. Skill de visualisation :
+- importe la skill vizualise-documentation ;
+- vérifie qu'elle est disponible et fonctionnelle ;
+- ne l'utilise pas encore.
+
+Ne lance pas encore l'analyse documentaire.
+Ne crée pas encore le registre.
+Ne déplace aucun fichier.
+Ne modifie rien sans confirmation.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-3">
+      <h2>3. 📐 Définir le cadre archivistique</h2>
+      <p>Objectif : faire préciser périmètre, documents exclus, plan de classement et convention de nommage.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Cadre archivistique</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Propose un cadre archivistique pour ce fonds documentaire.
+
+1. Périmètre :
+- quels types de documents sont inclus ?
+- quels types sont exclus du prototype ?
+
+2. Plan de classement :
+- la règle stable est : nature documentaire, puis année certaine ;
+- les cinq types fixes sont : 01_CONFERENCES, 02_ARTICLES_ET_PUBLICATIONS, 03_NOTES_ET_BROUILLONS, 04_CORRESPONDANCES, 05_DOCUMENTS_INSTITUTIONNELS ;
+- les axes intellectuels (thèmes, concepts, auteurs, auditoires, destinataires) ne déterminent pas les dossiers ; ils sont inscrits dans le registre Excel.
+
+3. Convention de nommage :
+- format normalisé : YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext
+- une date est utilisée dans le nom si elle est explicitement présente dans le document ou son nom de fichier, ou si elle a été validée par l'archiviste.
+
+4. Règles de date :
+- une date explicitement présente dans le document ou le nom de fichier est enregistrée avec date_source ;
+- une date déduite par rapprochement reste une question à investiguer et n'est pas inscrite ;
+- un document dont seule la date est à investiguer reste dans 01_DEPOT_VRAC/ jusqu'à validation humaine.
+
+Présente ce cadre sous forme de proposition soumise à validation.
+Ne renomme rien.
+Ne déplace aucun fichier.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-4">
+      <h2>4. 📊 Créer le registre documentaire</h2>
+      <p>Fichier cible : 99_SYSTEME/registre_documentation.xlsx</p>
+<pre class='plain'>Colonnes initiales :
+document_id, source_path, current_name, proposed_name, final_path,
+drive_file_id, drive_web_url, file_type, file_size, detected_date, date_source,
+date_status, author, audience, recipient, title, document_type, summary, tags,
+people, places, concepts, visual_register, duplicate_status,
+classification_status, confidence, human_check, source_reference, processed_at, notes</pre>
+<pre class='plain'>Valeurs contrôlées :
+duplicate_status = unique / exact_duplicate / possible_duplicate / unknown
+classification_status = to_analyze / proposed / validated / classified / to_validate / ignored / error
+date_status = explicit_document / explicit_filename / unknown / to_investigate / validated
+date_source = document / filename / human_validation
+confidence = high / medium / low
+human_check = required / not_required
+visual_register = register_1 / register_2 / register_3 / register_4 / register_5 / none</pre>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Création du registre</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Utilise la skill xlsx-proto pour créer un fichier Excel intitulé "registre_documentation.xlsx" dans le dossier 99_SYSTEME/ du projet Google Drive.
+
+Le fichier doit contenir un tableau structuré avec les colonnes suivantes, en anglais :
+- document_id
+- source_path
+- current_name
+- proposed_name
+- final_path
+- drive_file_id
+- drive_web_url
+- file_type
+- file_size
+- detected_date
+- date_source
+- date_status
+- author
+- audience
+- recipient
+- title
+- document_type
+- summary
+- tags
+- people
+- places
+- concepts
+- visual_register
+- duplicate_status
+- classification_status
+- confidence
+- human_check
+- source_reference
+- processed_at
+- notes
+
+Crée également un onglet "configuration" définissant les libellés des cinq registres visuels et leur correspondance avec les cinq couleurs : orange, bleu, violet, vert et or.
+
+Règles :
+- ne pas encore importer les documents ;
+- créer seulement la structure du fichier ;
+- utiliser uniquement ces colonnes pour le prototype ;
+- vérifier que le fichier est bien sauvegardé dans 99_SYSTEME/ ;
+- indiquer le chemin du fichier créé.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-5">
+      <h2>5. 🔎 Auditer le fonds</h2>
+      <p>Objectif : cartographier arborescence, formats, dates, volumes et anomalies sans modifier les sources.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Audit du fonds</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Audite le contenu du dossier 01_DEPOT_VRAC/ sans modifier, renommer ou déplacer aucun fichier.
+
+Pour chaque fichier rencontré, relève :
+- nom actuel ;
+- chemin source ;
+- format / extension ;
+- taille ;
+- date détectée si explicitement présente dans le nom de fichier ou le document ;
+- type documentaire probable parmi : 01_CONFERENCES, 02_ARTICLES_ET_PUBLICATIONS, 03_NOTES_ET_BROUILLONS, 04_CORRESPONDANCES, 05_DOCUMENTS_INSTITUTIONNELS, 99_DATE_OU_TYPE_A_VALIDER.
+
+Produis un rapport d'audit avec :
+- nombre total de fichiers ;
+- répartition par format ;
+- répartition par type documentaire probable ;
+- nombre de fichiers avec date explicite ;
+- nombre de fichiers sans date ;
+- anomalies détectées (fichiers vides, illisibles, hors périmètre) ;
+- volumes totaux.
+
+Ne crée pas encore de ligne dans le registre.
+Ne déplace aucun fichier.
+Ne renomme rien.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-6">
+      <h2>6. 🔍 Détecter les doublons</h2>
+      <p>Objectif : identifier doublons exacts/probables, vides, illisibles et hors périmètre.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Détection des doublons</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>À partir du dossier 01_DEPOT_VRAC/, identifie :
+
+1. Les doublons exacts :
+- fichiers identiques par nom et contenu ;
+- fichiers identiques par contenu avec nom différent.
+
+2. Les doublons probables :
+- fichiers très similaires par contenu (versions, brouillons, copies partielles).
+
+3. Les fichiers problématiques :
+- fichiers vides ;
+- fichiers illisibles ;
+- fichiers hors périmètre (format non documentaire, non pertinent).
+
+Pour chaque cas, indique :
+- le ou les fichiers concernés ;
+- le type de problème (exact_duplicate / possible_duplicate / unknown) ;
+- ta confiance (high / medium / low).
+
+Ne supprime jamais un fichier.
+Ne déplace aucun fichier.
+Présente la liste à l'archiviste pour examen.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-7">
+      <h2>7. 🏷️ Proposer la normalisation</h2>
+      <p>Objectif : proposer noms normalisés et destination par document.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Propositions de normalisation</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Pour chaque fichier du dossier 01_DEPOT_VRAC/, propose :
+
+1. Un nom normalisé selon le format :
+   YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext
+
+2. Une destination de classement parmi :
+   03_ARCHIVES_CLASSEES/01_CONFERENCES/YYYY/
+   03_ARCHIVES_CLASSEES/02_ARTICLES_ET_PUBLICATIONS/YYYY/
+   03_ARCHIVES_CLASSEES/03_NOTES_ET_BROUILLONS/
+   03_ARCHIVES_CLASSEES/04_CORRESPONDANCES/
+   03_ARCHIVES_CLASSEES/05_DOCUMENTS_INSTITUTIONNELS/
+   03_ARCHIVES_CLASSEES/99_DATE_OU_TYPE_A_VALIDER/
+
+3. Une justification courte.
+
+4. Un niveau de confiance : high / medium / low.
+
+Règles de date :
+- n'utilise une date dans le nom que si elle est explicitement présente dans le document ou le nom de fichier ;
+- si la date est inconnue, laisse la date vide et indique date_status = unknown ou to_investigate ;
+- ne propose jamais une date déduite par rapprochement.
+
+Présente le résultat sous forme de tableau :
+actuel → proposé → destination → justification → confiance
+
+Ne renomme aucun fichier.
+Ne déplace aucun fichier.
+Tout n'est que proposition soumise à validation.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-8">
+      <h2>8. ✅ Valider et appliquer un lot</h2>
+      <p>Objectif : présenter le lot de classement et appliquer uniquement les renommages et déplacements explicitement validés.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Application du lot validé</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Présente un lot de classement à l'archiviste.
+
+Pour chaque document du lot, indique :
+- nom actuel ;
+- nom proposé ;
+- destination proposée ;
+- justification ;
+- niveau de confiance.
+
+Attends une validation explicite de l'archiviste avant toute action.
+
+Après validation explicite :
+1. Renomme les fichiers approuvés avec leur nom normalisé.
+2. Déplace les fichiers approuvés vers 03_ARCHIVES_CLASSEES/ dans le sous-dossier correspondant.
+3. Pour les cas ambigus (type incertain, contenu problématique, doublon), oriente-les vers 02_A_VALIDER/ ou laisse-les en attente selon la décision de l'archiviste.
+4. Pour les documents dont seule la date est à investiguer, laisse-les dans 01_DEPOT_VRAC/.
+
+Règles :
+- ne jamais supprimer un fichier ;
+- ne jamais déplacer un fichier non validé ;
+- ne jamais modifier le contenu d'un document source ;
+- consigne chaque opération dans le registre Excel avec xlsx-proto.
+
+À la fin, indique :
+- nombre de fichiers renommés ;
+- nombre de fichiers déplacés ;
+- nombre de fichiers orientés vers 02_A_VALIDER/ ;
+- nombre de fichiers laissés en attente ;
+- erreurs éventuelles.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-9">
+      <h2>9. 🧠 Indexer les documents</h2>
+      <p>Objectif : extraire métadonnées, résumé, tags, concepts, auditoire, destinataire et références source.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Indexation des documents</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Pour chaque document classé dans 03_ARCHIVES_CLASSEES/, utilise la skill xlsx-proto pour enrichir le registre documentaire avec :
+
+1. Métadonnées d'identification :
+- title (titre du document) ;
+- author (auteur ou organisme) ;
+- audience (public visé) ;
+- recipient (destinataire si pertinent) ;
+- document_type (type documentaire) ;
+- file_type, file_size.
+
+2. Contenu analytique :
+- summary (résumé analytique court) ;
+- tags (mots-clés) ;
+- concepts (concepts principaux) ;
+- people (personnes citées) ;
+- places (lieux mentionnés).
+
+3. Date :
+- detected_date si explicitement présente dans le document ou le nom de fichier ;
+- date_source = document ou filename ;
+- date_status = explicit_document ou explicit_filename ;
+- si la date n'est pas explicite : detected_date vide, date_status = unknown ou to_investigate.
+
+4. Références :
+- source_reference (fichier et page quand disponibles) ;
+- drive_file_id et drive_web_url (identifiants Google Drive).
+
+5. Statut :
+- classification_status = classified ;
+- confidence = high / medium / low ;
+- human_check = required ou not_required.
+
+Règles :
+- ne jamais inventer de métadonnée manquante ;
+- utiliser unknown, laisser vide ou demander validation ;
+- ne jamais inscrire une date déduite par rapprochement ;
+- ne pas créer de colonnes additionnelles ;
+- ne pas modifier les documents source.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-10">
+      <h2>10. ❓ Produire des questions de recherche</h2>
+      <p>Objectif : réactiver la mémoire Excel validée à partir d'un ajout ou d'une date inconnue pour produire des pistes de recherche.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Questions de recherche contextualisées</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>À partir du registre documentaire validé, prends un document sans date certaine (date_status = unknown ou to_investigate) ou un nouveau document ajouté.
+
+Réactive la mémoire Excel en comparant :
+- les thèmes et concepts du document ;
+- le vocabulaire utilisé ;
+- les personnes citées ;
+- l'auditoire visé ;
+- le destinataire ;
+- le genre documentaire.
+
+Génère 2 à 5 questions de recherche pour l'archiviste, par exemple :
+- "Ce document destiné à X et mobilisant les concepts Y/Z peut-il être rapproché du cycle de conférences de telle période ?"
+- "L'évolution du concept A entre les documents B et C éclaire-t-elle la date de ce document ?"
+- "Le vocabulaire de ce document est-il cohérent avec la période des documents D et E ?"
+
+Pour chaque question, indique :
+- sa formulation ;
+- les sources activées (documents de référence du registre) ;
+- sa justification ;
+- son niveau de confiance (high / medium / low) ;
+- la limite d'interprétation.
+
+Règles :
+- ne jamais inscrire une date ou période proposée dans le registre ;
+- seule une réponse ou une validation explicite de l'archiviste peut modifier detected_date et date_status ;
+- les questions ne valent jamais conclusion ;
+- présente les questions comme des pistes de recherche, pas comme des affirmations.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-11">
+      <h2>11. 🧩 Créer et tester la Skill et la route</h2>
+      <p>Objectif : stabiliser le workflow, créer puis relire la Skill documentation et tester la routine incrémentale sur un lot réduit.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Synthèse du workflow final</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Relis ce fil de discussion et produis une synthèse du workflow final réellement validé.
+
+Ignore les variantes abandonnées.
+
+Ne garde que la dernière décision stabilisée :
+- Google Drive comme source de stockage ;
+- dossier 01_DEPOT_VRAC/ comme unique point d'entrée ;
+- registre Excel "registre_documentation.xlsx" dans 99_SYSTEME/ ;
+- skill xlsx-proto pour créer, lire et modifier le registre ;
+- classement : nature documentaire puis année certaine ;
+- nommage : YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext ;
+- aucune suppression de fichier ;
+- aucun déplacement sans validation explicite du lot ;
+- aucune date déduite inscrite sans validation humaine ;
+- skill vizualise-documentation importée et vérifiée, utilisée seulement à l'étape 12.
+
+Produis une synthèse courte avec :
+1. objectif du workflow ;
+2. connecteurs requis ;
+3. skills outils requises ;
+4. nom du fichier registre ;
+5. colonnes autorisées ;
+6. valeurs autorisées ;
+7. étapes du workflow ;
+8. règles de sécurité ;
+9. limites de volume ;
+10. cas où Claude doit s'arrêter et demander validation.</code></pre>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Création de la Skill métier</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>À partir de la synthèse validée ci-dessus, crée une Skill Claude métier.
+
+Nom de la Skill :
+documentation
+
+La Skill doit décrire uniquement le workflow final validé.
+
+Contraintes :
+- ne pas reprendre les anciennes variantes du fil ;
+- utiliser Google Drive comme source ;
+- utiliser 01_DEPOT_VRAC/ comme point d'entrée ;
+- utiliser xlsx-proto pour écrire dans "registre_documentation.xlsx" ;
+- ne jamais supprimer un fichier ;
+- ne jamais modifier le contenu d'un document source ;
+- ne jamais déplacer un fichier sans validation explicite du lot ;
+- ne jamais inscrire une date déduite sans validation humaine ;
+- ne pas ajouter de colonnes non prévues ;
+- ne pas inventer de données manquantes ;
+- limiter le traitement à un volume raisonnable par exécution ;
+- générer 2 à 5 questions de recherche pour les documents à date inconnue ;
+- consigner le rapport de run dans le registre et un journal dans 99_SYSTEME/journaux/.
+
+Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</code></pre>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Relecture critique de la Skill</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Relis le SKILL.md que tu viens de créer.
+
+Vérifie strictement :
+- qu'il interdit la suppression de fichiers ;
+- qu'il interdit la modification du contenu des documents source ;
+- qu'il exige une validation explicite pour tout déplacement ;
+- qu'il utilise Google Drive comme source ;
+- qu'il utilise xlsx-proto pour le registre ;
+- qu'il respecte les colonnes autorisées ;
+- qu'il interdit l'inscription de dates déduites sans validation ;
+- qu'il limite les volumes ;
+- qu'il génère des questions de recherche ;
+- qu'il reste concis.
+
+Si une règle est ambiguë, corrige-la.
+Ne rajoute pas de script.
+Ne rajoute pas de secret.</code></pre>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Test de la Skill et création de la route</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Utilise la Skill métier documentation.
+
+Mets à jour le registre "registre_documentation.xlsx".
+Traite uniquement les nouveaux documents ou documents modifiés dans 01_DEPOT_VRAC/.
+Ne supprime aucun fichier.
+Ne déplace aucun fichier sans validation explicite.
+Génère un rapport court à la fin.
+Consigne le journal dans 99_SYSTEME/journaux/.
+
+Objectif du test :
+vérifier que la Skill respecte les colonnes, les valeurs autorisées, les limites, les exclusions, xlsx-proto et les règles de sécurité.
+
+Puis crée une route opérationnelle qui rejoue le workflow validé :
+1. vérifier les accès aux dossiers et au registre ;
+2. identifier uniquement les documents nouveaux ou modifiés ;
+3. lire les documents dans la limite de volume configurée ;
+4. extraire métadonnées, résumé, entités, concepts ;
+5. enregistrer les dates explicites avec date_source ;
+6. vérifier les doublons contre le registre ;
+7. proposer un nom normalisé et une destination ;
+8. présenter un lot de classement et attendre validation ;
+9. déplacer seulement les documents approuvés ;
+10. mettre à jour le registre ;
+11. réactiver les sources validées pour les questions de recherche ;
+12. générer 2 à 5 questions de recherche ;
+13. consigner le rapport et le journal.
+
+À la fin de chaque exécution, la route doit indiquer :
+- nombre de documents détectés, analysés, classés, renommés ;
+- nombre de doublons ;
+- nombre de documents à valider ;
+- nombre de questions proposées ;
+- chemin du registre mis à jour ;
+- chemin du journal ;
+- actions humaines à valider.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card" id="step-12">
+      <h2>12. 🌐 Créer l'artefact de visualisation</h2>
+      <p>Objectif : utiliser la Skill importée vizualise-documentation pour créer ou actualiser une visualisation HTML alimentée par le registre.</p>
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Génération de la visualisation</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Utilise la skill vizualise-documentation importée à l'étape 2 pour générer l'artefact de visualisation du fonds documentaire.
+
+Entrée :
+- le registre Excel "registre_documentation.xlsx" validé, situé dans 99_SYSTEME/.
+
+La skill doit :
+1. vérifier les colonnes, les statuts utilisables, les liens Drive et la configuration des cinq registres visuels ;
+2. calculer les agrégats ;
+3. générer ou actualiser une page HTML autonome, responsive et consultable ;
+4. mettre à jour le seul artefact principal "documentation.html" dans 99_SYSTEME/ ;
+5. consigner la date, la version, le périmètre et le résultat de la génération dans le journal de run ;
+6. inclure dans la page la date de génération, le périmètre analysé et les limites de données ;
+7. citer les documents dans les chronologies, citations et analyses ;
+8. afficher dans la chronologie une icône d'ouverture Drive uniquement pour les documents classés ayant un lien drive_web_url ;
+9. fournir un feedback minimaliste de l'icône au survol et au focus, ainsi qu'un libellé accessible ;
+10. signaler les données insuffisantes plutôt que compléter par des contenus inventés.
+
+Données utilisables :
+- uniquement les documents dont classification_status = classified ;
+- liens Drive uniquement pour les documents classés dont drive_web_url est renseigné ;
+- dates certaines ou validées ;
+- concepts, tags, auteurs, auditoires, destinataires, types documentaires et visual_register validés.
+
+Les documents sans date validée restent visibles dans une section dédiée ou un compteur d'incertitude ; ils ne sont pas placés arbitrairement dans la frise chronologique.
+
+Le modèle visuel reprend philipp_research.html : en-tête de synthèse, légende à cinq couleurs, matrice conceptuelle, répartitions par registre, frise d'apparition des concepts, chronologie détaillée, cartes de synthèse et mise en page responsive.
+
+Après génération, exécute le script CLI de notification Railway pour demander le rechargement de la version courante depuis Google Drive.
+
+Règles :
+- ne pas modifier les documents source ni le registre ;
+- ne pas produire de copie HTML supplémentaire ;
+- ne pas exposer de secret dans l'artefact ;
+- les liens Drive n'accordent aucun droit : ils ne sont consultables que par les personnes ayant déjà accès au dossier Google Drive.</code></pre>
+        </div>
+
+    </section>
+
+    <section class="card">
+      <h2>✅ Synthèse finale</h2>
+      <pre class='plain'>1. Créer le projet SmartDocumentation.
+2. Connecter Google Drive et importer les outils (xlsx-proto, vizualise-documentation).
+3. Définir le cadre archivistique (type documentaire → année certaine).
+4. Créer le registre documentaire Excel.
+5. Auditer le fonds sans modifier les sources.
+6. Détecter les doublons (jamais de suppression).
+7. Proposer la normalisation (noms + destinations).
+8. Valider et appliquer un lot de classement.
+9. Indexer les documents (métadonnées, résumé, tags, concepts).
+10. Produire des questions de recherche contextualisées.
+11. Créer et tester la Skill documentation + route finale.
+12. Générer l'artefact HTML avec vizualise-documentation et publier sur Railway.</pre>
+
+    </section>
+
+  </main>
+
+  <footer>
+
+  </footer>
+
+  <script>
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.top = "0";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      let ok = false;
+      try {
+        ok = document.execCommand("copy");
+      } finally {
+        document.body.removeChild(textarea);
+      }
+
+      return ok;
+    }
+
+    function highlightNavForButton(button) {
+      const section = button.closest("section[id^='step-']");
+      if (!section) return;
+
+      const sectionId = section.id;
+      const navLink = document.querySelector(`.nav-grid a[href="#${sectionId}"]`);
+      if (!navLink) return;
+
+      navLink.classList.add("nav-copied");
+    }
+
+    document.querySelectorAll(".copy-btn").forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const promptCard = button.closest(".prompt-card");
+        const code = promptCard ? promptCard.querySelector("pre.prompt code") : null;
+        const text = code ? code.textContent.trim() : "";
+
+        if (!text) {
+          button.textContent = "Erreur";
+          setTimeout(() => {
+            button.textContent = "Copier";
+          }, 1200);
+          return;
+        }
+
+        try {
+          const copied = await copyTextToClipboard(text);
+          if (!copied) throw new Error("copy failed");
+
+          button.textContent = "Copié";
+          button.classList.add("copied");
+
+          highlightNavForButton(button);
+
+          setTimeout(() => {
+            button.textContent = "Copier";
+            button.classList.remove("copied");
+          }, 1200);
+        } catch (error) {
+          const range = document.createRange();
+          range.selectNodeContents(code);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+
+          button.textContent = "Sélectionné";
+
+          highlightNavForButton(button);
+
+          setTimeout(() => {
+            button.textContent = "Copier";
+          }, 1400);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

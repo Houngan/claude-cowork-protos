@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Proto Claude Cowork - MailFlow</title>
+  <title>Protos Claude Cowork</title>
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🧭</text></svg>'>
 <style>
   :root {
@@ -130,17 +130,17 @@ main {
   letter-spacing: -0.02em;
 }
 
-.provider-grid {
+.usecase-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 
-.provider-card {
+.usecase-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   padding: clamp(28px, 4vw, 48px) clamp(20px, 3vw, 36px);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -156,7 +156,7 @@ main {
   overflow: hidden;
 }
 
-.provider-card::before {
+.usecase-card::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
@@ -165,41 +165,35 @@ main {
   opacity: 0.95;
 }
 
-.provider-card:hover {
+.usecase-card:hover {
   transform: translateY(-4px);
   border-color: var(--border-strong);
   box-shadow: var(--shadow);
 }
 
-.provider-logo {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.usecase-icon {
+  font-size: 48px;
+  line-height: 1;
 }
 
-.provider-logo svg {
-  width: 100%;
-  height: 100%;
-}
-
-.provider-name {
+.usecase-name {
   margin: 0;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(22px, 3vw, 30px);
   font-weight: 850;
   letter-spacing: -0.03em;
   color: var(--black);
 }
 
-.provider-connector {
+.usecase-desc {
   margin: 0;
   font-size: 15px;
   color: var(--muted);
   font-weight: 600;
+  text-align: center;
+  max-width: 320px;
 }
 
-.provider-cta {
+.usecase-cta {
   margin: 8px 0 0;
   padding: 10px 22px;
   font-size: 15px;
@@ -213,7 +207,7 @@ main {
     filter 150ms ease;
 }
 
-.provider-card:hover .provider-cta {
+.usecase-card:hover .usecase-cta {
   transform: translateY(-1px);
   filter: brightness(1.05);
 }
@@ -246,12 +240,12 @@ a:focus-visible {
     padding: 42px 0 28px;
   }
 
-  .provider-grid {
+  .usecase-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  .provider-card {
+  .usecase-card {
     border-radius: 20px;
   }
 }
@@ -260,40 +254,34 @@ a:focus-visible {
 <body>
   <header>
     <div class="wrap">
-      <h1>🧭 Proto Claude Cowork - MailFlow</h1>
-      <p class="subtitle">Prioriser et traiter les mails non répondus avec un agent IA</p>
+      <h1>🧭 Protos Claude Cowork</h1>
+      <p class="subtitle">Prototyper des workflows d'IA agentique avec Claude</p>
     </div>
   </header>
 
   <main class="wrap">
     <div class="select-intro">
-      <p>Choisissez votre fournisseur de messagerie</p>
+      <p>Choisissez votre cas d'usage</p>
     </div>
 
-    <div class="provider-grid">
-      <a class="provider-card" href="workflow.html?provider=outlook">
-        <div class="provider-logo" id="logo-outlook"></div>
-        <h2 class="provider-name">Outlook</h2>
-        <p class="provider-connector">via Microsoft 365</p>
-        <span class="provider-cta">Commencer →</span>
+    <div class="usecase-grid">
+      <a class="usecase-card" href="MailFlow.html">
+        <div class="usecase-icon">📧</div>
+        <h2 class="usecase-name">MailFlow</h2>
+        <p class="usecase-desc">Prioriser et traiter les mails non répondus avec un agent IA</p>
+        <span class="usecase-cta">Commencer →</span>
       </a>
 
-      <a class="provider-card" href="workflow.html?provider=gmail">
-        <div class="provider-logo" id="logo-gmail"></div>
-        <h2 class="provider-name">Gmail</h2>
-        <p class="provider-connector">via Google Workspace</p>
-        <span class="provider-cta">Commencer →</span>
+      <a class="usecase-card" href="SmartDocumentation.html">
+        <div class="usecase-icon">📚</div>
+        <h2 class="usecase-name">SmartDocumentation</h2>
+        <p class="usecase-desc">Transformer un fonds documentaire en mémoire structurée et interrogeable</p>
+        <span class="usecase-cta">Commencer →</span>
       </a>
     </div>
   </main>
 
   <footer>
   </footer>
-
-  <script src="config.js"></script>
-  <script>
-    document.getElementById("logo-outlook").innerHTML = PROVIDERS.outlook.logo;
-    document.getElementById("logo-gmail").innerHTML = PROVIDERS.gmail.logo;
-  </script>
 </body>
 </html>

@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Proto Claude Cowork - MailFlow</title>
+  <title>Proto Claude MailFlow</title>
+  <meta name="description" content="Automatisation des mails non répondus avec un agent IA">
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🧭</text></svg>'>
 <style>
   :root {
@@ -508,6 +509,128 @@ button:focus-visible {
   }
 }
 
+/* PROVIDER SELECTION (when no ?provider= param) */
+
+.provider-select {
+  display: none;
+  padding: 40px 0 68px;
+}
+
+.provider-select.active {
+  display: block;
+}
+
+.provider-select .select-intro {
+  text-align: center;
+  margin: 0 0 36px;
+}
+
+.provider-select .select-intro p {
+  font-size: clamp(18px, 2.5vw, 24px);
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.provider-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 3vw, 36px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+  text-decoration: none;
+  color: var(--text);
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.provider-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--black), var(--accent-2), var(--accent));
+  opacity: 0.95;
+}
+
+.provider-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+.provider-logo {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.provider-logo svg {
+  width: 100%;
+  height: 100%;
+}
+
+.provider-name {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  color: var(--black);
+}
+
+.provider-connector {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.provider-cta {
+  margin: 8px 0 0;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffffff;
+  background: #8c6aa8;
+  border: 0;
+  border-radius: var(--radius-pill);
+  transition:
+    transform 150ms ease,
+    filter 150ms ease;
+}
+
+.provider-card:hover .provider-cta {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+@media (max-width: 760px) {
+  .provider-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .provider-card {
+    border-radius: 20px;
+  }
+}
+
 /* PRINT */
 
 @media print {
@@ -561,11 +684,33 @@ button:focus-visible {
 <body>
   <header>
     <div class="wrap">
-      <a class="back-btn" href="index.html">← Changer de fournisseur</a>
-      <h1 id="page-title">🧭 Proto Claude Cowork - MailFlow</h1>
+      <a class="back-btn" href="index.html">← Changer de cas d'usage</a>
+      <h1 id="page-title">🧭 Proto Claude MailFlow</h1>
       <p class="subtitle" id="page-subtitle">Automatisation des mails non répondus</p>
     </div>
   </header>
+
+  <section class="provider-select" id="provider-select">
+    <div class="wrap">
+      <div class="select-intro">
+        <p>Choisissez votre fournisseur de messagerie</p>
+      </div>
+      <div class="provider-grid">
+        <a class="provider-card" href="MailFlow.html?provider=outlook">
+          <div class="provider-logo" id="logo-outlook"></div>
+          <h2 class="provider-name">Outlook</h2>
+          <p class="provider-connector">via Microsoft 365</p>
+          <span class="provider-cta">Commencer →</span>
+        </a>
+        <a class="provider-card" href="MailFlow.html?provider=gmail">
+          <div class="provider-logo" id="logo-gmail"></div>
+          <h2 class="provider-name">Gmail</h2>
+          <p class="provider-connector">via Google Workspace</p>
+          <span class="provider-cta">Commencer →</span>
+        </a>
+      </div>
+    </div>
+  </section>
 
   <nav class="top-nav">
     <div class="wrap nav-grid">
@@ -647,7 +792,7 @@ button:focus-visible {
 
     <section class="card" id="step-1">
       <h2>1. 🧱 Créer le projet</h2>
-      <p>Nom proposé : Proto Claude Cowork - MailFlow</p>
+      <p>Nom proposé : Proto Claude MailFlow</p>
 
 
         <div class="prompt-card">
@@ -1105,7 +1250,7 @@ vérifier que le Skill respecte les colonnes, les valeurs autorisées, les limit
             <h3>Prompt — Création de la route finale</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Crée une route opérationnelle pour le projet "Proto Claude Cowork - MailFlow".
+          <pre class="prompt"><code>Crée une route opérationnelle pour le projet "Proto Claude MailFlow".
 
 Cette route doit utiliser la Skill métier :
 {{skillName}}
@@ -1205,22 +1350,55 @@ vérifier que la route respecte :
 
   </footer>
 
-  <script src="config.js"></script>
+  <script>
+    const PROVIDERS = {
+      outlook: {
+        name: "Outlook",
+        connector: "Microsoft 365",
+        fileName: "Base mails Outlook.xlsx",
+        skillName: "managing-outlook-inbox-emails",
+        skillXlsx: "xlsx-proto",
+        skillPdf: "pdf-proto",
+        cloudAlt: "fichier cloud parallèle",
+        draftLabel: "brouillon Outlook",
+        logo: `<svg viewBox="0 0 1831.085 1703.335" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Outlook"><path fill="#0A2767" d="M1831.083,894.25c0.1-14.318-7.298-27.644-19.503-35.131h-0.213l-0.767-0.426l-634.492-375.585c-2.74-1.851-5.583-3.543-8.517-5.067c-24.498-12.639-53.599-12.639-78.098,0c-2.934,1.525-5.777,3.216-8.517,5.067L446.486,858.693l-0.766,0.426c-19.392,12.059-25.337,37.556-13.278,56.948c3.553,5.714,8.447,10.474,14.257,13.868l634.492,375.585c2.749,1.835,5.592,3.527,8.517,5.068c24.498,12.639,53.599,12.639,78.098,0c2.925-1.541,5.767-3.232,8.517-5.068l634.492-375.585C1823.49,922.545,1831.228,908.923,1831.083,894.25z"/><path fill="#0364B8" d="M520.453,643.477h416.38v381.674h-416.38V643.477z M1745.917,255.5V80.908c1-43.652-33.552-79.862-77.203-80.908H588.204C544.552,1.046,510,37.256,511,80.908V255.5l638.75,170.333L1745.917,255.5z"/><path fill="#0078D4" d="M511,255.5h425.833v383.25H511V255.5z"/><path fill="#28A8EA" d="M1362.667,255.5H936.833v383.25L1362.667,1022h383.25V638.75L1362.667,255.5z"/><path fill="#0078D4" d="M936.833,638.75h425.833V1022H936.833V638.75z"/><path fill="#0364B8" d="M936.833,1022h425.833v383.25H936.833V1022z"/><path fill="#14447D" d="M520.453,1025.151h416.38v346.969h-416.38V1025.151z"/><path fill="#0078D4" d="M1362.667,1022h383.25v383.25h-383.25V1022z"/><path fill="#28A8EA" d="M514.833,1703.333h1228.316c18.901,0.096,37.335-5.874,52.59-17.033l-697.089-408.331c-2.929-1.47-5.773-3.105-8.517-4.897L447.125,906.088h-0.298l-20.993-11.838v719.914C425.786,1663.364,465.632,1703.286,514.833,1703.333z"/><path fill="#1490DF" d="M1811.58,927.593l-0.809,0.468l-634.492,356.848c-2.768,1.703-5.578,3.321-8.517,4.769c-24.641,12.038-53.457,12.038-78.098,0c-2.918-1.445-5.76-3.037-8.517-4.769L446.657,928.061l-0.766-0.468c-12.25-6.642-19.93-19.409-20.057-33.343v722.384c0.305,48.188,39.616,87.004,87.803,86.7h1229.636c48.188,0.307,87.5-38.509,87.807-86.696V894.25C1831.068,908.067,1823.616,920.807,1811.58,927.593z"/></svg>`
+      },
+      gmail: {
+        name: "Gmail",
+        connector: "Google Workspace",
+        fileName: "Base mails Gmail.xlsx",
+        skillName: "managing-gmail-inbox-emails",
+        skillXlsx: "xlsx-proto",
+        skillPdf: "pdf-proto",
+        cloudAlt: "Google Sheet",
+        draftLabel: "brouillon Gmail",
+        logo: `<svg viewBox="0 0 512 399.42" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gmail"><g fill="none" fill-rule="evenodd"><g fill-rule="nonzero"><path fill="#4285f4" d="M34.91 448.818h81.454V251L0 163.727V413.91c0 19.287 15.622 34.91 34.91 34.91z"/><path fill="#34a853" d="M395.636 448.818h81.455c19.287 0 34.909-15.622 34.909-34.909V163.727L395.636 251z"/><path fill="#fbbc04" d="M395.636 99.727V251L512 163.727v-46.545c0-43.142-49.25-67.782-83.782-41.891z"/></g><path fill="#ea4335" d="M116.364 251V99.727L256 204.455 395.636 99.727V251L256 355.727z"/><path fill="#c5221f" fill-rule="nonzero" d="M0 117.182v46.545L116.364 251V99.727L83.782 75.291C49.25 49.4 0 74.04 0 117.18z"/></g></svg>`
+      }
+    };
+  </script>
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
       var providerKey = params.get("provider");
 
       if (!providerKey || !PROVIDERS[providerKey]) {
-        window.location.href = "index.html";
+        document.getElementById("provider-select").classList.add("active");
+        document.getElementById("logo-outlook").innerHTML = PROVIDERS.outlook.logo;
+        document.getElementById("logo-gmail").innerHTML = PROVIDERS.gmail.logo;
+        document.querySelector("nav").style.display = "none";
+        document.querySelector("main").style.display = "none";
         return;
       }
 
       var p = PROVIDERS[providerKey];
 
-      document.title = "Proto Claude Cowork - MailFlow — " + p.name;
-      document.getElementById("page-title").textContent = "🧭 Proto Claude Cowork - MailFlow — " + p.name;
+      document.title = "Proto Claude MailFlow — " + p.name;
+      document.getElementById("page-title").textContent = "🧭 Proto Claude MailFlow — " + p.name;
       document.getElementById("page-subtitle").textContent = "Automatisation des mails " + p.name + " non répondus";
+
+      var backBtn = document.querySelector(".back-btn");
+      backBtn.textContent = "← Changer de fournisseur";
+      backBtn.setAttribute("href", "MailFlow.html");
 
       var replacements = {
         "{{provider}}": p.name,
