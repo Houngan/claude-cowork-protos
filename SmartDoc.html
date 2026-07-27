@@ -1298,7 +1298,27 @@ Règles :
       const navLink = document.querySelector(`.nav-grid a[href="#${sectionId}"]`);
       if (!navLink) return;
 
+      const allCards = section.querySelectorAll(".prompt-card");
+      const copiedCards = section.querySelectorAll(".prompt-card.copied");
+
+      if (allCards.length > 1 && copiedCards.length < allCards.length) {
+        return;
+      }
+
       navLink.classList.add("nav-copied");
+    }
+
+    function scrollToNextCard(button) {
+      const section = button.closest("section[id^='step-']");
+      if (!section) return;
+
+      const allCards = Array.from(section.querySelectorAll(".prompt-card"));
+      const currentCard = button.closest(".prompt-card");
+      const currentIndex = allCards.indexOf(currentCard);
+
+      if (currentIndex >= 0 && currentIndex < allCards.length - 1) {
+        allCards[currentIndex + 1].scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
 
     document.querySelectorAll(".copy-btn").forEach((button) => {
@@ -1324,8 +1344,10 @@ Règles :
 
           button.textContent = "Copié";
           button.classList.add("copied");
+          promptCard.classList.add("copied");
 
           highlightNavForButton(button);
+          scrollToNextCard(button);
 
           setTimeout(() => {
             button.textContent = "Copier";
@@ -1339,8 +1361,10 @@ Règles :
           selection.addRange(range);
 
           button.textContent = "Sélectionné";
+          promptCard.classList.add("copied");
 
           highlightNavForButton(button);
+          scrollToNextCard(button);
 
           setTimeout(() => {
             button.textContent = "Copier";
