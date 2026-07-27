@@ -1232,6 +1232,11 @@ Données utilisables :
 - dates certaines ou validées ;
 - concepts, tags, auteurs, auditoires, destinataires, types documentaires et visual_register validés.
 
+DONNÉES PUBLIQUES vs PRIVÉES — cet artefact est PUBLIC :
+- AUTORISÉ dans l'artefact : title, author, audience, recipient, document_type, detected_date, summary, tags, concepts, people, places, drive_web_url, visual_register ;
+- INTERDIT dans l'artefact : source_path, drive_file_id, human_check, processed_at, notes, duplicate_status, duplicate_of, confidence, original_filename, date_source, date_status, classification_status, run_log ;
+- ne jamais exposer de chemin de fichier, d'identifiant technique ou de métadonnée de traitement.
+
 Les documents sans date validée restent visibles dans une section dédiée ou un compteur d'incertitude ; ils ne sont pas placés arbitrairement dans la frise chronologique.
 
 Le modèle visuel reprend philipp_research.html : en-tête de synthèse, légende à cinq couleurs, matrice conceptuelle, répartitions par registre, frise d'apparition des concepts, chronologie détaillée, cartes de synthèse et mise en page responsive.
