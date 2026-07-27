@@ -1212,7 +1212,7 @@ La skill doit :
 1. vérifier les colonnes, les statuts utilisables, les liens Drive et la configuration des cinq registres visuels ;
 2. calculer les agrégats ;
 3. générer ou actualiser une page HTML autonome, responsive et consultable ;
-4. mettre à jour le seul artefact principal "documentation.html" dans 099_SYSTEME/ ;
+4. mettre à jour le seul artefact principal "documentation.html" dans 099_SYSTEME/ — MODIFIE le fichier existant, n'en crée pas un nouveau (le file ID Google Drive doit rester identique pour que l'URL Railway continue de fonctionner) ;
 5. consigner la date, la version, le périmètre et le résultat de la génération dans le journal de run ;
 6. inclure dans la page la date de génération, le périmètre analysé et les limites de données ;
 7. citer les documents dans les chronologies, citations et analyses ;
@@ -1235,6 +1235,7 @@ Après génération, exécute le script CLI de notification Railway pour demande
 Règles :
 - ne pas modifier les documents source ni le registre ;
 - ne pas produire de copie HTML supplémentaire ;
+- modifier le fichier documentation.html existant plutôt qu'en créer un nouveau ;
 - ne pas exposer de secret dans l'artefact ;
 - les liens Drive n'accordent aucun droit : ils ne sont consultables que par les personnes ayant déjà accès au dossier Google Drive.</code></pre>
         </div>
