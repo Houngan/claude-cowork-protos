@@ -1317,7 +1317,13 @@ Règles :
       const currentIndex = allCards.indexOf(currentCard);
 
       if (currentIndex >= 0 && currentIndex < allCards.length - 1) {
-        allCards[currentIndex + 1].scrollIntoView({ behavior: "smooth", block: "start" });
+        const nextCard = allCards[currentIndex + 1];
+        const nextButton = nextCard.querySelector(".copy-btn");
+        if (nextButton) {
+          nextButton.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else {
+          nextCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       }
     }
 
