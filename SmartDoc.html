@@ -1055,12 +1055,15 @@ Réactive la mémoire Excel en comparant :
 - le destinataire ;
 - le genre documentaire.
 
-Phase 1 — Élicitation :
-Avant de produire tes questions, pose à l'archiviste 1 à 3 questions courtes pour recueillir son intuition :
-- "Avez-vous une hypothèse sur la période ou le contexte de ce document ?"
-- "Ce document vous évoque-t-il un événement, un cycle ou un correspondant connu ?"
-- "Y a-t-il un élément qui vous frappe (formulation, référence, ton) ?"
-Attends sa réponse avant de passer à la phase 2.
+Phase 1 — Élicitation (OBLIGATOIRE, ne saute jamais cette étape) :
+Avant de produire tes questions, tu DOIS d'abord poser à l'archiviste 2 à 3 questions courtes pour recueillir son intuition. Ne génère aucune question de recherche avant d'avoir reçu sa réponse.
+
+Pose explicitement ces questions une par une et attends la réponse de l'archiviste à chacune :
+1. "Avez-vous une hypothèse sur la période ou le contexte de ce document ?"
+2. "Ce document vous évoque-t-il un événement, un cycle ou un correspondant connu ?"
+3. "Y a-t-il un élément qui vous frappe (formulation, référence, ton) ?"
+
+INTERDIT : ne passe pas à la phase 2 sans avoir reçu au moins une réponse de l'archiviste. Si l'archiviste répond "je ne sais pas", c'est une réponse valide : note-la et passe à la phase 2.
 
 Phase 2 — Questions de recherche :
 À partir des réponses de l'archiviste ET de la mémoire Excel, génère 2 à 5 questions de recherche, par exemple :
@@ -1075,18 +1078,20 @@ Pour chaque question, indique :
 - son niveau de confiance (high / medium / low) ;
 - la limite d'interprétation.
 
-Phase 3 — Itération :
-Après avoir présenté les questions, demande à l'archiviste :
+Phase 3 — Itération (OBLIGATOIRE) :
+Après avoir présenté les questions, tu DOIS demander à l'archiviste :
 - "Ces pistes vous permettent-elles d'avancer ? Souhaitez-vous que j'approfondisse l'une d'elles ?"
-- Si l'archiviste répond, affine les questions en tenant compte de sa réponse.
-- Maximum 2 itérations supplémentaires.
+Tu ne dois pas terminer l'étape sans avoir posé cette question.
+Si l'archiviste répond, affine les questions en tenant compte de sa réponse.
+Maximum 2 itérations supplémentaires.
 
 Règles :
 - ne jamais inscrire une date ou période proposée dans le registre ;
 - seule une réponse ou une validation explicite de l'archiviste peut modifier detected_date et date_status ;
 - les questions ne valent jamais conclusion ;
 - présente les questions comme des pistes de recherche, pas comme des affirmations ;
-- ne produit pas de questions sans avoir d'abord écouté l'archiviste.</code></pre>
+- INTERDIT de générer des questions sans avoir d'abord mené la phase 1 d'élicitation et reçu une réponse de l'archiviste ;
+- INTERDIT de terminer l'étape sans avoir proposé une itération (phase 3) à l'archiviste.</code></pre>
         </div>
 
     </section>
@@ -1128,7 +1133,7 @@ Contraintes :
 - ne pas ajouter de colonnes non prévues ;
 - ne pas inventer de données manquantes ;
 - pour ce test, limiter le traitement à 10 documents ; en production, traiter l'intégralité du dépôt ;
-- générer 2 à 5 questions de recherche avec élicitation préalable pour les documents à date inconnue ;
+- générer 2 à 5 questions de recherche avec élicitation préalable OBLIGATOIRE pour les documents à date inconnue : poser d'abord 2 à 3 questions à l'archiviste, attendre sa réponse, puis générer les questions, puis proposer une itération ;
 - consigner le rapport de run dans le registre et un journal dans 099_SYSTEME/journaux/.
 
 Puis relis le SKILL.md que tu viens de créer et vérifie strictement :
@@ -1140,7 +1145,8 @@ Puis relis le SKILL.md que tu viens de créer et vérifie strictement :
 - qu'il respecte les colonnes autorisées ;
 - qu'il interdit l'inscription de dates déduites sans validation ;
 - qu'il limite les volumes ;
-- qu'il génère des questions de recherche avec élicitation ;
+- qu'il impose une phase d'élicitation obligatoire avant toute génération de questions ;
+- qu'il impose une phase d'itération obligatoire après la génération ;
 - qu'il reste concis.
 
 Si une règle est ambiguë, corrige-la.
@@ -1176,7 +1182,7 @@ Puis crée une route opérationnelle qui rejoue le workflow validé :
 9. copier seulement les documents approuvés dans 03_ARCHIVES_CLASSEES/ ;
 10. mettre à jour le registre ;
 11. réactiver les sources validées pour les questions de recherche ;
-12. générer 2 à 5 questions de recherche avec phase d'élicitation préalable ;
+12. générer 2 à 5 questions de recherche avec phase d'élicitation préalable OBLIGATOIRE (poser 2 à 3 questions à l'archiviste, attendre réponse, puis générer, puis proposer itération) ;
 13. consigner le rapport et le journal.
 
 À la fin de chaque exécution, la route doit indiquer :
