@@ -1152,7 +1152,7 @@ Contraintes :
 - ne jamais inscrire une date déduite sans validation humaine ;
 - ne pas ajouter de colonnes non prévues ;
 - ne pas inventer de données manquantes ;
-- limiter le traitement à un volume raisonnable par exécution ;
+- pour ce test, limiter le traitement à 10 documents ; en production, traiter l'intégralité du dépôt ;
 - générer 2 à 5 questions de recherche pour les documents à date inconnue ;
 - consigner le rapport de run dans le registre et un journal dans 099_SYSTEME/journaux/.
 
@@ -1212,7 +1212,7 @@ Puis crée une route opérationnelle qui rejoue le workflow validé :
 9. copier seulement les documents approuvés dans 03_ARCHIVES_CLASSEES/ ;
 10. mettre à jour le registre ;
 11. réactiver les sources validées pour les questions de recherche ;
-12. générer 2 à 5 questions de recherche ;
+12. générer 2 à 5 questions de recherche avec phase d'élicitation préalable ;
 13. consigner le rapport et le journal.
 
 À la fin de chaque exécution, la route doit indiquer :
