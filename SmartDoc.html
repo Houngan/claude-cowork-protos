@@ -1097,14 +1097,12 @@ Règles :
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Synthèse du workflow final</h3>
+            <h3>Prompt — Créer la Skill documentation</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Relis ce fil de discussion et produis une synthèse du workflow final réellement validé.
 
-Ignore les variantes abandonnées.
-
-Ne garde que la dernière décision stabilisée :
+Ignore les variantes abandonnées. Ne garde que la dernière décision stabilisée :
 - Google Drive comme source de stockage ;
 - dossier 01_DEPOT_VRAC/ comme unique point d'entrée ;
 - registre Excel "registre_documentation.xlsx" dans 099_SYSTEME/ ;
@@ -1116,30 +1114,7 @@ Ne garde que la dernière décision stabilisée :
 - aucune date déduite inscrite sans validation humaine ;
 - skill vizualise-documentation importée et vérifiée, utilisée seulement à l'étape 12.
 
-Produis une synthèse courte avec :
-1. objectif du workflow ;
-2. connecteurs requis ;
-3. skills outils requises ;
-4. nom du fichier registre ;
-5. colonnes autorisées ;
-6. valeurs autorisées ;
-7. étapes du workflow ;
-8. règles de sécurité ;
-9. limites de volume ;
-10. cas où Claude doit s'arrêter et demander validation.</code></pre>
-        </div>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Création de la Skill métier</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>À partir de la synthèse validée ci-dessus, crée une Skill Claude métier.
-
-Nom de la Skill :
-documentation
-
-La Skill doit décrire uniquement le workflow final validé.
+À partir de cette synthèse, crée une Skill Claude métier nommée "documentation".
 
 Contraintes :
 - ne pas reprendre les anciennes variantes du fil ;
@@ -1153,20 +1128,10 @@ Contraintes :
 - ne pas ajouter de colonnes non prévues ;
 - ne pas inventer de données manquantes ;
 - pour ce test, limiter le traitement à 10 documents ; en production, traiter l'intégralité du dépôt ;
-- générer 2 à 5 questions de recherche pour les documents à date inconnue ;
+- générer 2 à 5 questions de recherche avec élicitation préalable pour les documents à date inconnue ;
 - consigner le rapport de run dans le registre et un journal dans 099_SYSTEME/journaux/.
 
-Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</code></pre>
-        </div>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Relecture critique de la Skill</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Relis le SKILL.md que tu viens de créer.
-
-Vérifie strictement :
+Puis relis le SKILL.md que tu viens de créer et vérifie strictement :
 - qu'il interdit la suppression de fichiers ;
 - qu'il interdit la modification du contenu des documents source ;
 - qu'il exige une validation explicite pour toute copie de classement ;
@@ -1175,17 +1140,16 @@ Vérifie strictement :
 - qu'il respecte les colonnes autorisées ;
 - qu'il interdit l'inscription de dates déduites sans validation ;
 - qu'il limite les volumes ;
-- qu'il génère des questions de recherche ;
+- qu'il génère des questions de recherche avec élicitation ;
 - qu'il reste concis.
 
 Si une règle est ambiguë, corrige-la.
-Ne rajoute pas de script.
-Ne rajoute pas de secret.</code></pre>
+Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</code></pre>
         </div>
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Test de la Skill et création de la route</h3>
+            <h3>Prompt — Tester la Skill et créer la route</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Utilise la Skill métier documentation.
