@@ -660,7 +660,7 @@ Règles générales :
 - tenir un registre Excel comme mémoire documentaire ;
 - utiliser des colonnes et valeurs en anglais dans le fichier Excel ;
 - traiter uniquement les nouveaux éléments ou les éléments modifiés ;
-- limiter les volumes traités à chaque exécution ;
+- limiter les volumes traités à chaque exécution (ajustable selon le contexte) ;
 - produire un rapport court à chaque run ;
 - utiliser la skill xlsx-proto pour créer, lire et modifier le fichier Excel ;
 - importer et vérifier la skill vizualise-documentation à l'étape 2 ;
@@ -841,6 +841,8 @@ Règles :
           </div>
           <pre class="prompt"><code>Audite le contenu du dossier 01_DEPOT_VRAC/ sans modifier, renommer ou copier aucun fichier.
 
+Limite : traite un maximum de 10 fichiers pour cette exécution.
+
 Pour chaque fichier rencontré, relève :
 - nom actuel ;
 - chemin source ;
@@ -909,7 +911,7 @@ Présente la liste à l'archiviste pour examen.</code></pre>
             <h3>Prompt — Propositions de normalisation</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Pour chaque fichier du dossier 01_DEPOT_VRAC/, propose :
+          <pre class="prompt"><code>Pour les 10 premiers fichiers non encore traités dans 01_DEPOT_VRAC/, propose :
 
 1. Un nom normalisé selon le format :
    YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext
@@ -950,7 +952,7 @@ Tout n'est que proposition soumise à validation.</code></pre>
             <h3>Prompt — Application du lot validé</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Présente un lot de classement à l'archiviste.
+          <pre class="prompt"><code>Présente un lot de classement à l'archiviste (maximum 10 documents par lot).
 
 Pour chaque document du lot, indique :
 - nom actuel ;
