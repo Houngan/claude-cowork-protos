@@ -698,7 +698,7 @@ Vérifie que tu as accès aux éléments nécessaires :
   - 04_CORRESPONDANCES/
   - 05_DOCUMENTS_INSTITUTIONNELS/
   - 99_DATE_OU_TYPE_A_VALIDER/
-- 99_SYSTEME/ avec :
+- 099_SYSTEME/ avec :
   - journaux/
 
 3. Skill tableur :
@@ -756,7 +756,7 @@ Ne déplace aucun fichier.</code></pre>
 
     <section class="card" id="step-4">
       <h2>4. 📊 Créer le registre documentaire</h2>
-      <p>Fichier cible : 99_SYSTEME/registre_documentation.xlsx</p>
+      <p>Fichier cible : 099_SYSTEME/registre_documentation.xlsx</p>
 <pre class='plain'>Colonnes initiales :
 document_id, source_path, current_name, proposed_name, final_path,
 drive_file_id, drive_web_url, file_type, file_size, detected_date, date_source,
@@ -777,7 +777,7 @@ visual_register = register_1 / register_2 / register_3 / register_4 / register_5
             <h3>Prompt — Création du registre</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Utilise la skill xlsx-proto pour créer un fichier Excel intitulé "registre_documentation.xlsx" dans le dossier 99_SYSTEME/ du projet Google Drive.
+          <pre class="prompt"><code>Utilise la skill xlsx-proto pour créer un fichier Excel intitulé "registre_documentation.xlsx" dans le dossier 099_SYSTEME/ du projet Google Drive.
 
 Le fichier doit contenir un tableau structuré avec les colonnes suivantes, en anglais :
 - document_id
@@ -817,7 +817,7 @@ Règles :
 - ne pas encore importer les documents ;
 - créer seulement la structure du fichier ;
 - utiliser uniquement ces colonnes pour le prototype ;
-- vérifier que le fichier est bien sauvegardé dans 99_SYSTEME/ ;
+- vérifier que le fichier est bien sauvegardé dans 099_SYSTEME/ ;
 - indiquer le chemin du fichier créé.</code></pre>
         </div>
 
@@ -1083,7 +1083,7 @@ Ignore les variantes abandonnées.
 Ne garde que la dernière décision stabilisée :
 - Google Drive comme source de stockage ;
 - dossier 01_DEPOT_VRAC/ comme unique point d'entrée ;
-- registre Excel "registre_documentation.xlsx" dans 99_SYSTEME/ ;
+- registre Excel "registre_documentation.xlsx" dans 099_SYSTEME/ ;
 - skill xlsx-proto pour créer, lire et modifier le registre ;
 - classement : nature documentaire puis année certaine ;
 - nommage : YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext ;
@@ -1130,7 +1130,7 @@ Contraintes :
 - ne pas inventer de données manquantes ;
 - limiter le traitement à un volume raisonnable par exécution ;
 - générer 2 à 5 questions de recherche pour les documents à date inconnue ;
-- consigner le rapport de run dans le registre et un journal dans 99_SYSTEME/journaux/.
+- consigner le rapport de run dans le registre et un journal dans 099_SYSTEME/journaux/.
 
 Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</code></pre>
         </div>
@@ -1171,7 +1171,7 @@ Traite uniquement les nouveaux documents ou documents modifiés dans 01_DEPOT_VR
 Ne supprime aucun fichier.
 Ne déplace aucun fichier sans validation explicite.
 Génère un rapport court à la fin.
-Consigne le journal dans 99_SYSTEME/journaux/.
+Consigne le journal dans 099_SYSTEME/journaux/.
 
 Objectif du test :
 vérifier que la Skill respecte les colonnes, les valeurs autorisées, les limites, les exclusions, xlsx-proto et les règles de sécurité.
@@ -1215,13 +1215,13 @@ Puis crée une route opérationnelle qui rejoue le workflow validé :
           <pre class="prompt"><code>Utilise la skill vizualise-documentation importée à l'étape 2 pour générer l'artefact de visualisation du fonds documentaire.
 
 Entrée :
-- le registre Excel "registre_documentation.xlsx" validé, situé dans 99_SYSTEME/.
+- le registre Excel "registre_documentation.xlsx" validé, situé dans 099_SYSTEME/.
 
 La skill doit :
 1. vérifier les colonnes, les statuts utilisables, les liens Drive et la configuration des cinq registres visuels ;
 2. calculer les agrégats ;
 3. générer ou actualiser une page HTML autonome, responsive et consultable ;
-4. mettre à jour le seul artefact principal "documentation.html" dans 99_SYSTEME/ ;
+4. mettre à jour le seul artefact principal "documentation.html" dans 099_SYSTEME/ ;
 5. consigner la date, la version, le périmètre et le résultat de la génération dans le journal de run ;
 6. inclure dans la page la date de génération, le périmètre analysé et les limites de données ;
 7. citer les documents dans les chronologies, citations et analyses ;
