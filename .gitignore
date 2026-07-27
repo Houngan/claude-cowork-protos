@@ -1,2 +1,4 @@
 archives/
 visualisation/
+railway-server/.env
+railway-server/node_modules/

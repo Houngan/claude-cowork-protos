@@ -1,0 +1,15 @@
+{
+  "name": "smartdoc-railway-server",
+  "version": "1.0.0",
+  "description": "Serveur léger pour servir documentation.html depuis Google Drive via une URL Railway stable",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
