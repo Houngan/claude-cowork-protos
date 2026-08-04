@@ -1,4 +1,3 @@
-archives/
-visualisation/
-railway-server/.env
-railway-server/node_modules/
+.DS_Store
+Thumbs.db
+*.log

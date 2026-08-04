@@ -3,1395 +3,1111 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Proto Claude SmartDoc</title>
-  <meta name="description" content="Transformer un fonds documentaire en mémoire structurée et interrogeable">
+  <title>Proto Claude SmartDoc — Cockpit</title>
+  <meta name="description" content="Transformer un fonds documentaire en mémoire structurée et interrogeable avec Claude et Google Drive.">
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📚</text></svg>'>
-<style>
-  :root {
-  --bg: #ffffff;
-  --bg-soft: #f7f4fa;
-  --surface: #ffffff;
-  --surface-soft: #fbf8fd;
-
-  --black: #05070d;
-  --ink: #0b1220;
-  --text: #111827;
-  --text-soft: #334155;
-  --muted: #64748b;
-
-  --accent: #CFAFE7;
-  --accent-2: #8C6AA8;
-  --accent-soft: rgba(207, 175, 231, 0.22);
-  --accent-border: rgba(140, 106, 168, 0.42);
-
-  --border: #ded8e6;
-  --border-strong: #c9bdd4;
-
-  --code-bg: #05070d;
-  --code-bg-2: #09111f;
-  --code-text: #f4f0ff;
-  --code-muted: #d8d2ff;
-  --code-border: rgba(207, 175, 231, 0.38);
-
-  --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
-  --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.07);
-
-  --radius-xl: 24px;
-  --radius-lg: 18px;
-  --radius-md: 14px;
-  --radius-pill: 999px;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  background: var(--bg);
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--text);
-  line-height: 1.6;
-  background:
-    radial-gradient(circle at top left, rgba(207, 175, 231, 0.20), transparent 28rem),
-    radial-gradient(circle at top right, rgba(140, 106, 168, 0.12), transparent 30rem),
-    linear-gradient(180deg, #ffffff 0%, #ffffff 48%, #f7f4fa 100%);
-}
-
-.wrap {
-  width: min(1120px, calc(100% - 40px));
-  margin: 0 auto;
-}
-
-/* HEADER */
-
-header {
-  position: relative;
-  overflow: hidden;
-  padding: 46px 0 30px;
-  color: #ffffff;
-  background:
-    radial-gradient(circle at 78% 18%, rgba(207, 175, 231, 0.30), transparent 25rem),
-    linear-gradient(135deg, #05070d 0%, #07111f 58%, #151124 100%);
-  border-bottom: 1px solid rgba(207, 175, 231, 0.34);
-}
-
-header::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(207, 175, 231, 0.95), transparent);
-}
-
-header .wrap {
-  position: relative;
-  z-index: 1;
-}
-
-h1 {
-  margin: 0 0 8px;
-  max-width: 100%;
-  font-size: clamp(34px, 5vw, 58px);
-  line-height: 1.02;
-  letter-spacing: -0.055em;
-  font-weight: 880;
-  white-space: nowrap;
-  color: #ffffff;
-}
-
-.subtitle {
-  margin: 0;
-  max-width: 760px;
-  color: #f2eaff;
-  font-size: clamp(17px, 2vw, 21px);
-  letter-spacing: -0.02em;
-}
-
-.subtitle::before {
-  content: "— ";
-  color: var(--accent);
-  font-weight: 900;
-}
-
-/* BACK BUTTON */
-
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 0 18px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 800;
-  color: #ffffff;
-  text-decoration: none;
-  border: 1px solid rgba(207, 175, 231, 0.50);
-  border-radius: var(--radius-pill);
-  background: rgba(207, 175, 231, 0.12);
-  transition:
-    background 160ms ease,
-    border-color 160ms ease;
-}
-
-.back-btn:hover {
-  background: rgba(207, 175, 231, 0.22);
-  border-color: rgba(207, 175, 231, 0.70);
-}
-
-/* NAVIGATION */
-
-.top-nav,
-nav {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
-}
-
-.nav-grid {
-  display: grid !important;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
-  padding: 12px 0;
-}
-
-.nav-grid a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 8px 10px;
-  color: var(--black);
-  text-decoration: none;
-  text-align: center;
-  white-space: nowrap;
-  font-size: 13px;
-  font-weight: 850;
-  letter-spacing: -0.01em;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: #ffffff;
-  box-shadow: none;
-  transition:
-    transform 160ms ease,
-    background 160ms ease,
-    color 160ms ease;
-}
-
-.nav-grid a:hover {
-  transform: translateY(-1px);
-  color: var(--black);
-  background: var(--accent-soft);
-  box-shadow: none;
-}
-
-.nav-grid a.nav-copied {
-  color: #ffffff;
-  background: #8c6aa8;
-  border: 0;
-  box-shadow: none;
-}
-
-/* MAIN */
-
-main {
-  padding: 30px 0 68px;
-}
-
-.card {
-  position: relative;
-  margin: 0 0 22px;
-  padding: clamp(22px, 3vw, 34px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: #ffffff;
-  box-shadow: var(--shadow-soft);
-  overflow: hidden;
-  scroll-margin-top: 112px;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--black), var(--accent-2), var(--accent));
-  opacity: 0.95;
-}
-
-.card:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow);
-}
-
-h2 {
-  margin: 0 0 14px;
-  color: var(--black);
-  font-size: clamp(24px, 3vw, 33px);
-  line-height: 1.12;
-  letter-spacing: -0.045em;
-}
-
-h3 {
-  margin: 0;
-  color: var(--black);
-  font-size: 15px;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-}
-
-p {
-  margin: 0 0 14px;
-  color: var(--text);
-}
-
-strong {
-  color: var(--black);
-}
-
-/* TEXTES À LIRE — NOIR SUR BLANC */
-
-.plain {
-  margin: 14px 0 0;
-  padding: 16px;
-  color: var(--black);
-  white-space: pre-wrap;
-  overflow: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: #ffffff;
-  font-size: 15px;
-  box-shadow: inset 0 0 0 1px rgba(5, 7, 13, 0.02);
-}
-
-/* WORKFLOW / FLUX CIBLE */
-
-.workflow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin: 20px 0 8px;
-  padding: 18px;
-  border: 1px solid var(--accent-border);
-  border-radius: var(--radius-xl);
-  background:
-    radial-gradient(circle at top left, rgba(207, 175, 231, 0.16), transparent 22rem),
-    #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
-}
-
-.workflow-step {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 38px;
-  padding: 6px 10px;
-  color: var(--black);
-  font-weight: 750;
-  font-size: 14px;
-  letter-spacing: -0.01em;
-  border: 0;
-  border-radius: 10px;
-  background: rgba(207, 175, 231, 0.14);
-  box-shadow: none;
-  cursor: default;
-}
-
-.workflow-step:hover {
-  border: 0;
-  background: rgba(207, 175, 231, 0.14);
-  box-shadow: none;
-  transform: none;
-}
-
-.workflow-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  height: auto;
-  font-size: 16px;
-  border-radius: 0;
-  background: transparent;
-  border: 0;
-}
-
-.workflow-arrow {
-  color: var(--accent-2);
-  font-weight: 850;
-  font-size: 16px;
-  opacity: 0.65;
-}
-
-/* PROMPTS — BLANC / LAVANDE SUR NOIR */
-
-.prompt-card {
-  margin-top: 18px;
-  overflow: hidden;
-  border: 1px solid var(--code-border);
-  border-radius: var(--radius-lg);
-  background: var(--code-bg);
-  box-shadow: 0 18px 42px rgba(5, 7, 13, 0.22);
-}
-
-.prompt-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 13px 14px;
-  border-bottom: 1px solid rgba(207, 175, 231, 0.34);
-  background:
-    linear-gradient(90deg, rgba(207, 175, 231, 0.18), rgba(140, 106, 168, 0.16)),
-    #09111f;
-}
-
-.prompt-head h3 {
-  color: #ffffff;
-}
-
-/* BOUTONS */
-
-.copy-btn {
-  appearance: none;
-  flex: 0 0 auto;
-  min-height: 36px;
-  padding: 8px 13px;
-  cursor: pointer;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 900;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: #8c6aa8;
-  box-shadow: none;
-  transition:
-    transform 150ms ease,
-    filter 150ms ease,
-    background 150ms ease;
-}
-
-.copy-btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-  box-shadow: none;
-}
-
-.copy-btn:active {
-  transform: translateY(0);
-}
-
-.copy-btn.copied {
-  color: #ffffff;
-  background: #8c6aa8;
-  box-shadow: none;
-}
-
-/* PROMPT CODE */
-
-pre.prompt {
-  margin: 0;
-  padding: 19px;
-  overflow: auto;
-  color: var(--code-text);
-  background:
-    radial-gradient(circle at top right, rgba(207, 175, 231, 0.12), transparent 18rem),
-    linear-gradient(180deg, var(--code-bg-2), var(--code-bg));
-  font-size: 14px;
-  line-height: 1.58;
-  white-space: pre-wrap;
-}
-
-pre.prompt code {
-  color: var(--code-text);
-}
-
-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-}
-
-/* FOOTER */
-
-footer {
-  padding: 0 0 44px;
-  color: var(--muted);
-  text-align: center;
-}
-
-/* ACCESSIBILITY */
-
-a:focus-visible,
-button:focus-visible {
-  outline: 3px solid rgba(207, 175, 231, 0.70);
-  outline-offset: 3px;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 1000px) {
-  h1 {
-    white-space: normal;
-  }
-}
-
-@media (max-width: 920px) {
-  .wrap {
-    width: min(100% - 28px, 1120px);
-  }
-
-  .nav-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  header {
-    padding: 42px 0 28px;
-  }
-
-  .nav-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .nav-grid a {
-    min-height: 40px;
-    font-size: 12.5px;
-  }
-
-  .card {
-    border-radius: 20px;
-  }
-
-  .prompt-head {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .copy-btn {
-    width: 100%;
-  }
-
-  .workflow {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 9px;
-  }
-
-  .workflow-arrow {
-    display: none;
-  }
-
-  .workflow-step {
-    width: 100%;
-    justify-content: flex-start;
-    border-radius: var(--radius-md);
-  }
-}
-
-@media (max-width: 440px) {
-  .nav-grid {
-    grid-template-columns: 1fr;
-  }
-
-  h1 {
-    letter-spacing: -0.045em;
-  }
-}
-
-/* PRINT */
-
-@media print {
-  body {
-    color: #111827;
-    background: #ffffff;
-  }
-
-  header {
-    color: #111827;
-    background: #ffffff;
-    border-bottom: 1px solid #dddddd;
-  }
-
-  nav,
-  .copy-btn,
-  .back-btn {
-    display: none !important;
-  }
-
-  .card {
-    color: #111827;
-    background: #ffffff;
-    border: 1px solid #dddddd;
-    box-shadow: none;
-    page-break-inside: avoid;
-  }
-
-  h1,
-  h2,
-  h3,
-  p,
-  .subtitle {
-    color: #111827;
-  }
-
-  .plain {
-    color: #111827;
-    background: #ffffff;
-    border: 1px solid #dddddd;
-  }
-
-  pre.prompt {
-    color: #111827;
-    background: #f3f4f6;
-    border: 1px solid #dddddd;
-  }
-}
-</style>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #f7f4fa;
+      --surface: #ffffff;
+      --surface-soft: #fbf8fd;
+
+      --black: #05070d;
+      --ink: #0b1220;
+      --text: #111827;
+      --text-soft: #334155;
+      --muted: #64748b;
+
+      --accent: #CFAFE7;
+      --accent-2: #8C6AA8;
+      --accent-soft: rgba(207, 175, 231, 0.22);
+      --accent-border: rgba(140, 106, 168, 0.42);
+
+      --border: #ded8e6;
+      --border-strong: #c9bdd4;
+
+      --code-bg: #05070d;
+      --code-bg-2: #09111f;
+      --code-text: #f4f0ff;
+      --code-muted: #d8d2ff;
+      --code-border: rgba(207, 175, 231, 0.38);
+
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+      --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.07);
+
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-pill: 999px;
+
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      background:
+        radial-gradient(circle at top left, rgba(207, 175, 231, 0.20), transparent 28rem),
+        radial-gradient(circle at top right, rgba(140, 106, 168, 0.12), transparent 30rem),
+        linear-gradient(180deg, #ffffff 0%, #ffffff 48%, #f7f4fa 100%);
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 46px 0 30px;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 78% 18%, rgba(207, 175, 231, 0.30), transparent 25rem),
+        linear-gradient(135deg, #05070d 0%, #07111f 58%, #151124 100%);
+      border-bottom: 1px solid rgba(207, 175, 231, 0.34);
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(207, 175, 231, 0.95), transparent);
+    }
+
+    header .wrap { position: relative; z-index: 1; }
+
+    h1 {
+      margin: 0 0 8px;
+      max-width: 100%;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -0.055em;
+      font-weight: 880;
+      white-space: nowrap;
+      color: #ffffff;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 760px;
+      color: #f2eaff;
+      font-size: clamp(17px, 2vw, 21px);
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle::before {
+      content: "— ";
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 0 18px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      border: 1px solid rgba(207, 175, 231, 0.50);
+      border-radius: var(--radius-pill);
+      background: rgba(207, 175, 231, 0.12);
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(207, 175, 231, 0.22);
+      border-color: rgba(207, 175, 231, 0.70);
+    }
+
+    /* NAV */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      padding: 12px 0;
+    }
+
+    .nav-grid a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 8px 10px;
+      color: var(--black);
+      text-decoration: none;
+      text-align: center;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: -0.01em;
+      border: 0;
+      border-radius: var(--radius-pill);
+      background: #ffffff;
+      box-shadow: none;
+      transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    .nav-grid a:hover {
+      transform: translateY(-1px);
+      background: var(--accent-soft);
+    }
+
+    /* MAIN */
+    main { padding: 30px 0 68px; }
+
+    .card {
+      position: relative;
+      margin: 0 0 22px;
+      padding: clamp(22px, 3vw, 34px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: #ffffff;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      scroll-margin-top: 96px;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--black), var(--accent-2), var(--accent));
+      opacity: 0.95;
+    }
+
+    .card:hover { border-color: var(--border-strong); box-shadow: var(--shadow); }
+
+    h2 {
+      margin: 0 0 14px;
+      color: var(--black);
+      font-size: clamp(24px, 3vw, 33px);
+      line-height: 1.12;
+      letter-spacing: -0.045em;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      color: var(--black);
+      font-size: 18px;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+
+    p { margin: 0 0 14px; color: var(--text); }
+    p:last-child { margin-bottom: 0; }
+    strong { color: var(--black); }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* WORKFLOW */
+    .workflow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0 8px;
+      padding: 18px;
+      border: 1px solid var(--accent-border);
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at top left, rgba(207, 175, 231, 0.16), transparent 22rem),
+        #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    .workflow-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 6px 12px;
+      color: var(--black);
+      font-weight: 750;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      border-radius: 10px;
+      background: rgba(207, 175, 231, 0.14);
+    }
+
+    .workflow-arrow {
+      color: var(--accent-2);
+      font-weight: 850;
+      font-size: 16px;
+      opacity: 0.65;
+    }
+
+    /* CONFIG */
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .field textarea { min-height: 120px; resize: vertical; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 22px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      background: #8c6aa8;
+      border: 0;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: transform 150ms ease, filter 150ms ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .btn:active { transform: translateY(0); }
+    .btn.secondary { background: var(--black); }
+    .btn.success { background: var(--success); }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    /* PROMPT BLOCK */
+    .prompt-card {
+      margin-top: 18px;
+      overflow: hidden;
+      border: 1px solid var(--code-border);
+      border-radius: var(--radius-lg);
+      background: var(--code-bg);
+      box-shadow: 0 18px 42px rgba(5, 7, 13, 0.22);
+    }
+
+    .prompt-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(207, 175, 231, 0.34);
+      background: linear-gradient(90deg, rgba(207, 175, 231, 0.18), rgba(140, 106, 168, 0.16)), #09111f;
+    }
+
+    .prompt-head h3 { color: #ffffff; margin: 0; }
+
+    pre.prompt {
+      margin: 0;
+      padding: 19px;
+      overflow: auto;
+      color: var(--code-text);
+      background:
+        radial-gradient(circle at top right, rgba(207, 175, 231, 0.12), transparent 18rem),
+        linear-gradient(180deg, var(--code-bg-2), var(--code-bg));
+      font-size: 14px;
+      line-height: 1.58;
+      white-space: pre-wrap;
+    }
+
+    pre.prompt code { color: var(--code-text); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+
+    .copy-btn {
+      appearance: none;
+      flex: 0 0 auto;
+      min-height: 36px;
+      padding: 8px 13px;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 900;
+      border: 0;
+      border-radius: var(--radius-pill);
+      background: #8c6aa8;
+      transition: transform 150ms ease, filter 150ms ease;
+    }
+
+    .copy-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .copy-btn.copied { background: var(--success); }
+
+    /* DASHBOARD LINKS */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .dash-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+    }
+
+    .dash-card h4 {
+      margin: 0;
+      font-size: 15px;
+      color: var(--black);
+    }
+
+    .dash-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-soft);
+      flex: 1;
+    }
+
+    .dash-card a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .embed-frame {
+      width: 100%;
+      height: 420px;
+      margin-top: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: var(--accent-2);
+    }
+
+    /* TEMPLATES */
+    .template-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .template-item {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+    }
+
+    .template-item h4 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: var(--black);
+    }
+
+    .template-item p {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+
+    /* CONVENTIONS */
+    .convention-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 18px;
+    }
+
+    .convention-box {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+    }
+
+    .convention-box h4 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--black);
+    }
+
+    .convention-box ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+
+    .convention-box li { margin-bottom: 6px; }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .status-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .status-tag code { color: var(--accent-2); }
+
+    /* FOOTER */
+    footer {
+      padding: 0 0 44px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    /* ACCESSIBILITY */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 3px solid rgba(207, 175, 231, 0.70);
+      outline-offset: 3px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1000px) {
+      h1 { white-space: normal; }
+    }
+
+    @media (max-width: 920px) {
+      .wrap { width: min(100% - 28px, 1120px); }
+      .nav-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      header { padding: 42px 0 28px; }
+      .nav-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .workflow { display: grid; grid-template-columns: 1fr; gap: 9px; }
+      .workflow-arrow { display: none; }
+      .workflow-step { width: 100%; justify-content: flex-start; border-radius: var(--radius-md); }
+      .embed-frame { height: 320px; }
+    }
+
+    @media (max-width: 440px) {
+      .nav-grid { grid-template-columns: 1fr; }
+      h1 { letter-spacing: -0.045em; }
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="wrap">
       <a class="back-btn" href="index.html">← Changer de cas d'usage</a>
-      <h1 id="page-title">📚 Proto Claude SmartDoc</h1>
-      <p class="subtitle" id="page-subtitle">Transformer un fonds documentaire en mémoire structurée et interrogeable</p>
+      <h1>📚 Proto Claude SmartDoc</h1>
+      <p class="subtitle">Transformer un fonds documentaire en mémoire structurée et interrogeable</p>
     </div>
   </header>
 
   <nav class="top-nav">
     <div class="wrap nav-grid">
-      <a href="#step-1">1. Projet</a>
-      <a href="#step-2">2. Drive</a>
-      <a href="#step-3">3. Cadre</a>
-      <a href="#step-4">4. Registre</a>
-      <a href="#step-5">5. Audit</a>
-      <a href="#step-6">6. Doublons</a>
-      <a href="#step-7">7. Normalisation</a>
-      <a href="#step-8">8. Classement</a>
-      <a href="#step-9">9. Indexation</a>
-      <a href="#step-10">10. Questions</a>
-      <a href="#step-11">11. Skill a & b</a>
-      <a href="#step-12">12. Visualisation</a>
+      <a href="#config">Configuration</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#importer">Importer</a>
+      <a href="#templates">Prompts</a>
+      <a href="#conventions">Conventions</a>
     </div>
   </nav>
 
-<main class="wrap">
+  <main class="wrap">
 
     <section class="card" id="intro">
       <h2>🎯 Objectif</h2>
-      <p>Transformer un dossier documentaire non structuré en mémoire sourcée, contextualisée et maintenue par une routine de classement incrémental.</p>
-<p>Flux cible :</p>
-<div class="workflow">
-  <div class="workflow-step">
-    <span class="workflow-icon">📥</span>
-    <span>Dépôt vrac Google Drive</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">📊</span>
-    <span>Registre Excel</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">🔎</span>
-    <span>Audit & détection doublons</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">🏷️</span>
-    <span>Normalisation & classement</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">🧠</span>
-    <span>Indexation & questions</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">🧩</span>
-    <span>Skill métier + route</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">🌐</span>
-    <span>Visualisation HTML + Railway</span>
-  </div>
-  <br/>
-  </div><p><b> Règle centrale : Claude ne supprime jamais un fichier. Le classement se fait par copie dans 03_ARCHIVES_CLASSEES/. L'archiviste purge les originaux de 01_DEPOT_VRAC/ après validation.</b></p>
-
+      <p>SmartDoc transforme un dossier documentaire non structuré en mémoire sourcée, contextualisée et maintenue par une routine de classement incrémental.</p>
+      <p>Claude travaille directement dans Google Drive. Cette page est le cockpit du workflow : elle centralise les liens, les outils et les prompts prêts à l'emploi.</p>
+      <div class="workflow">
+        <div class="workflow-step"><span>📥</span><span>Dépôt vrac Drive</span></div>
+        <span class="workflow-arrow">→</span>
+        <div class="workflow-step"><span>🤖</span><span>Claude classe & indexe</span></div>
+        <span class="workflow-arrow">→</span>
+        <div class="workflow-step"><span>📊</span><span>Registre Sheets</span></div>
+        <span class="workflow-arrow">→</span>
+        <div class="workflow-step"><span>🔎</span><span>Dashboard & recherche</span></div>
+      </div>
+      <p><strong>Règle centrale :</strong> Claude ne supprime jamais un fichier source. Le classement se fait par copie dans <code>03_ARCHIVES_CLASSEES/</code>. L'archiviste purge les originaux de <code>01_DEPOT_VRAC/</code> après validation.</p>
     </section>
 
-    <section class="card" id="step-1">
-      <h2>1. 🧱 Créer le projet</h2>
-      <p>Nom proposé : Proto Claude SmartDoc</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Instructions projet</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Ce projet sert à prototyper la gestion documentaire d'un fonds hétérogène (conférences, articles, notes, correspondances, documents institutionnels).
-
-Règles générales :
-- ne jamais supprimer un fichier ;
-- ne jamais modifier le contenu d'un document source ;
-- ne jamais renommer un document sans validation explicite du lot par l'archiviste ;
-- le classement physique se fait par copie (pas de déplacement ni suppression) ;
-- ne jamais inventer de métadonnée manquante ; utiliser unknown, laisser vide ou demander validation ;
-- enregistrer une date uniquement si elle est explicitement présente dans le document ou le nom de fichier, en indiquant son origine ;
-- ne jamais inscrire une date déduite par rapprochement sans validation explicite de l'archiviste ;
-- travailler par étapes simples ;
-- tenir un registre Excel comme mémoire documentaire ;
-- utiliser des colonnes et valeurs en anglais dans le fichier Excel ;
-- traiter uniquement les nouveaux éléments ou les éléments modifiés ;
-- pour ce test, limiter le traitement à 10 documents ; en production, traiter l'intégralité du dépôt ;
-- produire un rapport court à chaque run ;
-- utiliser la skill xlsx-proto pour créer, lire et modifier le fichier Excel ;
-- importer et vérifier la skill vizualise-documentation à l'étape 2 ;
-- ne créer la Skill métier documentation qu'après plusieurs étapes testées dans ce fil ;
-- créer la route finale seulement après validation du workflow et de la Skill métier.</code></pre>
+    <section class="card" id="config">
+      <h2>⚙️ Configuration du cockpit</h2>
+      <p>Renseigne les deux URLs de ton projet Google Drive. Elles sont stockées localement dans ton navigateur.</p>
+      <div class="config-grid">
+        <div class="field">
+          <label for="drive-folder-url">Dossier Google Drive SmartDoc</label>
+          <input type="url" id="drive-folder-url" placeholder="https://drive.google.com/drive/folders/...">
         </div>
-
+        <div class="field">
+          <label for="sheets-url">Registre Google Sheets</label>
+          <input type="url" id="sheets-url" placeholder="https://docs.google.com/spreadsheets/d/...">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" type="button" onclick="saveConfig()">💾 Enregistrer</button>
+        <button class="btn secondary" type="button" onclick="loadConfig()">🔄 Charger</button>
+      </div>
+      <p id="config-status" style="margin-top: 12px; font-size: 14px; color: var(--muted);"></p>
     </section>
 
-    <section class="card" id="step-2">
-      <h2>2. 🔌 Connecter Google Drive et importer les outils</h2>
-      <p>Objectif : pointer vers le dossier Google Drive "SmartDoc", vérifier les accès (lecture, création, copie), puis importer les Skills tableur et vizualise-documentation.</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Connexion Drive et vérification des outils</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Le dossier Google Drive de travail pour ce projet s'appelle "SmartDoc".
-Cherche-le dans mon Drive et utilise-le comme racine de travail.
-
-Vérifie que tu as accès aux éléments nécessaires :
-
-1. Connecteur Google Drive :
-- peux-tu lire les fichiers dans le dossier SmartDoc ?
-- peux-tu créer un fichier ou un dossier ?
-- peux-tu copier un fichier dans un autre dossier ?
-
-Règle de classement physique :
-- le connecteur ne permet ni déplacement ni suppression ;
-- le classement se fait par COPIE : Claude copie le fichier validé dans 03_ARCHIVES_CLASSEES/ avec son nom normalisé ;
-- les originaux restent dans 01_DEPOT_VRAC/ jusqu'à purge manuelle par l'archiviste ;
-- à la fin de chaque lot, Claude fournit la liste des fichiers à purger dans 01_DEPOT_VRAC/.
-
-2. Structure de dossiers à créer dans le dossier SmartDoc :
-- 01_DEPOT_VRAC/ (où le client dépose les nouveaux documents)
-- 02_A_VALIDER/ (documents dont le classement requiert validation)
-- 03_ARCHIVES_CLASSEES/ avec les sous-dossiers :
-  - 01_CONFERENCES/ (avec sous-dossier YYYY/)
-  - 02_ARTICLES_ET_PUBLICATIONS/ (avec sous-dossier YYYY/)
-  - 03_NOTES_ET_BROUILLONS/
-  - 04_CORRESPONDANCES/
-  - 05_DOCUMENTS_INSTITUTIONNELS/
-  - 99_DATE_OU_TYPE_A_VALIDER/
-- 099_SYSTEME/ avec :
-  - journaux/
-
-3. Skill tableur :
-- la skill xlsx-proto est-elle disponible ?
-- peux-tu l'utiliser pour créer, lire et modifier un fichier .xlsx ?
-
-4. Skill de visualisation :
-- importe la skill vizualise-documentation ;
-- vérifie qu'elle est disponible et fonctionnelle ;
-- ne l'utilise pas encore.
-
-Ne lance pas encore l'analyse documentaire.
-Ne crée pas encore le registre.
-Ne copie aucun fichier.
-Ne modifie rien sans confirmation.</code></pre>
+    <section class="card" id="dashboard">
+      <h2>📊 Dashboard documentation</h2>
+      <p>État des lieux du fonds documentaire. Le registre principal est le Google Sheets ; cette section donne les accès rapides.</p>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <h4>📁 Dossier Drive</h4>
+          <p>Ouvrir le dossier SmartDoc dans Google Drive.</p>
+          <a href="#" id="dash-drive-link" target="_blank" rel="noopener noreferrer">Ouvrir Drive →</a>
         </div>
-
+        <div class="dash-card">
+          <h4>📈 Registre Sheets</h4>
+          <p>Consulter et modifier le registre documentaire.</p>
+          <a href="#" id="dash-sheets-link" target="_blank" rel="noopener noreferrer">Ouvrir Sheets →</a>
+        </div>
+        <div class="dash-card">
+          <h4>📤 Déposer un document</h4>
+          <p>Ajouter un nouveau fichier dans <code>01_DEPOT_VRAC/</code>.</p>
+          <a href="#importer">Utiliser l'importeur →</a>
+        </div>
+      </div>
+      <iframe class="embed-frame" id="sheets-embed" src="" title="Registre Google Sheets"></iframe>
     </section>
 
-    <section class="card" id="step-3">
-      <h2>3. 📐 Définir le cadre archivistique</h2>
-      <p>Objectif : faire préciser périmètre, documents exclus, plan de classement et convention de nommage.</p>
+    <section class="card" id="importer">
+      <h2>📤 Importer & classer un document</h2>
+      <p>Remplis le formulaire ci-dessous. SmartDoc génère un prompt optimisé à coller dans Claude Code ou Claude.ai. Claude lira le document dans Drive, posera les questions de classification et mettra à jour le registre.</p>
 
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Cadre archivistique</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Propose un cadre archivistique pour ce fonds documentaire.
-
-1. Périmètre :
-- quels types de documents sont inclus ?
-- quels types sont exclus du prototype ?
-
-2. Plan de classement :
-- la règle stable est : nature documentaire, puis année certaine ;
-- les cinq types fixes sont : 01_CONFERENCES, 02_ARTICLES_ET_PUBLICATIONS, 03_NOTES_ET_BROUILLONS, 04_CORRESPONDANCES, 05_DOCUMENTS_INSTITUTIONNELS ;
-- les axes intellectuels (thèmes, concepts, auteurs, auditoires, destinataires) ne déterminent pas les dossiers ; ils sont inscrits dans le registre Excel.
-
-3. Convention de nommage :
-- format normalisé : YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext
-- une date est utilisée dans le nom si elle est explicitement présente dans le document ou son nom de fichier, ou si elle a été validée par l'archiviste.
-
-4. Règles de date :
-- une date explicitement présente dans le document ou le nom de fichier est enregistrée avec date_source ;
-- une date déduite par rapprochement reste une question à investiguer et n'est pas inscrite ;
-- un document dont seule la date est à investiguer reste dans 01_DEPOT_VRAC/ jusqu'à validation humaine.
-
-Présente ce cadre sous forme de proposition soumise à validation.
-Ne renomme rien.
-Ne copie aucun fichier.</code></pre>
+      <div class="config-grid">
+        <div class="field">
+          <label for="doc-title">Titre ou nom de fichier</label>
+          <input type="text" id="doc-title" placeholder="Ex. : Note sur l'éthique du care">
         </div>
+        <div class="field">
+          <label for="doc-type">Type documentaire (optionnel)</label>
+          <select id="doc-type">
+            <option value="">— À déterminer —</option>
+            <option value="01_CONFERENCES">01_CONFERENCES</option>
+            <option value="02_ARTICLES_ET_PUBLICATIONS">02_ARTICLES_ET_PUBLICATIONS</option>
+            <option value="03_NOTES_ET_BROUILLONS">03_NOTES_ET_BROUILLONS</option>
+            <option value="04_CORRESPONDANCES">04_CORRESPONDANCES</option>
+            <option value="05_DOCUMENTS_INSTITUTIONNELS">05_DOCUMENTS_INSTITUTIONNELS</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="doc-date">Date détectée (optionnel)</label>
+          <input type="text" id="doc-date" placeholder="YYYY-MM-DD ou YYYY">
+        </div>
+        <div class="field">
+          <label for="doc-content">Contenu, extrait ou description</label>
+          <textarea id="doc-content" placeholder="Colle ici un extrait du document ou une description..."></textarea>
+        </div>
+      </div>
 
+      <div class="btn-row">
+        <button class="btn" type="button" onclick="generateImportPrompt()">✨ Générer le prompt Claude</button>
+        <button class="btn secondary" type="button" onclick="resetImportForm()">Réinitialiser</button>
+      </div>
+
+      <div class="prompt-card" id="import-prompt-card" style="display: none;">
+        <div class="prompt-head">
+          <h3>Prompt à coller dans Claude</h3>
+          <button class="copy-btn" type="button" onclick="copyImportPrompt()">Copier</button>
+        </div>
+        <pre class="prompt" id="import-prompt"><code></code></pre>
+      </div>
     </section>
 
-    <section class="card" id="step-4">
-      <h2>4. 📊 Créer le registre documentaire</h2>
-      <p>Fichier cible : 099_SYSTEME/registre_documentation.xlsx</p>
-<pre class='plain'>Colonnes initiales :
-document_id, source_path, current_name, proposed_name, final_path,
-drive_file_id, drive_web_url, file_type, file_size, detected_date, date_source,
-date_status, author, audience, recipient, title, document_type, summary, tags,
-people, places, concepts, visual_register, duplicate_status,
-classification_status, confidence, human_check, source_reference, processed_at, notes</pre>
-<pre class='plain'>Valeurs contrôlées :
-duplicate_status = unique / exact_duplicate / possible_duplicate / unknown
-classification_status = to_analyze / proposed / validated / classified / to_validate / ignored / error
-date_status = explicit_document / explicit_filename / unknown / to_investigate / validated
-date_source = document / filename / human_validation
-confidence = high / medium / low
-human_check = required / not_required
-visual_register = register_1 / register_2 / register_3 / register_4 / register_5 / none</pre>
+    <section class="card" id="templates">
+      <h2>🧩 Templates de prompts</h2>
+      <p>Clique sur "Copier" pour obtenir le prompt prêt à coller dans Claude.</p>
 
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Création du registre</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Utilise la skill xlsx-proto pour créer un fichier Excel intitulé "registre_documentation.xlsx" dans le dossier 099_SYSTEME/ du projet Google Drive.
-
-Le fichier doit contenir un tableau structuré avec les colonnes suivantes, en anglais :
-- document_id
-- source_path
-- current_name
-- proposed_name
-- final_path
-- drive_file_id
-- drive_web_url
-- file_type
-- file_size
-- detected_date
-- date_source
-- date_status
-- author
-- audience
-- recipient
-- title
-- document_type
-- summary
-- tags
-- people
-- places
-- concepts
-- visual_register
-- duplicate_status
-- classification_status
-- confidence
-- human_check
-- source_reference
-- processed_at
-- notes
-
-Crée également un onglet "configuration" définissant les libellés des cinq registres visuels et leur correspondance avec les cinq couleurs : orange, bleu, violet, vert et or.
-
-Règles :
-- ne pas encore importer les documents ;
-- créer seulement la structure du fichier ;
-- utiliser uniquement ces colonnes pour le prototype ;
-- vérifier que le fichier est bien sauvegardé dans 099_SYSTEME/ ;
-- indiquer le chemin du fichier créé.</code></pre>
+      <div class="template-list">
+        <div class="template-item">
+          <h4>🧱 Initialiser le projet SmartDoc</h4>
+          <p>Crée l'arborescence Drive, le registre Sheets et la configuration des registres visuels.</p>
+          <button class="copy-btn" type="button" data-template="init">Copier</button>
         </div>
 
+        <div class="template-item">
+          <h4>🔎 Auditer le dépôt vrac</h4>
+          <p>Cartographie les fichiers de <code>01_DEPOT_VRAC/</code> sans les modifier.</p>
+          <button class="copy-btn" type="button" data-template="audit">Copier</button>
+        </div>
+
+        <div class="template-item">
+          <h4>🔍 Détecter les doublons</h4>
+          <p>Identifie les doublons exacts, probables et les fichiers problématiques.</p>
+          <button class="copy-btn" type="button" data-template="duplicates">Copier</button>
+        </div>
+
+        <div class="template-item">
+          <h4>🏷️ Normaliser et classer un lot</h4>
+          <p>Propose les noms normalisés et les destinations, puis applique après validation.</p>
+          <button class="copy-btn" type="button" data-template="classify">Copier</button>
+        </div>
+
+        <div class="template-item">
+          <h4>🧠 Indexer les documents</h4>
+          <p>Enrichit le registre avec les métadonnées, résumés, tags et concepts.</p>
+          <button class="copy-btn" type="button" data-template="index">Copier</button>
+        </div>
+
+        <div class="template-item">
+          <h4>❓ Questions de recherche</h4>
+          <p>Produit des pistes de recherche à partir d'un document sans date ou mal classé.</p>
+          <button class="copy-btn" type="button" data-template="questions">Copier</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" id="template-prompt-card" style="display: none; margin-top: 18px;">
+        <div class="prompt-head">
+          <h3 id="template-title">Prompt</h3>
+          <button class="copy-btn" type="button" onclick="copyTemplatePrompt()">Copier</button>
+        </div>
+        <pre class="prompt" id="template-prompt"><code></code></pre>
+      </div>
     </section>
 
-    <section class="card" id="step-5">
-      <h2>5. 🔎 Auditer le fonds</h2>
-      <p>Objectif : cartographier arborescence, formats, dates, volumes et anomalies sans modifier les sources.</p>
+    <section class="card" id="conventions">
+      <h2>📐 Conventions du fonds</h2>
 
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Audit du fonds</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Audite le contenu du dossier 01_DEPOT_VRAC/ sans modifier, renommer ou copier aucun fichier.
-
-Pour ce test, limite-toi aux 10 premiers fichiers. En production, tu traiteras l'intégralité du dépôt.
-
-Pour chaque fichier rencontré, relève :
-- nom actuel ;
-- chemin source ;
-- format / extension ;
-- taille ;
-- date détectée si explicitement présente dans le nom de fichier ou le document ;
-- type documentaire probable parmi : 01_CONFERENCES, 02_ARTICLES_ET_PUBLICATIONS, 03_NOTES_ET_BROUILLONS, 04_CORRESPONDANCES, 05_DOCUMENTS_INSTITUTIONNELS, 99_DATE_OU_TYPE_A_VALIDER.
-
-Produis un rapport d'audit avec :
-- nombre total de fichiers ;
-- répartition par format ;
-- répartition par type documentaire probable ;
-- nombre de fichiers avec date explicite ;
-- nombre de fichiers sans date ;
-- anomalies détectées (fichiers vides, illisibles, hors périmètre) ;
-- volumes totaux.
-
-Ne crée pas encore de ligne dans le registre.
-Ne copie aucun fichier.
-Ne renomme rien.</code></pre>
+      <div class="convention-grid">
+        <div class="convention-box">
+          <h4>Plan de classement</h4>
+          <ul>
+            <li><code>01_CONFERENCES/YYYY/</code></li>
+            <li><code>02_ARTICLES_ET_PUBLICATIONS/YYYY/</code></li>
+            <li><code>03_NOTES_ET_BROUILLONS/</code></li>
+            <li><code>04_CORRESPONDANCES/</code></li>
+            <li><code>05_DOCUMENTS_INSTITUTIONNELS/</code></li>
+            <li><code>99_DATE_OU_TYPE_A_VALIDER/</code></li>
+          </ul>
         </div>
 
-    </section>
-
-    <section class="card" id="step-6">
-      <h2>6. 🔍 Détecter les doublons</h2>
-      <p>Objectif : identifier doublons exacts/probables, vides, illisibles et hors périmètre.</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Détection des doublons</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Sur le même lot de fichiers que l'audit (10 pour ce test, tout en production), identifie :
-
-1. Les doublons exacts :
-- fichiers identiques par nom et contenu ;
-- fichiers identiques par contenu avec nom différent.
-
-2. Les doublons probables :
-- fichiers très similaires par contenu (versions, brouillons, copies partielles).
-
-3. Les fichiers problématiques :
-- fichiers vides ;
-- fichiers illisibles ;
-- fichiers hors périmètre (format non documentaire, non pertinent).
-
-Pour chaque cas, indique :
-- le ou les fichiers concernés ;
-- le type de problème (exact_duplicate / possible_duplicate / unknown) ;
-- ta confiance (high / medium / low).
-
-Ne supprime jamais un fichier.
-Ne copie aucun fichier à ce stade.
-Présente la liste à l'archiviste pour examen.</code></pre>
+        <div class="convention-box">
+          <h4>Nom normalisé</h4>
+          <p style="font-size: 14px; color: var(--text-soft);"><code>YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext</code></p>
+          <ul>
+            <li>Date uniquement si explicite</li>
+            <li>Pas d'espaces, pas d'accents</li>
+            <li>Titre court et significatif</li>
+          </ul>
         </div>
 
-    </section>
-
-    <section class="card" id="step-7">
-      <h2>7. 🏷️ Proposer la normalisation</h2>
-      <p>Objectif : proposer noms normalisés et destination par document.</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Propositions de normalisation</h3>
-            <button class="copy-btn" type="button">Copier</button>
+        <div class="convention-box">
+          <h4>Registres visuels</h4>
+          <div class="status-grid">
+            <div class="status-tag"><code>register_1</code> Récit & témoignage</div>
+            <div class="status-tag"><code>register_2</code> Droits & politique</div>
+            <div class="status-tag"><code>register_3</code> Théorie & épistémologie</div>
+            <div class="status-tag"><code>register_4</code> Critique de la CAA</div>
+            <div class="status-tag"><code>register_5</code> Singularité existentielle</div>
           </div>
-          <pre class="prompt"><code>Pour chaque fichier du lot en cours (10 pour ce test, tout en production), propose :
-
-1. Un nom normalisé selon le format :
-   YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext
-
-2. Une destination de classement parmi :
-   03_ARCHIVES_CLASSEES/01_CONFERENCES/YYYY/
-   03_ARCHIVES_CLASSEES/02_ARTICLES_ET_PUBLICATIONS/YYYY/
-   03_ARCHIVES_CLASSEES/03_NOTES_ET_BROUILLONS/
-   03_ARCHIVES_CLASSEES/04_CORRESPONDANCES/
-   03_ARCHIVES_CLASSEES/05_DOCUMENTS_INSTITUTIONNELS/
-   03_ARCHIVES_CLASSEES/99_DATE_OU_TYPE_A_VALIDER/
-
-3. Une justification courte.
-
-4. Un niveau de confiance : high / medium / low.
-
-Règles de date :
-- n'utilise une date dans le nom que si elle est explicitement présente dans le document ou le nom de fichier ;
-- si la date est inconnue, laisse la date vide et indique date_status = unknown ou to_investigate ;
-- ne propose jamais une date déduite par rapprochement.
-
-Présente le résultat sous forme de tableau :
-actuel → proposé → destination → justification → confiance
-
-Ne renomme aucun fichier.
-Ne copie aucun fichier à ce stade.
-Tout n'est que proposition soumise à validation.</code></pre>
         </div>
 
-    </section>
-
-    <section class="card" id="step-8">
-      <h2>8. ✅ Valider et appliquer un lot</h2>
-      <p>Objectif : présenter le lot de classement et appliquer uniquement les copies validées dans 03_ARCHIVES_CLASSEES/.</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Application du lot validé</h3>
-            <button class="copy-btn" type="button">Copier</button>
+        <div class="convention-box">
+          <h4>Statuts de classification</h4>
+          <div class="status-grid">
+            <div class="status-tag"><code>to_analyze</code></div>
+            <div class="status-tag"><code>proposed</code></div>
+            <div class="status-tag"><code>validated</code></div>
+            <div class="status-tag"><code>classified</code></div>
+            <div class="status-tag"><code>to_validate</code></div>
+            <div class="status-tag"><code>ignored</code></div>
+            <div class="status-tag"><code>error</code></div>
           </div>
-          <pre class="prompt"><code>Présente un lot de classement à l'archiviste (10 documents pour ce test ; en production, traiter par lots adaptés au volume).
-
-Pour chaque document du lot, indique :
-- nom actuel ;
-- nom proposé ;
-- destination proposée ;
-- justification ;
-- niveau de confiance.
-
-Attends une validation explicite de l'archiviste avant toute action.
-
-Après validation explicite :
-1. Copie les fichiers approuvés dans 03_ARCHIVES_CLASSEES/ dans le sous-dossier correspondant, avec leur nom normalisé.
-2. Pour les cas ambigus (type incertain, contenu problématique, doublon), copie-les vers 02_A_VALIDER/ ou laisse-les en attente selon la décision de l'archiviste.
-3. Pour les documents dont seule la date est à investiguer, laisse-les dans 01_DEPOT_VRAC/.
-4. À la fin, fournis la liste des fichiers originaux dans 01_DEPOT_VRAC/ que l'archiviste peut maintenant purger.
-
-Règles :
-- ne jamais supprimer un fichier ;
-- ne jamais copier un fichier non validé dans 03_ARCHIVES_CLASSEES/ ;
-- ne jamais modifier le contenu d'un document source ;
-- consigne chaque opération dans le registre Excel avec xlsx-proto.
-
-À la fin, indique :
-- nombre de fichiers copiés dans 03_ARCHIVES_CLASSEES/ ;
-- nombre de fichiers orientés vers 02_A_VALIDER/ ;
-- nombre de fichiers laissés en attente dans 01_DEPOT_VRAC/ ;
-- liste des originaux à purger dans 01_DEPOT_VRAC/ ;
-- erreurs éventuelles.</code></pre>
         </div>
-
-    </section>
-
-    <section class="card" id="step-9">
-      <h2>9. 🧠 Indexer les documents</h2>
-      <p>Objectif : extraire métadonnées, résumé, tags, concepts, auditoire, destinataire et références source.</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Indexation des documents</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Pour chaque document classé dans 03_ARCHIVES_CLASSEES/, utilise la skill xlsx-proto pour enrichir le registre documentaire avec :
-
-1. Métadonnées d'identification :
-- title (titre du document) ;
-- author (auteur ou organisme) ;
-- audience (public visé) ;
-- recipient (destinataire si pertinent) ;
-- document_type (type documentaire) ;
-- file_type, file_size.
-
-2. Contenu analytique :
-- summary (résumé analytique court) ;
-- tags (mots-clés) ;
-- concepts (concepts principaux) ;
-- people (personnes citées) ;
-- places (lieux mentionnés).
-
-3. Date :
-- detected_date si explicitement présente dans le document ou le nom de fichier ;
-- date_source = document ou filename ;
-- date_status = explicit_document ou explicit_filename ;
-- si la date n'est pas explicite : detected_date vide, date_status = unknown ou to_investigate.
-
-4. Références :
-- source_reference (fichier et page quand disponibles) ;
-- drive_file_id et drive_web_url (identifiants Google Drive).
-
-5. Statut :
-- classification_status = classified ;
-- confidence = high / medium / low ;
-- human_check = required ou not_required.
-
-Règles :
-- ne jamais inventer de métadonnée manquante ;
-- utiliser unknown, laisser vide ou demander validation ;
-- ne jamais inscrire une date déduite par rapprochement ;
-- ne pas créer de colonnes additionnelles ;
-- ne pas modifier les documents source.</code></pre>
-        </div>
-
-    </section>
-
-    <section class="card" id="step-10">
-      <h2>10. ❓ Produire des questions de recherche</h2>
-      <p>Objectif : réactiver la mémoire Excel validée à partir d'un ajout ou d'une date inconnue pour produire des pistes de recherche.</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Questions de recherche contextualisées</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>À partir du registre documentaire validé, prends un document sans date certaine (date_status = unknown ou to_investigate) ou un nouveau document ajouté.
-
-Réactive la mémoire Excel en comparant :
-- les thèmes et concepts du document ;
-- le vocabulaire utilisé ;
-- les personnes citées ;
-- l'auditoire visé ;
-- le destinataire ;
-- le genre documentaire.
-
-Phase 1 — Élicitation (OBLIGATOIRE, ne saute jamais cette étape) :
-Avant de produire tes questions, tu DOIS d'abord poser à l'archiviste 2 à 3 questions courtes pour recueillir son intuition. Ne génère aucune question de recherche avant d'avoir reçu sa réponse.
-
-Pose explicitement ces questions une par une et attends la réponse de l'archiviste à chacune :
-1. "Avez-vous une hypothèse sur la période ou le contexte de ce document ?"
-2. "Ce document vous évoque-t-il un événement, un cycle ou un correspondant connu ?"
-3. "Y a-t-il un élément qui vous frappe (formulation, référence, ton) ?"
-
-INTERDIT : ne passe pas à la phase 2 sans avoir reçu au moins une réponse de l'archiviste. Si l'archiviste répond "je ne sais pas", c'est une réponse valide : note-la et passe à la phase 2.
-
-Phase 2 — Questions de recherche :
-À partir des réponses de l'archiviste ET de la mémoire Excel, génère 2 à 5 questions de recherche, par exemple :
-- "Ce document destiné à X et mobilisant les concepts Y/Z peut-il être rapproché du cycle de conférences de telle période ?"
-- "L'évolution du concept A entre les documents B et C éclaire-t-elle la date de ce document ?"
-- "Le vocabulaire de ce document est-il cohérent avec la période des documents D et E ?"
-
-Pour chaque question, indique :
-- sa formulation ;
-- les sources activées (documents de référence du registre) ;
-- sa justification ;
-- son niveau de confiance (high / medium / low) ;
-- la limite d'interprétation.
-
-Phase 3 — Itération (OBLIGATOIRE) :
-Après avoir présenté les questions, tu DOIS demander à l'archiviste :
-- "Ces pistes vous permettent-elles d'avancer ? Souhaitez-vous que j'approfondisse l'une d'elles ?"
-Tu ne dois pas terminer l'étape sans avoir posé cette question.
-Si l'archiviste répond, affine les questions en tenant compte de sa réponse.
-Maximum 2 itérations supplémentaires.
-
-Règles :
-- ne jamais inscrire une date ou période proposée dans le registre ;
-- seule une réponse ou une validation explicite de l'archiviste peut modifier detected_date et date_status ;
-- les questions ne valent jamais conclusion ;
-- présente les questions comme des pistes de recherche, pas comme des affirmations ;
-- INTERDIT de générer des questions sans avoir d'abord mené la phase 1 d'élicitation et reçu une réponse de l'archiviste ;
-- INTERDIT de terminer l'étape sans avoir proposé une itération (phase 3) à l'archiviste.</code></pre>
-        </div>
-
-    </section>
-
-    <section class="card" id="step-11">
-      <h2>11. 🧩 Créer et tester la Skill et la route</h2>
-      <p>Objectif : stabiliser le workflow, créer puis relire la Skill documentation et tester la routine incrémentale sur un lot réduit.</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — 11a. Créer la Skill documentation</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Relis ce fil de discussion et produis une synthèse du workflow final réellement validé.
-
-Ignore les variantes abandonnées. Ne garde que la dernière décision stabilisée :
-- Google Drive comme source de stockage ;
-- dossier 01_DEPOT_VRAC/ comme unique point d'entrée ;
-- registre Excel "registre_documentation.xlsx" dans 099_SYSTEME/ ;
-- skill xlsx-proto pour créer, lire et modifier le registre ;
-- classement : nature documentaire puis année certaine ;
-- nommage : YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext ;
-- aucune suppression de fichier ;
-- aucune copie dans 03_ARCHIVES_CLASSEES/ sans validation explicite du lot ;
-- aucune date déduite inscrite sans validation humaine ;
-- skill vizualise-documentation importée et vérifiée, utilisée seulement à l'étape 12.
-
-À partir de cette synthèse, crée une Skill Claude métier nommée "documentation".
-
-Contraintes :
-- ne pas reprendre les anciennes variantes du fil ;
-- utiliser Google Drive comme source ;
-- utiliser 01_DEPOT_VRAC/ comme point d'entrée ;
-- utiliser xlsx-proto pour écrire dans "registre_documentation.xlsx" ;
-- ne jamais supprimer un fichier ;
-- ne jamais modifier le contenu d'un document source ;
-- ne jamais copier un fichier dans 03_ARCHIVES_CLASSEES/ sans validation explicite du lot ;
-- ne jamais inscrire une date déduite sans validation humaine ;
-- ne pas ajouter de colonnes non prévues ;
-- ne pas inventer de données manquantes ;
-- pour ce test, limiter le traitement à 10 documents ; en production, traiter l'intégralité du dépôt ;
-- générer 2 à 5 questions de recherche avec élicitation préalable OBLIGATOIRE pour les documents à date inconnue : poser d'abord 2 à 3 questions à l'archiviste, attendre sa réponse, puis générer les questions, puis proposer une itération ;
-- consigner le rapport de run dans le registre et un journal dans 099_SYSTEME/journaux/.
-
-Puis relis le SKILL.md que tu viens de créer et vérifie strictement :
-- qu'il interdit la suppression de fichiers ;
-- qu'il interdit la modification du contenu des documents source ;
-- qu'il exige une validation explicite pour toute copie de classement ;
-- qu'il utilise Google Drive comme source ;
-- qu'il utilise xlsx-proto pour le registre ;
-- qu'il respecte les colonnes autorisées ;
-- qu'il interdit l'inscription de dates déduites sans validation ;
-- qu'il limite les volumes ;
-- qu'il impose une phase d'élicitation obligatoire avant toute génération de questions ;
-- qu'il impose une phase d'itération obligatoire après la génération ;
-- qu'il reste concis.
-
-Si une règle est ambiguë, corrige-la.
-Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</code></pre>
-        </div>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — 11b. Tester la Skill et créer la route</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Utilise la Skill métier documentation.
-
-Mets à jour le registre "registre_documentation.xlsx".
-Traite uniquement les nouveaux documents ou documents modifiés dans 01_DEPOT_VRAC/.
-Ne supprime aucun fichier.
-Ne copie aucun fichier dans 03_ARCHIVES_CLASSEES/ sans validation explicite.
-Génère un rapport court à la fin.
-Consigne le journal dans 099_SYSTEME/journaux/.
-
-Objectif du test :
-vérifier que la Skill respecte les colonnes, les valeurs autorisées, les limites, les exclusions, xlsx-proto et les règles de sécurité.
-
-Puis crée une route opérationnelle qui rejoue le workflow validé :
-1. vérifier les accès aux dossiers et au registre ;
-2. identifier uniquement les documents nouveaux ou modifiés ;
-3. lire les documents dans la limite de volume configurée ;
-4. extraire métadonnées, résumé, entités, concepts ;
-5. enregistrer les dates explicites avec date_source ;
-6. vérifier les doublons contre le registre ;
-7. proposer un nom normalisé et une destination ;
-8. présenter un lot de classement et attendre validation ;
-9. copier seulement les documents approuvés dans 03_ARCHIVES_CLASSEES/ ;
-10. mettre à jour le registre ;
-11. réactiver les sources validées pour les questions de recherche ;
-12. générer 2 à 5 questions de recherche avec phase d'élicitation préalable OBLIGATOIRE (poser 2 à 3 questions à l'archiviste, attendre réponse, puis générer, puis proposer itération) ;
-13. consigner le rapport et le journal.
-
-À la fin de chaque exécution, la route doit indiquer :
-- nombre de documents détectés et analysés ;
-- nombre de documents copiés dans 03_ARCHIVES_CLASSEES/ ;
-- nombre de doublons ;
-- nombre de documents à valider ;
-- nombre de questions proposées ;
-- liste des originaux à purger dans 01_DEPOT_VRAC/ ;
-- si des documents ont été classés ou modifiés, signaler que la visualisation doit être actualisée (étape 12) ;
-- chemin du registre mis à jour ;
-- chemin du journal ;
-- actions humaines restantes.</code></pre>
-        </div>
-
-    </section>
-
-    <section class="card" id="step-12">
-      <h2>12. 🌐 Créer l'artefact de visualisation</h2>
-      <p>Objectif : utiliser la Skill importée vizualise-documentation pour créer ou actualiser une visualisation HTML alimentée par le registre.</p>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Génération de la visualisation</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Utilise la skill vizualise-documentation importée à l'étape 2 pour générer l'artefact de visualisation du fonds documentaire.
-
-Entrée :
-- le registre Excel "registre_documentation.xlsx" validé, situé dans 099_SYSTEME/.
-
-La skill doit :
-1. vérifier les colonnes, les statuts utilisables, les liens Drive et la configuration des cinq registres visuels ;
-2. calculer les agrégats ;
-3. générer ou actualiser une page HTML autonome, responsive et consultable ;
-4. mettre à jour le seul artefact principal "documentation.html" dans 099_SYSTEME/ — MODIFIE le fichier existant, n'en crée pas un nouveau (le file ID Google Drive doit rester identique pour que l'URL Railway continue de fonctionner) ;
-5. consigner la date, la version, le périmètre et le résultat de la génération dans le journal de run ;
-6. inclure dans la page la date de génération, le périmètre analysé et les limites de données ;
-7. citer les documents dans les chronologies, citations et analyses ;
-8. afficher dans la chronologie une icône d'ouverture Drive uniquement pour les documents classés ayant un lien drive_web_url ;
-9. fournir un feedback minimaliste de l'icône au survol et au focus, ainsi qu'un libellé accessible ;
-10. signaler les données insuffisantes plutôt que compléter par des contenus inventés.
-
-Données utilisables :
-- uniquement les documents dont classification_status = classified ;
-- liens Drive uniquement pour les documents classés dont drive_web_url est renseigné ;
-- dates certaines ou validées ;
-- concepts, tags, auteurs, auditoires, destinataires, types documentaires et visual_register validés.
-
-DONNÉES PUBLIQUES vs PRIVÉES — cet artefact est PUBLIC :
-- AUTORISÉ dans l'artefact : title, author, audience, recipient, document_type, detected_date, summary, tags, concepts, people, places, drive_web_url, visual_register ;
-- INTERDIT dans l'artefact : source_path, drive_file_id, human_check, processed_at, notes, duplicate_status, duplicate_of, confidence, original_filename, date_source, date_status, classification_status, run_log ;
-- ne jamais exposer de chemin de fichier, d'identifiant technique ou de métadonnée de traitement.
-
-Les documents sans date validée restent visibles dans une section dédiée ou un compteur d'incertitude ; ils ne sont pas placés arbitrairement dans la frise chronologique.
-
-Le modèle visuel reprend philipp_research.html : en-tête de synthèse, légende à cinq couleurs, matrice conceptuelle, répartitions par registre, frise d'apparition des concepts, chronologie détaillée, cartes de synthèse et mise en page responsive.
-
-Après génération, exécute le script CLI de notification Railway pour demander le rechargement de la version courante depuis Google Drive.
-
-Règles :
-- ne pas modifier les documents source ni le registre ;
-- ne pas produire de copie HTML supplémentaire ;
-- modifier le fichier documentation.html existant plutôt qu'en créer un nouveau ;
-- ne pas exposer de secret dans l'artefact ;
-- les liens Drive n'accordent aucun droit : ils ne sont consultables que par les personnes ayant déjà accès au dossier Google Drive.</code></pre>
-        </div>
-
-    </section>
-
-    <section class="card">
-      <h2>✅ Synthèse finale</h2>
-      <pre class='plain'>1. Créer le projet SmartDoc.
-2. Connecter Google Drive "SmartDoc" et importer les outils (xlsx-proto, vizualise-documentation).
-3. Définir le cadre archivistique (type documentaire → année certaine).
-4. Créer le registre documentaire Excel dans 099_SYSTEME/.
-5. Auditer le fonds sans modifier les sources.
-6. Détecter les doublons (jamais de suppression).
-7. Proposer la normalisation (noms + destinations).
-8. Valider et appliquer un lot (copie dans 03_ARCHIVES_CLASSEES/ + liste de purge).
-9. Indexer les documents (métadonnées, résumé, tags, concepts).
-10. Produire des questions de recherche contextualisées.
-11. Créer et tester la Skill documentation + route finale.
-12. Générer l'artefact HTML avec vizualise-documentation et notifier Railway.</pre>
-
+      </div>
     </section>
 
   </main>
 
   <footer>
-
+    <div class="wrap">
+      <p>SmartDoc — Proto Claude Cowork · Mis à jour en temps réel depuis Google Drive</p>
+    </div>
   </footer>
 
   <script>
-    async function copyTextToClipboard(text) {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
+    const CONFIG_KEYS = {
+      driveFolder: 'smartdoc_drive_folder_url',
+      sheetsUrl: 'smartdoc_sheets_url'
+    };
 
-      const textarea = document.createElement("textarea");
-      textarea.value = text;
-      textarea.setAttribute("readonly", "");
-      textarea.style.position = "fixed";
-      textarea.style.top = "0";
-      textarea.style.left = "-9999px";
-      document.body.appendChild(textarea);
-      textarea.focus();
-      textarea.select();
-
-      let ok = false;
-      try {
-        ok = document.execCommand("copy");
-      } finally {
-        document.body.removeChild(textarea);
-      }
-
-      return ok;
+    function getDriveFolderUrl() {
+      return document.getElementById('drive-folder-url').value.trim() || localStorage.getItem(CONFIG_KEYS.driveFolder) || '';
     }
 
-    function highlightNavForButton(button) {
-      const section = button.closest("section[id^='step-']");
-      if (!section) return;
+    function getSheetsUrl() {
+      return document.getElementById('sheets-url').value.trim() || localStorage.getItem(CONFIG_KEYS.sheetsUrl) || '';
+    }
 
-      const sectionId = section.id;
-      const navLink = document.querySelector(`.nav-grid a[href="#${sectionId}"]`);
-      if (!navLink) return;
+    function saveConfig() {
+      const driveUrl = document.getElementById('drive-folder-url').value.trim();
+      const sheetsUrl = document.getElementById('sheets-url').value.trim();
+      if (driveUrl) localStorage.setItem(CONFIG_KEYS.driveFolder, driveUrl);
+      if (sheetsUrl) localStorage.setItem(CONFIG_KEYS.sheetsUrl, sheetsUrl);
+      updateDashboardLinks();
+      document.getElementById('config-status').textContent = 'Configuration enregistrée localement.';
+      setTimeout(() => document.getElementById('config-status').textContent = '', 3000);
+    }
 
-      const allCards = section.querySelectorAll(".prompt-card");
-      const copiedCards = section.querySelectorAll(".prompt-card.copied");
+    function loadConfig() {
+      const driveUrl = localStorage.getItem(CONFIG_KEYS.driveFolder) || '';
+      const sheetsUrl = localStorage.getItem(CONFIG_KEYS.sheetsUrl) || '';
+      document.getElementById('drive-folder-url').value = driveUrl;
+      document.getElementById('sheets-url').value = sheetsUrl;
+      updateDashboardLinks();
+      document.getElementById('config-status').textContent = 'Configuration chargée.';
+      setTimeout(() => document.getElementById('config-status').textContent = '', 3000);
+    }
 
-      if (allCards.length > 1 && copiedCards.length < allCards.length) {
+    function updateDashboardLinks() {
+      const driveUrl = getDriveFolderUrl();
+      const sheetsUrl = getSheetsUrl();
+
+      const driveLink = document.getElementById('dash-drive-link');
+      const sheetsLink = document.getElementById('dash-sheets-link');
+      const sheetsEmbed = document.getElementById('sheets-embed');
+
+      if (driveUrl) {
+        driveLink.href = driveUrl;
+        driveLink.style.opacity = '1';
+      } else {
+        driveLink.href = '#';
+        driveLink.style.opacity = '0.5';
+      }
+
+      if (sheetsUrl) {
+        sheetsLink.href = sheetsUrl;
+        sheetsLink.style.opacity = '1';
+        const embedUrl = sheetsUrl.replace('/edit', '/htmlembed');
+        sheetsEmbed.src = embedUrl;
+      } else {
+        sheetsLink.href = '#';
+        sheetsLink.style.opacity = '0.5';
+        sheetsEmbed.src = '';
+      }
+    }
+
+    function generateImportPrompt() {
+      const title = document.getElementById('doc-title').value.trim();
+      const type = document.getElementById('doc-type').value;
+      const date = document.getElementById('doc-date').value.trim();
+      const content = document.getElementById('doc-content').value.trim();
+      const driveUrl = getDriveFolderUrl();
+
+      if (!driveUrl) {
+        alert('Renseigne d\'abord le dossier Google Drive dans la section Configuration.');
+        return;
+      }
+      if (!title && !content) {
+        alert('Renseigne au moins le titre ou un extrait de contenu.');
         return;
       }
 
-      navLink.classList.add("nav-copied");
+      const prompt = `Tu es l'assistant archiviste du projet SmartDoc.
+Le dossier de travail Google Drive est : ${driveUrl}
+
+Un nouveau document doit être classé. Voici les informations disponibles :
+- Titre / nom de fichier : ${title || '(non renseigné)'}
+- Type documentaire proposé : ${type || '(à déterminer)'}
+- Date détectée : ${date || '(non renseignée)'}
+- Contenu ou extrait : ${content || '(non fourni)'}
+
+Travaille directement dans Google Drive :
+1. Si le fichier est dans 01_DEPOT_VRAC/, lis-le.
+2. Pose-moi les questions nécessaires pour compléter la classification :
+   - titre définitif
+   - auteur / organisme
+   - audience et destinataire éventuel
+   - type documentaire parmi 01_CONFERENCES, 02_ARTICLES_ET_PUBLICATIONS, 03_NOTES_ET_BROUILLONS, 04_CORRESPONDANCES, 05_DOCUMENTS_INSTITUTIONNELS
+   - date exacte ou approximative (source document ou filename)
+   - résumé analytique
+   - tags, concepts, personnes, lieux
+   - registre visuel parmi register_1 à register_5
+   - statut de classification
+   - confiance et nécessité de vérification humaine
+3. Propose un nom normalisé : YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext
+4. Après ma validation explicite, copie le fichier dans 03_ARCHIVES_CLASSEES/ avec le nom normalisé.
+5. Mets à jour le registre Google Sheets du projet avec toutes les métadonnées.
+6. Signale les incertitudes (date inconnue, doublon possible, vérification humaine requise).
+
+Règles :
+- Ne supprime jamais le fichier source.
+- Ne modifie jamais le contenu du document.
+- N'invente pas de date ou de métadonnée ; laisse vide ou demande validation.
+- Copie uniquement après validation explicite.`;
+
+      document.getElementById('import-prompt').querySelector('code').textContent = prompt;
+      document.getElementById('import-prompt-card').style.display = 'block';
     }
 
-    function scrollToNextCard(button) {
-      const section = button.closest("section[id^='step-']");
-      if (!section) return;
-
-      const allCards = Array.from(section.querySelectorAll(".prompt-card"));
-      const currentCard = button.closest(".prompt-card");
-      const currentIndex = allCards.indexOf(currentCard);
-
-      if (currentIndex >= 0 && currentIndex < allCards.length - 1) {
-        const nextCard = allCards[currentIndex + 1];
-        const nextButton = nextCard.querySelector(".copy-btn");
-        if (nextButton) {
-          nextButton.scrollIntoView({ behavior: "smooth", block: "center" });
-        } else {
-          nextCard.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }
+    function copyImportPrompt() {
+      const text = document.getElementById('import-prompt').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('#import-prompt-card .copy-btn');
+        const original = btn.textContent;
+        btn.textContent = 'Copié !';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+      });
     }
 
-    document.querySelectorAll(".copy-btn").forEach((button) => {
-      button.addEventListener("click", async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+    function resetImportForm() {
+      document.getElementById('doc-title').value = '';
+      document.getElementById('doc-type').value = '';
+      document.getElementById('doc-date').value = '';
+      document.getElementById('doc-content').value = '';
+      document.getElementById('import-prompt-card').style.display = 'none';
+    }
 
-        const promptCard = button.closest(".prompt-card");
-        const code = promptCard ? promptCard.querySelector("pre.prompt code") : null;
-        const text = code ? code.textContent.trim() : "";
+    const TEMPLATES = {
+      init: `Tu es l'assistant archiviste du projet SmartDoc. Travaille dans le dossier Google Drive du projet.
 
-        if (!text) {
-          button.textContent = "Erreur";
-          setTimeout(() => {
-            button.textContent = "Copier";
-          }, 1200);
-          return;
-        }
+1. Crée l'arborescence suivante si elle n'existe pas :
+   - 01_DEPOT_VRAC/
+   - 02_A_VALIDER/
+   - 03_ARCHIVES_CLASSEES/
+     - 01_CONFERENCES/ (avec sous-dossiers YYYY/)
+     - 02_ARTICLES_ET_PUBLICATIONS/ (avec sous-dossiers YYYY/)
+     - 03_NOTES_ET_BROUILLONS/
+     - 04_CORRESPONDANCES/
+     - 05_DOCUMENTS_INSTITUTIONNELS/
+   - 099_SYSTEME/
 
-        try {
-          const copied = await copyTextToClipboard(text);
-          if (!copied) throw new Error("copy failed");
+2. Crée un Google Sheets intitulé "registre_documentation" dans 099_SYSTEME/ avec les colonnes :
+   document_id, source_path, current_name, proposed_name, final_path, drive_file_id, drive_web_url, file_type, file_size, detected_date, date_source, date_status, author, audience, recipient, title, document_type, summary, tags, people, places, concepts, visual_register, duplicate_status, classification_status, confidence, human_check, source_reference, processed_at, notes
 
-          button.textContent = "Copié";
-          button.classList.add("copied");
-          promptCard.classList.add("copied");
+3. Crée un onglet "configuration" avec les cinq registres visuels :
+   - register_1 : Récit & témoignage — orange #e07845
+   - register_2 : Droits & politique — bleu #5ba0d0
+   - register_3 : Théorie & épistémologie — violet #c76dd7
+   - register_4 : Critique de la CAA — vert #50b88e
+   - register_5 : Singularité existentielle — or #d4a843
 
-          highlightNavForButton(button);
-          scrollToNextCard(button);
+Ne crée pas de documents fictifs. Attends le dépôt de fichiers dans 01_DEPOT_VRAC/.`,
 
-          setTimeout(() => {
-            button.textContent = "Copier";
-            button.classList.remove("copied");
-          }, 1200);
-        } catch (error) {
-          const range = document.createRange();
-          range.selectNodeContents(code);
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(range);
+      audit: `Audite le contenu du dossier 01_DEPOT_VRAC/ dans le projet SmartDoc sur Google Drive.
 
-          button.textContent = "Sélectionné";
-          promptCard.classList.add("copied");
+Ne modifie, ne renomme et ne copie aucun fichier.
 
-          highlightNavForButton(button);
-          scrollToNextCard(button);
+Pour chaque fichier, relève :
+- nom actuel
+- chemin source
+- format / extension
+- taille
+- date détectée si explicitement présente dans le nom ou le document
+- type documentaire probable
 
-          setTimeout(() => {
-            button.textContent = "Copier";
-          }, 1400);
-        }
+Produis un rapport avec :
+- nombre total de fichiers
+- répartition par format
+- répartition par type documentaire probable
+- nombre de fichiers avec date explicite
+- nombre de fichiers sans date
+- anomalies (vides, illisibles, hors périmètre)
+- volumes totaux
+
+Ne crée pas encore de lignes dans le registre.`,
+
+      duplicates: `Dans le dossier 01_DEPOT_VRAC/ du projet SmartDoc sur Google Drive, identifie :
+
+1. Les doublons exacts :
+   - fichiers identiques par nom et contenu
+   - fichiers identiques par contenu avec nom différent
+
+2. Les doublons probables :
+   - fichiers très similaires (versions, brouillons, copies partielles)
+
+3. Les fichiers problématiques :
+   - fichiers vides
+   - fichiers illisibles
+   - fichiers hors périmètre
+
+Pour chaque cas, indique :
+- le ou les fichiers concernés
+- le type de problème : exact_duplicate / possible_duplicate / unknown
+- niveau de confiance : high / medium / low
+
+Ne supprime jamais un fichier. Présente la liste pour examen.`,
+
+      classify: `Prépare un lot de classement à partir des fichiers de 01_DEPOT_VRAC/ dans le projet SmartDoc sur Google Drive.
+
+Pour chaque document du lot, indique :
+- nom actuel
+- nom proposé (format YYYY-MM-DD_Auteur-ou-Organisme_Titre-court.ext)
+- destination proposée dans 03_ARCHIVES_CLASSEES/
+- justification courte
+- niveau de confiance : high / medium / low
+
+Attends ma validation explicite avant toute action.
+
+Après validation :
+1. Copie les fichiers approuvés dans 03_ARCHIVES_CLASSEES/ avec leur nom normalisé.
+2. Oriente les cas ambigus vers 02_A_VALIDER/ ou laisse-les en attente selon ma décision.
+3. Laisse dans 01_DEPOT_VRAC/ les documents dont seule la date est à investiguer.
+4. Fournis la liste des originaux que je peux purger.
+
+Ne supprime jamais un fichier. Mets à jour le registre Sheets à chaque opération validée.`,
+
+      index: `Pour chaque document classé dans 03_ARCHIVES_CLASSEES/ du projet SmartDoc sur Google Drive, enrichis le registre Sheets avec :
+
+1. Métadonnées d'identification :
+   - title, author, audience, recipient, document_type, file_type, file_size
+
+2. Contenu analytique :
+   - summary (résumé analytique court)
+   - tags (mots-clés)
+   - concepts (concepts principaux)
+   - people (personnes citées)
+   - places (lieux mentionnés)
+
+3. Date :
+   - detected_date si explicite
+   - date_source = document / filename
+   - date_status = explicit_document / explicit_filename / unknown / to_investigate
+
+4. Références :
+   - source_reference
+   - drive_file_id et drive_web_url
+
+5. Statut :
+   - classification_status = classified
+   - confidence = high / medium / low
+   - human_check = required / not_required
+
+Ne modifie jamais le contenu des documents source.`,
+
+      questions: `Dans le projet SmartDoc sur Google Drive, prends un document du registre dont la date est inconnue (date_status = unknown ou to_investigate) ou un document nouvellement ajouté.
+
+Compare-le avec le reste du corpus validé selon :
+- thèmes et concepts
+- vocabulaire utilisé
+- personnes citées
+- auditoire visé
+- destinataire
+- genre documentaire
+
+Propose :
+1. Une date plausible ou une fourchette, avec justification
+2. Des documents du corpus auxquels il pourrait être rattaché
+3. Des questions de recherche pour lever l'incertitude
+4. Une hypothèse de classification provisoire
+
+N'inscris rien dans le registre sans validation explicite.`
+    };
+
+    document.querySelectorAll('[data-template]').forEach(button => {
+      button.addEventListener('click', () => {
+        const key = button.dataset.template;
+        const title = {
+          init: 'Initialiser le projet',
+          audit: 'Auditer le dépôt',
+          duplicates: 'Détecter les doublons',
+          classify: 'Normaliser et classer',
+          index: 'Indexer les documents',
+          questions: 'Questions de recherche'
+        }[key];
+        document.getElementById('template-title').textContent = title;
+        document.getElementById('template-prompt').querySelector('code').textContent = TEMPLATES[key];
+        document.getElementById('template-prompt-card').style.display = 'block';
+        document.getElementById('template-prompt-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     });
-  </script>
 
+    function copyTemplatePrompt() {
+      const text = document.getElementById('template-prompt').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('#template-prompt-card .copy-btn');
+        const original = btn.textContent;
+        btn.textContent = 'Copié !';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+      });
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+      loadConfig();
+    });
+  </script>
 </body>
 </html>
