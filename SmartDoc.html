@@ -345,20 +345,6 @@ strong {
   box-shadow: inset 0 0 0 1px rgba(5, 7, 13, 0.02);
 }
 
-.optional-tag {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 8px;
-  padding: 2px 10px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0;
-  border-radius: var(--radius-pill);
-  background: var(--accent-soft);
-  color: var(--accent-2);
-  vertical-align: middle;
-}
-
 /* WORKFLOW / FLUX CIBLE */
 
 .workflow {
@@ -1149,7 +1135,7 @@ Règles générales :
 
     <section class="card" id="step-2">
       <h2>2. 🔌 Vérifier les accès</h2>
-      <p>Objectif : vérifier {{connector}}, le répertoire projet, {{skillXlsx}} et {{skillPdf}} avant toute action.</p>
+      <p>Objectif : vérifier {{connector}}, le répertoire projet, {{skillXlsx}} et {{skillPdf}} avant toute action. Si le dossier source est vide, Claude propose de générer un jeu d'essai.</p>
 
 
         <div class="prompt-card">
@@ -1181,38 +1167,21 @@ Règles générales :
 
 Réponds point par point, et signale clairement ce qui ne fonctionne pas.
 
+Enfin, si le dossier "{{src}}" est vide ou contient moins de 5 fichiers, propose-moi de créer un jeu d'essai pour la formation. Si j'accepte :
+- demande-moi d'abord dans quel secteur d'activité je travaille, et attends ma réponse ;
+- crée ensuite dans "{{src}}" 10 documents fictifs, plausibles et variés pour ce métier : compte rendu, facture, contrat, note interne, procédure, courrier, devis, présentation, rapport, fiche pratique ;
+- utilise les formats que tu sais réellement créer dans ce stockage (document texte, .txt ou .md à défaut) ;
+- contenu court mais crédible, 5 à 15 lignes, avec des noms de personnes, des lieux et des dates fictifs ;
+- 8 documents portent une date explicite, 1 n'en porte aucune, et 1 est un doublon volontaire d'un autre : même contenu, nom de fichier différent ;
+- les noms de fichiers sont volontairement désordonnés : majuscules aléatoires, underscores, "v2", "final", "copie de", abréviations ;
+- aucune donnée réelle, aucune donnée personnelle véritable ;
+- termine en listant les fichiers créés avec leur nom exact.
+
 Ne lance pas encore l'analyse des documents.
 Ne crée pas encore le registre.
 Ne {{actionImp}} aucun fichier.
-Ne modifie rien sans confirmation.</code></pre>
-        </div>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Jeu d'essai<span class="optional-tag">optionnel</span></h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Avant de commencer, j'ai besoin d'un jeu d'essai dans le dossier "{{src}}".
-
-Phase 1 — Question préalable, obligatoire :
-Demande-moi d'abord : "Dans quel secteur d'activité travaillez-vous ?"
-Attends ma réponse. Ne crée aucun fichier avant de l'avoir reçue.
-
-Phase 2 — Génération :
-À partir de mon secteur, crée dans le dossier "{{src}}" 10 documents fictifs, plausibles et variés pour ce métier : par exemple compte rendu, facture, contrat, note interne, procédure, courrier, devis, présentation, rapport, fiche pratique.
-
-Contraintes :
-- utilise les formats que tu sais réellement créer dans ce stockage (document texte, .txt ou .md à défaut) ;
-- contenu court mais crédible, 5 à 15 lignes, avec des noms de personnes, des lieux et des dates fictifs ;
-- 8 documents portent une date explicite, visible dans le contenu ou dans le nom du fichier ;
-- 1 document ne porte aucune date ;
-- 1 document est un doublon volontaire d'un autre : même contenu, nom de fichier différent ;
-- les noms de fichiers sont volontairement désordonnés et incohérents : majuscules aléatoires, underscores, "v2", "final", "copie de", abréviations ;
-- aucune donnée réelle, aucune donnée personnelle véritable.
-
-Ne classe rien.
 Ne crée aucun sous-dossier dans "{{dst}}".
-À la fin, liste les 10 fichiers créés avec leur nom exact.</code></pre>
+Ne modifie rien sans confirmation.</code></pre>
         </div>
 
     </section>
@@ -1533,15 +1502,17 @@ Règles :
 
     <section class="card" id="step-10">
       <h2>10. 💬 Interroger le fonds</h2>
-      <p>Le registre devient la mémoire de Claude. Les deux rapports PDF sont au choix : jouez celui qui parle à votre interlocuteur.</p>
+      <p>Le registre devient la mémoire de Claude, et le rapport PDF restitue à la fois l'état du fonds et ce qu'il contient.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Questions au fonds</h3>
+            <h3>Prompt — Questions au fonds et rapport PDF</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Le registre "{{fileName}}" est désormais ta mémoire documentaire. Utilise-le pour répondre, sans rien inventer.
+
+PREMIÈRE PARTIE — interroge le fonds.
 
 Réponds aux questions suivantes en citant systématiquement tes sources : nom du fichier, et page quand elle existe.
 
@@ -1557,53 +1528,33 @@ Règles :
 - si le registre ne suffit pas pour répondre, dis-le explicitement au lieu de combler ;
 - distingue clairement ce que le fonds démontre de ce qu'il suggère ;
 - les documents sans date certaine ne sont jamais placés arbitrairement dans une chronologie ;
-- ne modifie pas le registre.</code></pre>
-        </div>
+- ne modifie pas le registre.
 
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Rapport PDF : état du fonds</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>À partir du registre "{{fileName}}", utilise la skill {{skillPdf}} pour générer un rapport PDF court sur l'état du fonds.
+SECONDE PARTIE — produis le rapport.
 
-Le rapport doit contenir :
+Utilise ensuite la skill {{skillPdf}} pour générer un seul rapport PDF, en deux sections.
+
+Section 1, état du fonds :
 - date du rapport et périmètre analysé ;
 - nombre total de documents traités ;
-- répartition par category ;
-- répartition par status ;
+- répartition par category et par status ;
 - nombre de documents sans date explicite ;
 - doublons détectés et sort qui leur a été réservé ;
 - documents en needs_review et motif ;
-- actions humaines restantes ;
-- limites de l'analyse.
+- actions humaines restantes.
 
-Règles :
-- ne jamais inclure le contenu complet d'un document ;
-- ne pas inventer de chiffre : tout doit provenir du registre ;
-- ne pas exposer de données sensibles inutiles ;
-- sauvegarder le PDF dans le répertoire du projet ;
-- indiquer le chemin du fichier généré.</code></pre>
-        </div>
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Rapport PDF : synthèse intellectuelle</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>À partir du registre "{{fileName}}", utilise la skill {{skillPdf}} pour générer une synthèse du contenu intellectuel du fonds.
-
-Ce rapport doit restituer ce que le fonds contient, et non son état de rangement :
-- les grands thèmes du fonds et leur poids relatif ;
+Section 2, contenu du fonds :
+- les grands thèmes et leur poids relatif ;
 - l'évolution des thèmes et des concepts dans le temps, quand les dates le permettent ;
 - les auteurs, personnes ou interlocuteurs récurrents, et ceux qui apparaissent ensemble ;
-- les périodes les plus denses ;
 - 3 à 5 documents représentatifs, avec un résumé d'une phrase chacun ;
 - ce que le fonds ne couvre pas ou couvre mal.
 
 Règles :
+- ne jamais inclure le contenu complet d'un document ;
+- ne pas inventer de chiffre : tout doit provenir du registre ;
 - chaque affirmation renvoie aux documents qui la fondent, par leur nom de fichier ;
-- les documents sans date certaine figurent à part et ne sont jamais placés arbitrairement dans une chronologie ;
+- les documents sans date certaine figurent à part, jamais placés arbitrairement dans une chronologie ;
 - signaler les données insuffisantes plutôt que compléter par des contenus inventés ;
 - sauvegarder le PDF dans le répertoire du projet et indiquer son chemin.</code></pre>
         </div>
