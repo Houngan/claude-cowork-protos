@@ -654,6 +654,111 @@ input:focus-visible {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.field input.invalid {
+  border-color: #ef4444;
+}
+
+.field-error {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.setup-back {
+  display: inline-block;
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--accent-2);
+  text-decoration: none;
+}
+
+.setup-back:hover {
+  text-decoration: underline;
+}
+
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-browse {
+  appearance: none;
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 800;
+  color: var(--black);
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.btn-browse:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-2);
+}
+
+.picked {
+  font-size: 14.5px;
+  color: var(--muted);
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.picked.filled {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(207, 175, 231, 0.20);
+  color: var(--black);
+  font-weight: 800;
+}
+
+.setup-note {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.btn-start {
+  appearance: none;
+  margin: 20px 0 0;
+  padding: 13px 26px;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: 900;
+  color: #ffffff;
+  cursor: pointer;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #8c6aa8;
+  transition:
+    transform 150ms ease,
+    filter 150ms ease;
+}
+
+.btn-start:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.btn-start:disabled {
+  cursor: not-allowed;
+  background: var(--border-strong);
+}
+
 .storage-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -828,38 +933,62 @@ input:focus-visible {
   <section class="storage-select" id="storage-select">
     <div class="wrap">
       <div class="select-intro">
-        <p>Deux dossiers à nommer, un stockage à choisir</p>
-      </div>
-
-      <div class="setup-card">
-        <h2>⚙️ Vos deux dossiers</h2>
-        <p class="hint">Nom de sous-dossier du dossier de travail Cowork, chemin complet, ou nom de dossier Google Drive. Ces deux valeurs sont injectées dans les douze prompts de la formation.</p>
-        <div class="folder-grid">
-          <div class="field">
-            <label for="src-input">📥 Dossier source — les documents à classer</label>
-            <input type="text" id="src-input" value="À classer" placeholder="À classer" spellcheck="false">
-          </div>
-          <div class="folder-arrow" aria-hidden="true">→</div>
-          <div class="field">
-            <label for="dst-input">🗄️ Dossier cible — le fonds rangé</label>
-            <input type="text" id="dst-input" value="Classé" placeholder="Classé" spellcheck="false">
-          </div>
-        </div>
+        <p>Où sont vos documents ?</p>
       </div>
 
       <div class="storage-grid">
-        <a class="storage-card" id="card-local" href="#">
+        <a class="storage-card" id="card-local" href="SmartDoc.html?storage=local">
           <div class="storage-logo" id="logo-local"></div>
           <h2 class="storage-name">Dossier local</h2>
           <p class="storage-desc">via le dossier de travail Cowork — les dossiers OneDrive ou SharePoint synchronisés fonctionnent aussi</p>
-          <span class="storage-cta">Commencer →</span>
+          <span class="storage-cta">Choisir →</span>
         </a>
-        <a class="storage-card" id="card-drive" href="#">
+        <a class="storage-card" id="card-drive" href="SmartDoc.html?storage=drive">
           <div class="storage-logo" id="logo-drive"></div>
           <h2 class="storage-name">Google Drive</h2>
           <p class="storage-desc">via le connecteur Google Drive</p>
-          <span class="storage-cta">Commencer →</span>
+          <span class="storage-cta">Choisir →</span>
         </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="storage-select" id="folder-setup">
+    <div class="wrap">
+      <div class="select-intro">
+        <p id="setup-intro">Deux dossiers à nommer</p>
+      </div>
+
+      <div class="setup-card">
+        <a class="setup-back" href="SmartDoc.html">← Changer de stockage</a>
+        <h2 id="setup-title">⚙️ Vos deux dossiers</h2>
+        <p class="hint">Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.</p>
+
+        <div class="folder-grid">
+          <div class="field">
+            <label for="src-input" id="src-label">📥 Dossier source</label>
+
+            <div class="picker" id="src-picker" hidden>
+              <button class="btn-browse" type="button" id="src-browse">📂 Parcourir…</button>
+              <span class="picked" id="src-picked">Aucun dossier sélectionné</span>
+            </div>
+
+            <input type="text" id="src-input" placeholder="ex. Factures à trier" spellcheck="false" autocomplete="off">
+            <p class="field-error" id="src-error" hidden>Indiquez le dossier de départ.</p>
+          </div>
+
+          <div class="folder-arrow" aria-hidden="true">→</div>
+
+          <div class="field">
+            <label for="dst-input" id="dst-label">🗄️ Dossier cible</label>
+            <input type="text" id="dst-input" placeholder="ex. Archives" spellcheck="false" autocomplete="off">
+            <p class="field-error" id="dst-error" hidden>Nommez le dossier d'arrivée.</p>
+          </div>
+        </div>
+
+        <p class="setup-note">Le registre Excel et les rapports PDF ne vont dans aucun de ces deux dossiers : ils sont créés dans le répertoire du projet Cowork.</p>
+
+        <button class="btn-start" type="button" id="start-btn" disabled>Commencer la formation →</button>
       </div>
     </div>
   </section>
@@ -1014,9 +1143,11 @@ Règles générales :
           <pre class="prompt"><code>Vérifie que tu as accès aux éléments nécessaires pour ce projet :
 
 1. {{storage}}, via {{connector}} :
-- peux-tu lister les fichiers du dossier "{{src}}" ?
+- trouves-tu le dossier "{{src}}" ? indique combien de fichiers il contient ;
+- si tu ne le trouves pas, dis-le clairement et demande-moi où il se situe avant de continuer ;
 - peux-tu lire le contenu d'un de ces fichiers ?
-- peux-tu créer un sous-dossier dans "{{dst}}" ?
+- le dossier "{{dst}}" existe-t-il ? s'il n'existe pas, crée-le ;
+- peux-tu y créer un sous-dossier ?
 - peux-tu {{action}} un fichier vers "{{dst}}" ?
 
 2. Répertoire du projet :
@@ -1668,10 +1799,27 @@ Contraintes de test :
       }
     };
 
-    const DEFAULT_SRC = "À classer";
-    const DEFAULT_DST = "Classé";
     const LS_SRC = "smartdoc_src";
     const LS_DST = "smartdoc_dst";
+
+    const SETUP_COPY = {
+      local: {
+        intro: "Deux dossiers de votre poste à désigner",
+        title: "⚙️ Vos deux dossiers",
+        srcLabel: "📥 Dossier source — où sont vos documents en vrac aujourd'hui",
+        dstLabel: "🗄️ Dossier cible — où Claude les rangera (il le créera s'il n'existe pas)",
+        srcPlaceholder: "ex. Factures à trier",
+        dstPlaceholder: "ex. Archives"
+      },
+      drive: {
+        intro: "Deux dossiers Google Drive à désigner",
+        title: "⚙️ Vos deux dossiers Google Drive",
+        srcLabel: "📥 Dossier Drive source — où sont vos documents en vrac aujourd'hui",
+        dstLabel: "🗄️ Dossier Drive cible — où Claude les rangera (il le créera s'il n'existe pas)",
+        srcPlaceholder: "ex. Fonds à classer",
+        dstPlaceholder: "ex. Archives"
+      }
+    };
   </script>
 
   <script>
@@ -1695,43 +1843,136 @@ Contraintes de test :
         }
       }
 
-      var src = (params.get("src") || stored(LS_SRC) || DEFAULT_SRC).trim() || DEFAULT_SRC;
-      var dst = (params.get("dst") || stored(LS_DST) || DEFAULT_DST).trim() || DEFAULT_DST;
+      var src = (params.get("src") || "").trim();
+      var dst = (params.get("dst") || "").trim();
 
-      if (!storageKey || !STORAGES[storageKey]) {
-        var selectSection = document.getElementById("storage-select");
-        selectSection.classList.add("active");
-        document.getElementById("logo-local").innerHTML = STORAGES.local.logo;
-        document.getElementById("logo-drive").innerHTML = STORAGES.drive.logo;
+      function hideWorkflow() {
         document.querySelector("nav").style.display = "none";
         document.getElementById("params-bar").style.display = "none";
         document.querySelector("main").style.display = "none";
+      }
 
-        var srcInput = document.getElementById("src-input");
-        var dstInput = document.getElementById("dst-input");
-        srcInput.value = src;
-        dstInput.value = dst;
-
-        [["card-local", "local"], ["card-drive", "drive"]].forEach(function (pair) {
-          document.getElementById(pair[0]).addEventListener("click", function (event) {
-            event.preventDefault();
-            var chosenSrc = srcInput.value.trim() || DEFAULT_SRC;
-            var chosenDst = dstInput.value.trim() || DEFAULT_DST;
-            remember(LS_SRC, chosenSrc);
-            remember(LS_DST, chosenDst);
-            window.location.href =
-              "SmartDoc.html?storage=" + pair[1] +
-              "&src=" + encodeURIComponent(chosenSrc) +
-              "&dst=" + encodeURIComponent(chosenDst);
-          });
-        });
+      // ÉCRAN 1 — choix du stockage, aucun champ
+      if (!storageKey || !STORAGES[storageKey]) {
+        document.getElementById("storage-select").classList.add("active");
+        document.getElementById("logo-local").innerHTML = STORAGES.local.logo;
+        document.getElementById("logo-drive").innerHTML = STORAGES.drive.logo;
+        hideWorkflow();
         return;
       }
 
+      var s = STORAGES[storageKey];
+
+      // ÉCRAN 2 — désignation des deux dossiers
+      if (!src || !dst) {
+        var copy = SETUP_COPY[storageKey];
+        document.getElementById("folder-setup").classList.add("active");
+        hideWorkflow();
+
+        document.title = "Proto Claude SmartDoc — " + s.name;
+        document.getElementById("page-title").textContent = "📚 Proto Claude SmartDoc — " + s.name;
+        document.getElementById("setup-intro").textContent = copy.intro;
+        document.getElementById("setup-title").textContent = copy.title;
+        document.getElementById("src-label").textContent = copy.srcLabel;
+        document.getElementById("dst-label").textContent = copy.dstLabel;
+
+        var srcInput = document.getElementById("src-input");
+        var dstInput = document.getElementById("dst-input");
+        var srcError = document.getElementById("src-error");
+        var dstError = document.getElementById("dst-error");
+        var startBtn = document.getElementById("start-btn");
+        var srcPicker = document.getElementById("src-picker");
+        var srcPicked = document.getElementById("src-picked");
+
+        srcInput.placeholder = copy.srcPlaceholder;
+        dstInput.placeholder = copy.dstPlaceholder;
+        srcInput.value = params.get("src") || stored(LS_SRC) || "";
+        dstInput.value = params.get("dst") || stored(LS_DST) || "";
+
+        // Sélecteur natif : uniquement en local, et seulement si le navigateur le propose.
+        // Il ne renvoie que le NOM du dossier — jamais son chemin absolu.
+        var canBrowse =
+          storageKey === "local" && typeof window.showDirectoryPicker === "function";
+
+        if (canBrowse) {
+          srcPicker.hidden = false;
+          srcInput.hidden = true;
+          refreshPicked();
+
+          document.getElementById("src-browse").addEventListener("click", function () {
+            window
+              .showDirectoryPicker()
+              .then(function (handle) {
+                srcInput.value = handle.name;
+                refreshPicked();
+                validate(false);
+              })
+              .catch(function () {
+                /* sélection annulée : on ne touche à rien */
+              });
+          });
+        }
+
+        function refreshPicked() {
+          if (srcInput.value) {
+            srcPicked.textContent = "📁 " + srcInput.value;
+            srcPicked.classList.add("filled");
+          } else {
+            srcPicked.textContent = "Aucun dossier sélectionné";
+            srcPicked.classList.remove("filled");
+          }
+        }
+
+        function validate(showErrors) {
+          var okSrc = srcInput.value.trim().length > 0;
+          var okDst = dstInput.value.trim().length > 0;
+
+          srcError.hidden = okSrc || !showErrors;
+          dstError.hidden = okDst || !showErrors;
+          srcInput.classList.toggle("invalid", showErrors && !okSrc);
+          dstInput.classList.toggle("invalid", showErrors && !okDst);
+
+          startBtn.disabled = !(okSrc && okDst);
+          return okSrc && okDst;
+        }
+
+        [srcInput, dstInput].forEach(function (input) {
+          input.addEventListener("input", function () {
+            validate(false);
+          });
+          // le bouton grisé n'explique rien : on signale le champ vide dès qu'on le quitte
+          input.addEventListener("blur", function () {
+            if (!input.value.trim()) validate(true);
+          });
+        });
+
+        startBtn.addEventListener("click", function () {
+          if (!validate(true)) return;
+          var chosenSrc = srcInput.value.trim();
+          var chosenDst = dstInput.value.trim();
+          remember(LS_SRC, chosenSrc);
+          remember(LS_DST, chosenDst);
+          window.location.href =
+            "SmartDoc.html?storage=" + storageKey +
+            "&src=" + encodeURIComponent(chosenSrc) +
+            "&dst=" + encodeURIComponent(chosenDst);
+        });
+
+        dstInput.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") startBtn.click();
+        });
+
+        validate(false);
+        return;
+      }
+
+      // ÉCRAN 3 — les 12 étapes
       remember(LS_SRC, src);
       remember(LS_DST, dst);
-
-      var s = STORAGES[storageKey];
+      document.querySelector(".params-edit").setAttribute(
+        "href",
+        "SmartDoc.html?storage=" + storageKey
+      );
 
       document.title = "Proto Claude SmartDoc — " + s.name;
       document.getElementById("page-title").textContent = "📚 Proto Claude SmartDoc — " + s.name;
