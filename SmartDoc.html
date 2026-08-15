@@ -690,19 +690,6 @@ input:focus-visible {
   color: #ef4444;
 }
 
-.setup-back {
-  display: inline-block;
-  margin: 0 0 12px;
-  font-size: 13.5px;
-  font-weight: 800;
-  color: var(--accent-2);
-  text-decoration: none;
-}
-
-.setup-back:hover {
-  text-decoration: underline;
-}
-
 .picker {
   display: flex;
   flex-wrap: wrap;
@@ -985,7 +972,6 @@ input:focus-visible {
       </div>
 
       <div class="setup-card">
-        <a class="setup-back" href="SmartDoc.html">← Changer de fournisseur</a>
         <h2 id="setup-title">⚙️ Vos deux dossiers</h2>
         <p class="hint" id="setup-hint">Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.</p>
 
@@ -1885,6 +1871,11 @@ Contraintes de test :
 
         document.title = "Proto Claude SmartDoc — " + s.name;
         document.getElementById("page-title").textContent = "📚 Proto Claude SmartDoc — " + s.name;
+
+        var setupBack = document.querySelector(".back-btn");
+        setupBack.textContent = "← Changer de stockage";
+        setupBack.setAttribute("href", "SmartDoc.html");
+
         document.getElementById("setup-intro").textContent = copy.intro;
         document.getElementById("setup-title").textContent = copy.title;
         document.getElementById("setup-hint").textContent = copy.hint;
@@ -2002,7 +1993,7 @@ Contraintes de test :
         "Classer, indexer et interroger un fonds documentaire";
 
       var backBtn = document.querySelector(".back-btn");
-      backBtn.textContent = "← Changer de fournisseur";
+      backBtn.textContent = "← Changer de stockage";
       backBtn.setAttribute("href", "SmartDoc.html");
 
       document.getElementById("pb-storage").textContent = s.name;
