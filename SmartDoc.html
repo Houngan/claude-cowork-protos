@@ -965,13 +965,13 @@ input:focus-visible {
         <a class="storage-card" id="card-local" href="SmartDoc.html?storage=local">
           <div class="storage-logo" id="logo-local"></div>
           <h2 class="storage-name">Dossier local</h2>
-          <p class="storage-desc">Un dossier de votre ordinateur, que vous pourrez parcourir — OneDrive et SharePoint synchronisés compris</p>
+          <p class="storage-desc">Un dossier de votre ordinateur que vous pourrez parcourir</p>
           <span class="storage-cta">Choisir →</span>
         </a>
         <a class="storage-card" id="card-drive" href="SmartDoc.html?storage=drive">
           <div class="storage-logo" id="logo-drive"></div>
           <h2 class="storage-name">Google Drive</h2>
-          <p class="storage-desc">Un dossier en ligne, dont vous donnerez le nom — via le connecteur Google Drive</p>
+          <p class="storage-desc">Un dossier en ligne dont vous donnerez l'adresse</p>
           <span class="storage-cta">Choisir →</span>
         </a>
       </div>
@@ -985,7 +985,7 @@ input:focus-visible {
       </div>
 
       <div class="setup-card">
-        <a class="setup-back" href="SmartDoc.html">← Changer de stockage</a>
+        <a class="setup-back" href="SmartDoc.html">← Changer de fournisseur</a>
         <h2 id="setup-title">⚙️ Vos deux dossiers</h2>
         <p class="hint" id="setup-hint">Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.</p>
 
@@ -1831,8 +1831,8 @@ Contraintes de test :
         hint: "Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.",
         srcLabel: "📥 Dossier source — où sont vos documents en vrac aujourd'hui",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera (il le créera s'il n'existe pas)",
-        srcPlaceholder: "ex. Factures à trier",
-        dstPlaceholder: "ex. Archives"
+        srcPlaceholder: "Ex : Factures à trier",
+        dstPlaceholder: "Ex : Archives"
       },
       drive: {
         intro: "Deux dossiers Google Drive à désigner",
@@ -1840,8 +1840,8 @@ Contraintes de test :
         hint: "Collez l'adresse du dossier depuis Google Drive — elle contient son identifiant, donc aucune confusion possible entre deux dossiers de même nom. Un simple nom fonctionne aussi. La valeur sera recopiée telle quelle dans les douze prompts.",
         srcLabel: "📥 Dossier Drive source — où sont vos documents en vrac aujourd'hui",
         dstLabel: "🗄️ Dossier Drive cible — où Claude les rangera (il le créera s'il n'existe pas)",
-        srcPlaceholder: "https://drive.google.com/drive/folders/1AbCdEf…",
-        dstPlaceholder: "adresse du dossier, ou un nom à créer"
+        srcPlaceholder: "Ex : https://drive.google.com/drive/u/0/home",
+        dstPlaceholder: "Ex : https://drive.google.com/drive/u/0/home"
       }
     };
   </script>
@@ -1987,7 +1987,7 @@ Contraintes de test :
         "Classer, indexer et interroger un fonds documentaire";
 
       var backBtn = document.querySelector(".back-btn");
-      backBtn.textContent = "← Changer de stockage ou de dossiers";
+      backBtn.textContent = "← Changer de fournisseur";
       backBtn.setAttribute("href", "SmartDoc.html");
 
       document.getElementById("pb-storage").textContent = s.name;
