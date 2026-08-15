@@ -719,7 +719,7 @@ button:focus-visible {
       <a href="#step-3">3. Excel</a>
       <a href="#step-4">4. Import</a>
       <a href="#step-5">5. Détection</a>
-      <a href="#step-6">6. Priorité</a>
+      <a href="#step-6">6. Critères</a>
       <a href="#step-7">7. Réponses</a>
       <a href="#step-8">8. PDF</a>
       <a href="#step-9">9. Synthèse</a>
@@ -869,8 +869,8 @@ Ne modifie rien sans confirmation.</code></pre>
 email_id, thread_id, received_at, sender, subject, snippet, has_attachment, status, priority, signal, suggested_reply, human_check</pre>
 <pre class='plain'>Valeurs autorisées :
 status = to_analyze / unanswered / draft_proposed / done / ignored
-priority = critical / high / medium / low
-signal = urgency / client_frustration / budget_issue / operational_blocker / sales_request / follow_up / none
+priority = critical / high / medium / low        ← valeurs par défaut, redéfinies avec vous à l'étape 6
+signal = urgency / client_frustration / budget_issue / operational_blocker / sales_request / follow_up / none        ← idem
 has_attachment = yes / no
 human_check = required / not_required</pre>
 
@@ -895,6 +895,11 @@ Le fichier doit contenir un tableau structuré avec les colonnes suivantes, en a
 - signal
 - suggested_reply
 - human_check
+
+Crée également un second onglet, vide, intitulé "criteres_priorite", avec les colonnes :
+question, choix_retenu, valeurs, date_validation
+
+Cet onglet recevra à l'étape 6 les critères de priorité que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées au tableau principal.
 
 Règles :
 - ne pas encore importer les mails ;
@@ -989,45 +994,70 @@ Ne crée pas de {{cloudAlt}}.</code></pre>
 
 
     <section class="card" id="step-6">
-      <h2>6. 🚦 Prioriser les mails</h2>
-      <p>Colonnes mises à jour : priority et signal.</p>
+      <h2>6. 🚦 Définir les critères et prioriser</h2>
+      <p>Claude pose huit questions construites sur vos mails réels, vous choisissez, et vos critères pilotent la priorisation puis tout le reste du workflow.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Priorisation</h3>
+            <h3>Prompt — Élicitation en 8 questions, puis priorisation</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Analyse uniquement les lignes où status = unanswered dans le fichier Excel "{{fileName}}".
+          <pre class="prompt"><code>Nous allons d'abord définir ensemble mes critères de priorité, puis tu prioriseras les mails.
 
-Classe chaque mail avec la colonne :
-- priority
+Phase 1 — Élicitation, obligatoire :
+À partir des mails que tu viens d'importer dans "{{fileName}}", pose-moi les 8 questions ci-dessous.
 
-Valeurs autorisées :
-- critical
-- high
-- medium
-- low
+Règles de la phase 1 :
+- utilise ton interface de choix cliquables, par groupes de 4 questions ;
+- si tu ne peux pas afficher de choix cliquables, pose les 8 questions numérotées dans un seul message avec des options a / b / c, et je répondrai en une ligne du type "1b 2a 3c 4a 5b 6a 7ac 8b" ;
+- pour chaque question, propose 2 à 4 options concrètes construites sur MES mails, en citant des expéditeurs et des objets réellement présents dans le fichier, avec les décomptes correspondants ;
+- indique à chaque fois l'option que tu recommandes, et pourquoi ;
+- n'ajoute aucune question, n'en saute aucune ;
+- attends mes réponses avant de passer à la phase 2.
 
-Détecte le signal principal avec la colonne :
-- signal
+Les 8 questions :
+1. Qu'est-ce qui rend un mail urgent dans mon activité : un délai de réponse dépassé, un client stratégique, un enjeu financier, ou un blocage opérationnel ?
+2. À partir de quel délai sans réponse un mail devient-il préoccupant : 24 heures, 3 jours, 7 jours, ou cela dépend-il de l'expéditeur ?
+3. Y a-t-il des expéditeurs prioritaires par nature : clients, direction, fournisseurs, candidats, ou aucun ? Appuie-toi sur les expéditeurs réellement présents dans le fichier.
+4. Quels signaux dois-tu détecter dans le contenu : relance, ton de frustration, escalade hiérarchique, mention d'un montant, échéance explicite ? Ces valeurs remplaceront la liste par défaut de la colonne signal.
+5. Combien de niveaux de priorité veux-tu, et sous quels libellés : 3 niveaux, 4 niveaux comme critical / high / medium / low, ou 5 ?
+6. Quels mails ne doivent jamais être priorisés : newsletters, no-reply, notifications automatiques, fils internes, listes de diffusion ?
+7. Quels axes veux-tu pouvoir interroger plus tard, plusieurs réponses possibles : client, montant, dossier ou affaire, échéance, canal ?
+8. Quand une validation humaine est-elle obligatoire : toujours, seulement pour les deux niveaux les plus élevés, ou jamais pour le niveau le plus bas ?
 
-Valeurs autorisées :
-- urgency
-- client_frustration
-- budget_issue
-- operational_blocker
-- sales_request
-- follow_up
-- none
+Phase 2 — Récapitulatif :
+Présente-moi un récapitulatif clair de mes 8 choix, comprenant :
+- la liste définitive des valeurs autorisées de priority, du plus urgent au moins urgent ;
+- la liste définitive des valeurs autorisées de signal ;
+- la règle de délai retenue ;
+- les expéditeurs et les catégories exclus de la priorisation ;
+- la règle de human_check ;
+- la liste des colonnes supplémentaires qui seront ajoutées au fichier.
+Demande-moi ensuite une validation explicite. N'écris rien dans le fichier avant de l'avoir reçue.
+
+Phase 3 — Enregistrement, après ma validation seulement :
+Utilise la skill {{skillXlsx}} pour :
+- inscrire les 8 questions, mes réponses et les valeurs retenues dans l'onglet "criteres_priorite" de "{{fileName}}" ;
+- ajouter au tableau principal les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes.
+
+Phase 4 — Priorisation :
+Analyse maintenant uniquement les lignes où status = unanswered dans "{{fileName}}", et applique les critères que je viens de valider.
 
 Utilise la skill {{skillXlsx}} pour mettre à jour uniquement :
-- priority
-- signal
+- priority, avec les valeurs validées à la question 5 ;
+- signal, avec les valeurs validées à la question 4 ;
+- human_check, selon la règle validée à la question 8 ;
+- les colonnes supplémentaires créées à la question 7, quand l'information est présente dans le mail.
 
-Ne prépare pas encore de brouillon.
-Limite l'analyse aux 30 mails les plus récents.
-Ne crée pas de {{cloudAlt}}.</code></pre>
+Règles :
+- passe status = ignored pour les mails exclus à la question 6 ;
+- ne prépare pas encore de brouillon ni de réponse ;
+- limite l'analyse aux 30 mails les plus récents ;
+- n'invente aucune information absente du mail : laisse vide ;
+- ne crée pas de {{cloudAlt}}.
+
+À la fin, indique la répartition par priority, les signaux les plus fréquents, et le nombre de mails exclus.</code></pre>
         </div>
 
     </section>
@@ -1036,7 +1066,7 @@ Ne crée pas de {{cloudAlt}}.</code></pre>
 
     <section class="card" id="step-7">
       <h2>7. ✍️ Proposer des réponses à valider</h2>
-      <p>Uniquement pour status = unanswered et priority = critical ou high.</p>
+      <p>Uniquement pour status = unanswered et les deux niveaux de priorité les plus élevés définis à l'étape 6.</p>
 
 
         <div class="prompt-card">
@@ -1044,7 +1074,7 @@ Ne crée pas de {{cloudAlt}}.</code></pre>
             <h3>Prompt — Propositions de réponse</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Pour les lignes où status = unanswered et priority = critical ou high, prépare une proposition de réponse courte, professionnelle et factuelle.
+          <pre class="prompt"><code>Pour les lignes où status = unanswered et où priority correspond à l'un des deux niveaux les plus élevés définis à l'étape 6 (onglet "criteres_priorite"), prépare une proposition de réponse courte, professionnelle et factuelle.
 
 Maximum 10 propositions.
 
@@ -1089,9 +1119,9 @@ Le rapport doit contenir :
 - nombre de mails ajoutés ;
 - nombre de mails ignorés ;
 - nombre de mails avec status = unanswered ;
-- nombre de priorités critical / high / medium / low ;
+- répartition par niveau de priorité, selon les niveaux définis à l'étape 6 ;
 - principaux signaux détectés ;
-- 3 exemples anonymisés de cas critical ou high ;
+- 3 exemples anonymisés parmi les cas les plus prioritaires ;
 - propositions de réponse à valider ;
 - limites rencontrées ;
 - actions humaines recommandées.
@@ -1130,8 +1160,9 @@ Ne garde que la dernière décision stabilisée :
 - pas d'import manuel ;
 - {{skillXlsx}} pour créer, lire et modifier le fichier Excel ;
 - {{skillPdf}} pour générer les rapports PDF ;
+- critères de priorité tels qu'enregistrés dans l'onglet "criteres_priorite" à l'étape 6 ;
 - pas d'envoi automatique ;
-- création de brouillons uniquement si possible et uniquement pour les cas critical ou high ;
+- création de brouillons uniquement si possible et uniquement pour les deux niveaux de priorité les plus élevés ;
 - Skill métier créée seulement après validation du workflow.
 
 Produis une synthèse courte avec :
@@ -1140,7 +1171,7 @@ Produis une synthèse courte avec :
 3. skills outils requises ;
 4. nom du fichier Excel ;
 5. colonnes autorisées ;
-6. valeurs autorisées ;
+6. valeurs autorisées, y compris les critères de priorité validés à l'étape 6 ;
 7. étapes du workflow ;
 8. règles de sécurité ;
 9. limites de volume ;
@@ -1168,7 +1199,10 @@ Nom de la Skill :
 
 La Skill doit décrire uniquement le workflow final validé.
 
-Contraintes :
+Contrainte essentielle :
+la Skill ne doit PAS figer dans son texte les valeurs de priority et de signal. Elle doit lire l'onglet "criteres_priorite" du fichier Excel au début de chaque exécution et s'y conformer. Ainsi les critères pourront évoluer sans réécrire la Skill.
+
+Autres contraintes :
 - ne pas reprendre les anciennes variantes du fil ;
 - ne pas utiliser de {{cloudAlt}} ;
 - ne pas inclure d'import manuel ;
@@ -1176,7 +1210,7 @@ Contraintes :
 - utiliser {{skillXlsx}} pour écrire dans "{{fileName}}" ;
 - utiliser {{skillPdf}} pour générer le rapport PDF ;
 - ne jamais envoyer d'e-mail automatiquement ;
-- ne jamais créer de brouillon sauf pour priority = critical ou high ;
+- ne jamais créer de brouillon sauf pour les deux niveaux de priorité les plus élevés ;
 - ne pas ajouter de colonnes non prévues ;
 - ne pas inventer de données manquantes ;
 - limiter le traitement à 50 mails scannés, 30 analysés, 10 propositions.
@@ -1210,6 +1244,7 @@ Vérifie strictement :
 - qu'il interdit l'envoi automatique ;
 - qu'il limite les volumes ;
 - qu'il respecte les colonnes autorisées ;
+- qu'il lit bien les critères de priorité dans l'onglet "criteres_priorite" au lieu de les figer dans son texte ;
 - qu'il reste concis.
 
 Si une règle est ambiguë, corrige-la.
@@ -1266,10 +1301,10 @@ La route doit exécuter les étapes suivantes :
 5. ignorer newsletters, no-reply, notifications automatiques et alertes système ;
 6. ajouter les nouveaux mails utiles avec status = to_analyze ;
 7. détecter les mails probablement non répondus avec status = unanswered ;
-8. prioriser les cas avec priority = critical / high / medium / low ;
-9. renseigner le signal principal avec signal ;
-10. proposer une réponse uniquement pour les cas critical ou high ;
-11. mettre human_check = required pour toute proposition ;
+8. lire l'onglet "criteres_priorite" et prioriser selon les critères validés à l'étape 6 ;
+9. renseigner le signal principal avec signal, selon les valeurs validées ;
+10. proposer une réponse uniquement pour les deux niveaux de priorité les plus élevés ;
+11. renseigner human_check selon la règle validée à l'étape 6 ;
 12. ne jamais envoyer d'e-mail ;
 13. ne créer aucun {{cloudAlt}} ;
 14. générer un rapport court dans Claude ;
@@ -1287,7 +1322,7 @@ Limites :
 - nombre de mails ajoutés ;
 - nombre de mails ignorés ;
 - nombre de mails avec status = unanswered ;
-- nombre de cas critical / high ;
+- nombre de cas dans les deux niveaux de priorité les plus élevés ;
 - nombre de propositions générées ;
 - chemin du fichier Excel mis à jour ;
 - chemin du rapport PDF généré ;
@@ -1333,7 +1368,7 @@ vérifier que la route respecte :
 3. Créer le fichier Excel.
 4. Importer {{provider}}.
 5. Détecter les mails non répondus.
-6. Prioriser.
+6. Définir les critères de priorité en 8 questions, puis prioriser.
 7. Proposer des réponses.
 8. Générer le PDF.
 9. Synthétiser le workflow final depuis le fil réel.
