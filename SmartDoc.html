@@ -46,6 +46,11 @@
   box-sizing: border-box;
 }
 
+/* l'attribut hidden doit l'emporter sur nos regles display (.picker, etc.) */
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   background: var(--bg);
@@ -219,13 +224,30 @@ nav {
   color: var(--text-soft);
 }
 
+/* sans min-width:0, un element flex refuse de retrecir sous la taille de son
+   contenu : le max-width de la valeur ci-dessous n'aurait alors aucun effet */
+.params-inner > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .params-inner code {
+  display: inline-block;
+  max-width: 100%;
   padding: 2px 8px;
   border-radius: var(--radius-pill);
   background: rgba(207, 175, 231, 0.20);
   color: var(--black);
   font-weight: 700;
   font-size: 13px;
+  /* une adresse Drive est longue : on tronque plutot que de faire deborder */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }
 
 .params-inner strong {
@@ -369,6 +391,9 @@ strong {
   background: rgba(207, 175, 231, 0.14);
   box-shadow: none;
   cursor: default;
+  max-width: 100%;
+  /* le nom du dossier peut etre une adresse Drive complete */
+  overflow-wrap: anywhere;
 }
 
 .workflow-icon {
@@ -940,13 +965,13 @@ input:focus-visible {
         <a class="storage-card" id="card-local" href="SmartDoc.html?storage=local">
           <div class="storage-logo" id="logo-local"></div>
           <h2 class="storage-name">Dossier local</h2>
-          <p class="storage-desc">via le dossier de travail Cowork — les dossiers OneDrive ou SharePoint synchronisés fonctionnent aussi</p>
+          <p class="storage-desc">Un dossier de votre ordinateur, que vous pourrez parcourir — OneDrive et SharePoint synchronisés compris</p>
           <span class="storage-cta">Choisir →</span>
         </a>
         <a class="storage-card" id="card-drive" href="SmartDoc.html?storage=drive">
           <div class="storage-logo" id="logo-drive"></div>
           <h2 class="storage-name">Google Drive</h2>
-          <p class="storage-desc">via le connecteur Google Drive</p>
+          <p class="storage-desc">Un dossier en ligne, dont vous donnerez le nom — via le connecteur Google Drive</p>
           <span class="storage-cta">Choisir →</span>
         </a>
       </div>
@@ -962,7 +987,7 @@ input:focus-visible {
       <div class="setup-card">
         <a class="setup-back" href="SmartDoc.html">← Changer de stockage</a>
         <h2 id="setup-title">⚙️ Vos deux dossiers</h2>
-        <p class="hint">Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.</p>
+        <p class="hint" id="setup-hint">Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.</p>
 
         <div class="folder-grid">
           <div class="field">
@@ -1799,13 +1824,11 @@ Contraintes de test :
       }
     };
 
-    const LS_SRC = "smartdoc_src";
-    const LS_DST = "smartdoc_dst";
-
     const SETUP_COPY = {
       local: {
         intro: "Deux dossiers de votre poste à désigner",
         title: "⚙️ Vos deux dossiers",
+        hint: "Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.",
         srcLabel: "📥 Dossier source — où sont vos documents en vrac aujourd'hui",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera (il le créera s'il n'existe pas)",
         srcPlaceholder: "ex. Factures à trier",
@@ -1814,10 +1837,11 @@ Contraintes de test :
       drive: {
         intro: "Deux dossiers Google Drive à désigner",
         title: "⚙️ Vos deux dossiers Google Drive",
+        hint: "Collez l'adresse du dossier depuis Google Drive — elle contient son identifiant, donc aucune confusion possible entre deux dossiers de même nom. Un simple nom fonctionne aussi. La valeur sera recopiée telle quelle dans les douze prompts.",
         srcLabel: "📥 Dossier Drive source — où sont vos documents en vrac aujourd'hui",
         dstLabel: "🗄️ Dossier Drive cible — où Claude les rangera (il le créera s'il n'existe pas)",
-        srcPlaceholder: "ex. Fonds à classer",
-        dstPlaceholder: "ex. Archives"
+        srcPlaceholder: "https://drive.google.com/drive/folders/1AbCdEf…",
+        dstPlaceholder: "adresse du dossier, ou un nom à créer"
       }
     };
   </script>
@@ -1826,22 +1850,6 @@ Contraintes de test :
     (function () {
       var params = new URLSearchParams(window.location.search);
       var storageKey = params.get("storage");
-
-      function stored(key) {
-        try {
-          return window.localStorage.getItem(key) || "";
-        } catch (e) {
-          return "";
-        }
-      }
-
-      function remember(key, value) {
-        try {
-          window.localStorage.setItem(key, value);
-        } catch (e) {
-          /* stockage indisponible : on continue sans mémoriser */
-        }
-      }
 
       var src = (params.get("src") || "").trim();
       var dst = (params.get("dst") || "").trim();
@@ -1873,6 +1881,7 @@ Contraintes de test :
         document.getElementById("page-title").textContent = "📚 Proto Claude SmartDoc — " + s.name;
         document.getElementById("setup-intro").textContent = copy.intro;
         document.getElementById("setup-title").textContent = copy.title;
+        document.getElementById("setup-hint").textContent = copy.hint;
         document.getElementById("src-label").textContent = copy.srcLabel;
         document.getElementById("dst-label").textContent = copy.dstLabel;
 
@@ -1884,15 +1893,17 @@ Contraintes de test :
         var srcPicker = document.getElementById("src-picker");
         var srcPicked = document.getElementById("src-picked");
 
-        srcInput.placeholder = copy.srcPlaceholder;
-        dstInput.placeholder = copy.dstPlaceholder;
-        srcInput.value = params.get("src") || stored(LS_SRC) || "";
-        dstInput.value = params.get("dst") || stored(LS_DST) || "";
-
         // Sélecteur natif : uniquement en local, et seulement si le navigateur le propose.
         // Il ne renvoie que le NOM du dossier — jamais son chemin absolu.
         var canBrowse =
           storageKey === "local" && typeof window.showDirectoryPicker === "function";
+
+        srcInput.placeholder = copy.srcPlaceholder;
+        dstInput.placeholder = copy.dstPlaceholder;
+        // Aucun préremplissage : afficher un nom que personne n'a choisi
+        // laisserait croire qu'un dossier est déjà sélectionné.
+        srcInput.value = "";
+        dstInput.value = "";
 
         if (canBrowse) {
           srcPicker.hidden = false;
@@ -1950,8 +1961,6 @@ Contraintes de test :
           if (!validate(true)) return;
           var chosenSrc = srcInput.value.trim();
           var chosenDst = dstInput.value.trim();
-          remember(LS_SRC, chosenSrc);
-          remember(LS_DST, chosenDst);
           window.location.href =
             "SmartDoc.html?storage=" + storageKey +
             "&src=" + encodeURIComponent(chosenSrc) +
@@ -1967,8 +1976,6 @@ Contraintes de test :
       }
 
       // ÉCRAN 3 — les 12 étapes
-      remember(LS_SRC, src);
-      remember(LS_DST, dst);
       document.querySelector(".params-edit").setAttribute(
         "href",
         "SmartDoc.html?storage=" + storageKey
@@ -1984,8 +1991,13 @@ Contraintes de test :
       backBtn.setAttribute("href", "SmartDoc.html");
 
       document.getElementById("pb-storage").textContent = s.name;
-      document.getElementById("pb-src").textContent = src;
-      document.getElementById("pb-dst").textContent = dst;
+      var pbSrc = document.getElementById("pb-src");
+      var pbDst = document.getElementById("pb-dst");
+      pbSrc.textContent = src;
+      pbDst.textContent = dst;
+      // la valeur est tronquee si c'est une adresse Drive : on la donne au survol
+      pbSrc.title = src;
+      pbDst.title = dst;
 
       var replacements = {
         "{{storage}}": s.name,
