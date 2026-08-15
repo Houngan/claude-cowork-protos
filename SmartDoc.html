@@ -1006,7 +1006,13 @@ input:focus-visible {
 
           <div class="field">
             <label for="dst-input" id="dst-label">🗄️ Dossier cible</label>
-            <input type="text" id="dst-input" placeholder="ex. Archives" spellcheck="false" autocomplete="off">
+
+            <div class="picker" id="dst-picker" hidden>
+              <button class="btn-browse" type="button" id="dst-browse">📂 Parcourir…</button>
+              <span class="picked" id="dst-picked">Aucun dossier sélectionné</span>
+            </div>
+
+            <input type="text" id="dst-input" placeholder="Ex : Archives" spellcheck="false" autocomplete="off">
             <p class="field-error" id="dst-error" hidden>Nommez le dossier d'arrivée.</p>
           </div>
         </div>
@@ -1828,7 +1834,7 @@ Contraintes de test :
       local: {
         intro: "Deux dossiers de votre poste à désigner",
         title: "⚙️ Vos deux dossiers",
-        hint: "Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.",
+        hint: "Le dossier d'arrivée n'a pas besoin d'exister : vous pouvez le créer depuis la fenêtre de sélection.",
         srcLabel: "📥 Dossier source — où sont vos documents",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera",
         srcPlaceholder: "Ex : Factures à trier",
@@ -1890,8 +1896,6 @@ Contraintes de test :
         var srcError = document.getElementById("src-error");
         var dstError = document.getElementById("dst-error");
         var startBtn = document.getElementById("start-btn");
-        var srcPicker = document.getElementById("src-picker");
-        var srcPicked = document.getElementById("src-picked");
 
         // Sélecteur natif : uniquement en local, et seulement si le navigateur le propose.
         // Il ne renvoie que le NOM du dossier — jamais son chemin absolu.
@@ -1905,16 +1909,37 @@ Contraintes de test :
         srcInput.value = "";
         dstInput.value = "";
 
-        if (canBrowse) {
-          srcPicker.hidden = false;
-          srcInput.hidden = true;
+        // Source et cible reçoivent exactement le même traitement.
+        // Pour la cible, la fenêtre native permet de créer le dossier à la volée.
+        ["src", "dst"].forEach(function (key) {
+          var input = document.getElementById(key + "-input");
+          var picker = document.getElementById(key + "-picker");
+          var picked = document.getElementById(key + "-picked");
+
+          function refreshPicked() {
+            if (input.value) {
+              picked.textContent = "📁 " + input.value;
+              picked.title = input.value;
+              picked.classList.add("filled");
+            } else {
+              picked.textContent = "Aucun dossier sélectionné";
+              picked.removeAttribute("title");
+              picked.classList.remove("filled");
+            }
+          }
+
+          if (!canBrowse) return;
+
+          picker.hidden = false;
+          input.hidden = true;
           refreshPicked();
 
-          document.getElementById("src-browse").addEventListener("click", function () {
+          document.getElementById(key + "-browse").addEventListener("click", function () {
             window
-              .showDirectoryPicker()
+              // id distinct : le navigateur retient un dossier de départ par champ
+              .showDirectoryPicker({ id: "smartdoc-" + key })
               .then(function (handle) {
-                srcInput.value = handle.name;
+                input.value = handle.name;
                 refreshPicked();
                 validate(false);
               })
@@ -1922,17 +1947,7 @@ Contraintes de test :
                 /* sélection annulée : on ne touche à rien */
               });
           });
-        }
-
-        function refreshPicked() {
-          if (srcInput.value) {
-            srcPicked.textContent = "📁 " + srcInput.value;
-            srcPicked.classList.add("filled");
-          } else {
-            srcPicked.textContent = "Aucun dossier sélectionné";
-            srcPicked.classList.remove("filled");
-          }
-        }
+        });
 
         function validate(showErrors) {
           var okSrc = srcInput.value.trim().length > 0;
