@@ -1029,7 +1029,7 @@ input:focus-visible {
     <span>Route incrémentale</span>
   </div>
   <br/>
-  </div><p><b> Règle centrale : l'IA propose, l'humain dispose. Claude ne supprime jamais un fichier, ne range rien sans validation explicite, et source chacune de ses réponses.</b></p>
+  </div><p><b> Règle centrale : l'IA propose, l'humain dispose. Le dossier source n'est jamais modifié — Claude y lit les documents et en copie une version rangée dans le dossier cible, sans rien supprimer, déplacer ni renommer à la source, et en sourçant chacune de ses réponses.</b></p>
 
     </section>
 
@@ -1055,7 +1055,8 @@ Contexte de travail :
 
 Règles générales :
 - l'IA propose, l'humain dispose : aucune action sur les fichiers sans ma validation explicite ;
-- ne jamais supprimer un fichier ;
+- le dossier source "{{src}}" est en lecture seule : ne jamais y supprimer, déplacer ni renommer quoi que ce soit ;
+- le classement se fait uniquement par COPIE vers "{{dst}}" ; l'original reste toujours en place ;
 - ne jamais {{action}} un fichier avant que j'aie validé le lot ;
 - ne jamais modifier le contenu d'un document source ;
 - ne jamais inventer une métadonnée : laisser vide ou écrire unknown ;
@@ -1305,8 +1306,8 @@ Les 8 questions :
 2. Axe secondaire, pour les sous-dossiers : année, thème, auteur, ou aucun sous-niveau ?
 3. Granularité : 3 à 5 catégories larges, 6 à 10 catégories, ou davantage ? Propose le découpage correspondant à partir de ce que tu as vu.
 4. Convention de nommage des fichiers : YYYY-MM-DD_Auteur_Sujet, ou Sujet-court seul, ou conserver les noms d'origine ? Illustre chaque option sur un fichier réel de l'inventaire.
-5. Documents sans date certaine : un dossier dédié "À dater", classés sans date dans leur catégorie, ou laissés dans "{{src}}" en attente ?
-6. Doublons et fichiers inutiles : isolés dans un sous-dossier "Doublons", laissés dans "{{src}}" avec une liste à purger, ou classés en ne gardant que la meilleure version ?
+5. Documents sans date certaine : copiés dans un sous-dossier "À dater", copiés sans date dans leur catégorie, ou pas encore copiés en attendant que la date soit tranchée ?
+6. Doublons et fichiers inutiles : ne copier qu'une seule version dans "{{dst}}", copier toutes les versions en les distinguant, ou ne rien copier et se contenter de les signaler dans le registre ?
 7. Axes que je veux pouvoir interroger plus tard, plusieurs réponses possibles : personnes citées, lieux, concepts, auteur ou organisme, client ou projet, niveau de confidentialité ?
 8. Profondeur d'indexation : résumé d'une ligne, résumé et mots-clés, ou résumé et mots-clés et entités et citation sourcée ?
 
@@ -1391,10 +1392,11 @@ Après ma validation :
 - applique la règle validée à la question 5 pour les documents sans date ;
 - applique la règle validée à la question 6 pour les doublons et les fichiers inutiles ;
 - utilise la skill {{skillXlsx}} pour passer status = classified sur les documents traités ;
-- passe status = needs_review pour les documents en confidence = low ou que j'ai écartés, et laisse-les où ils sont.
+- passe status = needs_review pour les documents en confidence = low ou que j'ai écartés : ne les copie pas.
 
 Règles :
-- ne supprime jamais un fichier ;
+- le dossier source "{{src}}" ne doit être modifié en aucune façon : rien de supprimé, rien de déplacé, rien de renommé ;
+- le renommage ne s'applique qu'à la COPIE déposée dans "{{dst}}" ;
 - ne modifie jamais le contenu d'un document ;
 - {{afterAction}}.
 
@@ -1541,7 +1543,8 @@ la Skill ne doit PAS figer le plan de classement dans son texte. Elle doit lire 
 Autres contraintes :
 - utiliser {{connector}} comme source ;
 - utiliser {{skillXlsx}} pour écrire dans "{{fileName}}" ;
-- ne jamais supprimer un fichier ;
+- traiter le dossier source en lecture seule : ne jamais y supprimer, déplacer ni renommer un fichier ;
+- classer uniquement par copie vers "{{dst}}", l'original restant en place ;
 - ne jamais modifier le contenu d'un document source ;
 - ne jamais {{action}} un fichier sans validation explicite du lot ;
 - ne jamais inventer une métadonnée ni une date ;
@@ -1565,7 +1568,7 @@ Applique la Skill {{skillName}} à ce seul document :
 1. relis l'onglet "plan_de_classement" du registre "{{fileName}}" ;
 2. qualifie le document selon le plan validé : category, proposed_name, et la date uniquement si elle est explicite ;
 3. présente-moi ta proposition et attends ma validation ;
-4. après ma validation, enregistre le document dans "{{dst}}" à l'emplacement prévu, avec son nom normalisé ;
+4. après ma validation, dépose une copie du document dans "{{dst}}" à l'emplacement prévu, avec son nom normalisé ;
 5. crée sa ligne dans le registre et indexe-le comme à l'étape 9 ;
 6. dis-moi enfin ce que ce document ajoute au fonds : ce qu'il confirme, ce qu'il nuance, ce qu'il apporte de nouveau par rapport aux documents déjà classés.
 
@@ -1607,15 +1610,15 @@ La route doit exécuter les étapes suivantes :
 5. vérifier les doublons contre l'ensemble du registre, et pas seulement contre le lot en cours ;
 6. proposer category, proposed_name et target_path selon le plan validé ;
 7. présenter le lot et attendre une validation explicite ;
-8. après validation, {{actionImp}} les documents approuvés vers "{{dst}}" ;
+8. après validation, {{actionImp}} les documents approuvés vers "{{dst}}", en laissant les originaux intacts dans "{{src}}" ;
 9. indexer les documents classés : summary, tags, colonnes du plan, source_reference ;
 10. mettre à jour le registre ;
 11. produire un rapport court.
 
 Limites :
 - maximum 20 documents par exécution pour cette formation, l'intégralité en production ;
-- ne pas retraiter les documents déjà classés ;
-- ne jamais supprimer un fichier ;
+- ne pas retraiter les documents déjà classés : c'est le registre qui fait foi, puisque les originaux restent dans "{{src}}" ;
+- ne jamais supprimer, déplacer ni renommer un fichier du dossier source ;
 - demander une validation humaine en cas d'ambiguïté.
 
 À la fin de chaque exécution, la route doit indiquer :
@@ -1646,7 +1649,7 @@ Ensuite, planifie l'exécution récurrente :
 - si aucun nouveau document n'est détecté, la routine le signale en une ligne et s'arrête.
 
 Contraintes de test :
-- ne supprime aucun fichier ;
+- ne supprime, ne déplace ni ne renomme aucun fichier de "{{src}}" ;
 - ne retraite pas les documents déjà classés ;
 - ne crée pas de {{cloudAlt}} ;
 - utilise {{skillXlsx}} pour toute écriture dans "{{fileName}}".</code></pre>
@@ -1685,10 +1688,10 @@ Contraintes de test :
       local: {
         name: "Dossier local",
         connector: "l'accès aux fichiers de votre ordinateur",
-        action: "déplacer",
-        actionImp: "déplace",
-        actionPast: "déplacés",
-        afterAction: "une fois un document déplacé, il ne doit plus se trouver dans le dossier source",
+        action: "copier",
+        actionImp: "copie",
+        actionPast: "copiés",
+        afterAction: "l'original reste toujours dans le dossier source : ne le supprime pas, ne le déplace pas, ne le renomme pas",
         fileName: "Registre documents.xlsx",
         skillName: "classifying-local-documents",
         skillXlsx: "xlsx-proto",
@@ -1702,7 +1705,7 @@ Contraintes de test :
         action: "copier",
         actionImp: "copie",
         actionPast: "copiés",
-        afterAction: "l'original reste dans le dossier source : fournis à la fin la liste des originaux que je pourrai purger moi-même",
+        afterAction: "l'original reste toujours dans le dossier source : ne le supprime pas, ne le déplace pas, ne le renomme pas",
         fileName: "Registre documents.xlsx",
         skillName: "classifying-drive-documents",
         skillXlsx: "xlsx-proto",
