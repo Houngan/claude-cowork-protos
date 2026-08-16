@@ -967,7 +967,6 @@ input:focus-visible {
             <div class="path-row">
               <input type="text" id="src-input" placeholder="ex. Factures à trier" spellcheck="false" autocomplete="off">
               <button class="btn-browse" type="button" id="src-browse" hidden>📂 Parcourir…</button>
-              <input type="file" id="src-picker" webkitdirectory directory multiple hidden>
             </div>
             <p class="field-error" id="src-error" hidden>Indiquez le dossier de départ.</p>
           </div>
@@ -979,7 +978,6 @@ input:focus-visible {
             <div class="path-row">
               <input type="text" id="dst-input" placeholder="Ex : Archives" spellcheck="false" autocomplete="off">
               <button class="btn-browse" type="button" id="dst-browse" hidden>📂 Parcourir…</button>
-              <input type="file" id="dst-picker" webkitdirectory directory multiple hidden>
             </div>
             <p class="field-error" id="dst-error" hidden>Nommez le dossier d'arrivée.</p>
           </div>
@@ -1842,40 +1840,27 @@ Contraintes de test :
         srcInput.value = "";
         dstInput.value = "";
 
-        // Chemin du dossier choisi : file.path (chemin absolu, quand
-        // l'environnement le fournit) moins la partie relative du fichier.
-        // À défaut, le nom du dossier.
-        function cheminDuDossier(file) {
-          var rel = file.webkitRelativePath || "";
-          var full = file.path || "";
-          var nom = rel.split("/")[0] || "";
-          if (!full || !rel) return nom;
-
-          var sep = full.indexOf("\\") !== -1 ? "\\" : "/";
-          var relNative = rel.split("/").join(sep);
-          if (full.slice(-relNative.length) !== relNative) return nom;
-
-          return full.slice(0, full.length - relNative.length) + nom;
-        }
-
+        // Sélecteur de dossier natif : il ne lit aucun fichier, donc aucune
+        // demande d'importation. En contrepartie il ne renvoie que le nom du
+        // dossier — le champ reste modifiable pour y coller un chemin complet.
         ["src", "dst"].forEach(function (key) {
-          // Parcourir n'a de sens que sur un dossier de l'ordinateur
           if (storageKey !== "local") return;
+          if (typeof window.showDirectoryPicker !== "function") return;
 
           var input = document.getElementById(key + "-input");
-          var picker = document.getElementById(key + "-picker");
           var browse = document.getElementById(key + "-browse");
 
           browse.hidden = false;
           browse.addEventListener("click", function () {
-            picker.click();
-          });
-
-          picker.addEventListener("change", function () {
-            var file = picker.files && picker.files[0];
-            if (!file) return;
-            input.value = cheminDuDossier(file);
-            validate(false);
+            window
+              .showDirectoryPicker({ id: "smartdoc-" + key })
+              .then(function (handle) {
+                input.value = handle.name;
+                validate(false);
+              })
+              .catch(function () {
+                /* sélection annulée */
+              });
           });
         });
 
