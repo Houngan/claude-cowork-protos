@@ -676,6 +676,48 @@ input:focus-visible {
   color: #ef4444;
 }
 
+.field-note {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-2);
+}
+
+.path-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+/* sans min-width:0 l'element flex refuse de retrecir sous son contenu */
+.path-row input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.btn-browse {
+  appearance: none;
+  flex: 0 0 auto;
+  padding: 0 16px;
+  font-size: 14.5px;
+  font-family: inherit;
+  font-weight: 800;
+  white-space: nowrap;
+  color: var(--black);
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.btn-browse:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-2);
+}
+
 .setup-note {
   margin: 18px 0 0;
   padding: 12px 14px;
@@ -819,6 +861,15 @@ input:focus-visible {
     align-items: stretch;
   }
 
+  /* un chemin complet ne tient pas a cote du bouton sur un ecran etroit */
+  .path-row {
+    flex-direction: column;
+  }
+
+  .btn-browse {
+    padding: 12px 16px;
+  }
+
   .folder-arrow {
     display: none;
   }
@@ -894,7 +945,7 @@ input:focus-visible {
         <a class="storage-card" id="card-local" href="SmartDoc.html?storage=local">
           <div class="storage-logo" id="logo-local"></div>
           <h2 class="storage-name">Dossier local</h2>
-          <p class="storage-desc">Un dossier de votre ordinateur<br>dont vous donnerez le chemin</p>
+          <p class="storage-desc">Un dossier de votre ordinateur<br>que vous pourrez parcourir</p>
           <span class="storage-cta">Choisir →</span>
         </a>
         <a class="storage-card" id="card-drive" href="SmartDoc.html?storage=drive">
@@ -920,7 +971,12 @@ input:focus-visible {
         <div class="folder-grid">
           <div class="field">
             <label for="src-input" id="src-label">📥 Dossier source</label>
-            <input type="text" id="src-input" placeholder="ex. Factures à trier" spellcheck="false" autocomplete="off">
+            <div class="path-row">
+              <input type="text" id="src-input" placeholder="ex. Factures à trier" spellcheck="false" autocomplete="off">
+              <button class="btn-browse" type="button" id="src-browse" hidden>📂 Parcourir…</button>
+              <input type="file" id="src-picker" webkitdirectory directory multiple hidden>
+            </div>
+            <p class="field-note" id="src-note" hidden></p>
             <p class="field-error" id="src-error" hidden>Indiquez le dossier de départ.</p>
           </div>
 
@@ -928,7 +984,12 @@ input:focus-visible {
 
           <div class="field">
             <label for="dst-input" id="dst-label">🗄️ Dossier cible</label>
-            <input type="text" id="dst-input" placeholder="Ex : Archives" spellcheck="false" autocomplete="off">
+            <div class="path-row">
+              <input type="text" id="dst-input" placeholder="Ex : Archives" spellcheck="false" autocomplete="off">
+              <button class="btn-browse" type="button" id="dst-browse" hidden>📂 Parcourir…</button>
+              <input type="file" id="dst-picker" webkitdirectory directory multiple hidden>
+            </div>
+            <p class="field-note" id="dst-note" hidden></p>
             <p class="field-error" id="dst-error" hidden>Nommez le dossier d'arrivée.</p>
           </div>
         </div>
@@ -1715,7 +1776,7 @@ Contraintes de test :
       local: {
         intro: "Deux dossiers de votre poste à désigner",
         title: "⚙️ Vos deux dossiers",
-        hint: "Indiquez le chemin complet de chaque dossier. Sur Windows, cliquez dans la barre d'adresse de l'Explorateur pour l'afficher, puis copiez-le. Un simple nom suffit si le dossier se trouve dans le répertoire du projet.",
+        hint: "Utilisez Parcourir, ou collez directement le chemin complet du dossier — sur Windows, la barre d'adresse de l'Explorateur l'affiche.",
         srcLabel: "📥 Dossier source — où sont vos documents",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera",
         srcPlaceholder: "Ex : C:\\Users\\vous\\Documents\\Factures à trier",
@@ -1789,6 +1850,60 @@ Contraintes de test :
         // laisserait croire qu'un dossier est déjà sélectionné.
         srcInput.value = "";
         dstInput.value = "";
+
+        // Un navigateur ordinaire ne révèle jamais le chemin absolu d'un dossier.
+        // Seuls les environnements Electron (le navigateur intégré de Cowork)
+        // exposent file.path : on s'en sert pour reconstituer le chemin réel,
+        // et on prévient l'utilisateur quand ce n'est pas possible.
+        function folderPathFromFile(file) {
+          var rel = file.webkitRelativePath || "";
+          var full = file.path || "";
+          if (!rel) return "";
+          var rootName = rel.split("/")[0];
+          if (!full) return rootName;
+
+          var sep = full.indexOf("\\") !== -1 ? "\\" : "/";
+          var relNative = rel.split("/").join(sep);
+          if (full.length <= relNative.length) return rootName;
+          if (full.slice(-relNative.length) !== relNative) return rootName;
+
+          // "C:\...\Documents\" + "Factures à trier"
+          return full.slice(0, full.length - relNative.length) + rootName;
+        }
+
+        ["src", "dst"].forEach(function (key) {
+          var input = document.getElementById(key + "-input");
+          var browse = document.getElementById(key + "-browse");
+          var picker = document.getElementById(key + "-picker");
+          var note = document.getElementById(key + "-note");
+
+          // Parcourir n'a de sens que sur un dossier de l'ordinateur
+          if (storageKey !== "local") return;
+
+          browse.hidden = false;
+          browse.addEventListener("click", function () {
+            picker.click();
+          });
+
+          picker.addEventListener("change", function () {
+            var file = picker.files && picker.files[0];
+            if (!file) return;
+
+            var value = folderPathFromFile(file);
+            var complet = value.indexOf("/") !== -1 || value.indexOf("\\") !== -1;
+
+            input.value = value;
+            if (complet) {
+              note.hidden = true;
+            } else {
+              note.textContent =
+                "Votre navigateur ne transmet pas le chemin complet. Complétez-le devant « " +
+                value + " », par exemple C:\\Users\\vous\\Documents\\";
+              note.hidden = false;
+            }
+            validate(false);
+          });
+        });
 
         function validate(showErrors) {
           var okSrc = srcInput.value.trim().length > 0;
