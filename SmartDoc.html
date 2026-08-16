@@ -46,7 +46,7 @@
   box-sizing: border-box;
 }
 
-/* l'attribut hidden doit l'emporter sur nos regles display (.picker, etc.) */
+/* l'attribut hidden doit l'emporter sur toute regle display de la page */
 [hidden] {
   display: none !important;
 }
@@ -676,50 +676,6 @@ input:focus-visible {
   color: #ef4444;
 }
 
-.picker {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
-
-.btn-browse {
-  appearance: none;
-  flex: 0 0 auto;
-  padding: 12px 18px;
-  font-size: 15px;
-  font-family: inherit;
-  font-weight: 800;
-  color: var(--black);
-  cursor: pointer;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  background: #ffffff;
-  transition:
-    background 160ms ease,
-    border-color 160ms ease;
-}
-
-.btn-browse:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent-2);
-}
-
-.picked {
-  font-size: 14.5px;
-  color: var(--muted);
-  font-weight: 600;
-  word-break: break-word;
-}
-
-.picked.filled {
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  background: rgba(207, 175, 231, 0.20);
-  color: var(--black);
-  font-weight: 800;
-}
-
 .setup-note {
   margin: 18px 0 0;
   padding: 12px 14px;
@@ -938,7 +894,7 @@ input:focus-visible {
         <a class="storage-card" id="card-local" href="SmartDoc.html?storage=local">
           <div class="storage-logo" id="logo-local"></div>
           <h2 class="storage-name">Dossier local</h2>
-          <p class="storage-desc">Un dossier de votre ordinateur<br>que vous pourrez parcourir</p>
+          <p class="storage-desc">Un dossier de votre ordinateur<br>dont vous donnerez le chemin</p>
           <span class="storage-cta">Choisir →</span>
         </a>
         <a class="storage-card" id="card-drive" href="SmartDoc.html?storage=drive">
@@ -964,12 +920,6 @@ input:focus-visible {
         <div class="folder-grid">
           <div class="field">
             <label for="src-input" id="src-label">📥 Dossier source</label>
-
-            <div class="picker" id="src-picker" hidden>
-              <button class="btn-browse" type="button" id="src-browse">📂 Parcourir…</button>
-              <span class="picked" id="src-picked">Aucun dossier sélectionné</span>
-            </div>
-
             <input type="text" id="src-input" placeholder="ex. Factures à trier" spellcheck="false" autocomplete="off">
             <p class="field-error" id="src-error" hidden>Indiquez le dossier de départ.</p>
           </div>
@@ -978,12 +928,6 @@ input:focus-visible {
 
           <div class="field">
             <label for="dst-input" id="dst-label">🗄️ Dossier cible</label>
-
-            <div class="picker" id="dst-picker" hidden>
-              <button class="btn-browse" type="button" id="dst-browse">📂 Parcourir…</button>
-              <span class="picked" id="dst-picked">Aucun dossier sélectionné</span>
-            </div>
-
             <input type="text" id="dst-input" placeholder="Ex : Archives" spellcheck="false" autocomplete="off">
             <p class="field-error" id="dst-error" hidden>Nommez le dossier d'arrivée.</p>
           </div>
@@ -1739,7 +1683,7 @@ Contraintes de test :
     const STORAGES = {
       local: {
         name: "Dossier local",
-        connector: "le dossier de travail Cowork",
+        connector: "l'accès aux fichiers de votre ordinateur",
         action: "déplacer",
         actionImp: "déplace",
         actionPast: "déplacés",
@@ -1771,11 +1715,11 @@ Contraintes de test :
       local: {
         intro: "Deux dossiers de votre poste à désigner",
         title: "⚙️ Vos deux dossiers",
-        hint: "Le dossier d'arrivée n'a pas besoin d'exister : vous pouvez le créer depuis la fenêtre de sélection.",
+        hint: "Indiquez le chemin complet de chaque dossier. Sur Windows, cliquez dans la barre d'adresse de l'Explorateur pour l'afficher, puis copiez-le. Un simple nom suffit si le dossier se trouve dans le répertoire du projet.",
         srcLabel: "📥 Dossier source — où sont vos documents",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera",
-        srcPlaceholder: "Ex : Factures à trier",
-        dstPlaceholder: "Ex : Archives"
+        srcPlaceholder: "Ex : C:\\Users\\vous\\Documents\\Factures à trier",
+        dstPlaceholder: "Ex : C:\\Users\\vous\\Documents\\Archives"
       },
       drive: {
         intro: "Deux dossiers Google Drive à désigner",
@@ -1839,57 +1783,12 @@ Contraintes de test :
         var dstError = document.getElementById("dst-error");
         var startBtn = document.getElementById("start-btn");
 
-        // Sélecteur natif : uniquement en local, et seulement si le navigateur le propose.
-        // Il ne renvoie que le NOM du dossier — jamais son chemin absolu.
-        var canBrowse =
-          storageKey === "local" && typeof window.showDirectoryPicker === "function";
-
         srcInput.placeholder = copy.srcPlaceholder;
         dstInput.placeholder = copy.dstPlaceholder;
         // Aucun préremplissage : afficher un nom que personne n'a choisi
         // laisserait croire qu'un dossier est déjà sélectionné.
         srcInput.value = "";
         dstInput.value = "";
-
-        // Source et cible reçoivent exactement le même traitement.
-        // Pour la cible, la fenêtre native permet de créer le dossier à la volée.
-        ["src", "dst"].forEach(function (key) {
-          var input = document.getElementById(key + "-input");
-          var picker = document.getElementById(key + "-picker");
-          var picked = document.getElementById(key + "-picked");
-
-          function refreshPicked() {
-            if (input.value) {
-              picked.textContent = "📁 " + input.value;
-              picked.title = input.value;
-              picked.classList.add("filled");
-            } else {
-              picked.textContent = "Aucun dossier sélectionné";
-              picked.removeAttribute("title");
-              picked.classList.remove("filled");
-            }
-          }
-
-          if (!canBrowse) return;
-
-          picker.hidden = false;
-          input.hidden = true;
-          refreshPicked();
-
-          document.getElementById(key + "-browse").addEventListener("click", function () {
-            window
-              // id distinct : le navigateur retient un dossier de départ par champ
-              .showDirectoryPicker({ id: "smartdoc-" + key })
-              .then(function (handle) {
-                input.value = handle.name;
-                refreshPicked();
-                validate(false);
-              })
-              .catch(function () {
-                /* sélection annulée : on ne touche à rien */
-              });
-          });
-        });
 
         function validate(showErrors) {
           var okSrc = srcInput.value.trim().length > 0;
