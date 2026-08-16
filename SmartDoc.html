@@ -345,6 +345,44 @@ strong {
   box-shadow: inset 0 0 0 1px rgba(5, 7, 13, 0.02);
 }
 
+/* CHAMP EN LIGNE, AU-DESSUS D'UN PROMPT */
+
+.inline-field {
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+}
+
+.inline-field label {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--black);
+}
+
+.inline-field input {
+  width: 100%;
+  padding: 11px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.inline-field input:focus {
+  outline: none;
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 /* WORKFLOW / FLUX CIBLE */
 
 .workflow {
@@ -1451,6 +1489,10 @@ Règles :
       <h2>10. 💬 Interroger le fonds</h2>
       <p>Le registre devient la mémoire de Claude, et le rapport PDF restitue à la fois l'état du fonds et ce qu'il contient.</p>
 
+        <div class="inline-field">
+          <label for="topic-input">🔎 Sujet à interroger — il s'insère dans la première question du prompt</label>
+          <input type="text" id="topic-input" value="le sujet principal du fonds" spellcheck="false" autocomplete="off">
+        </div>
 
         <div class="prompt-card">
           <div class="prompt-head">
@@ -1463,7 +1505,7 @@ PREMIÈRE PARTIE — interroge le fonds.
 
 Réponds aux questions suivantes en citant systématiquement tes sources : nom du fichier, et page quand elle existe.
 
-1. Quels documents du fonds traitent de [remplace ceci par un sujet qui t'intéresse] ?
+1. Quels documents du fonds traitent de : {{topic}} ?
 2. Quels thèmes ou concepts reviennent le plus souvent, et à quel moment apparaissent-ils pour la première fois ?
 3. Un thème évolue-t-il, disparaît-il ou se transforme-t-il au fil du temps ?
 4. Quelles personnes, quels auteurs ou quels interlocuteurs reviennent le plus, et lesquels apparaissent souvent ensemble ?
@@ -1911,6 +1953,24 @@ Contraintes de test :
       document.querySelectorAll("pre.plain").forEach(function (pre) {
         pre.textContent = applyTemplate(pre.textContent);
       });
+
+      // Étape 10 : le sujet interrogé se règle au-dessus du prompt.
+      // On garde le texte templaté comme gabarit pour le rejouer à chaque frappe.
+      var topicInput = document.getElementById("topic-input");
+      var topicCode = document.querySelector("#step-10 pre.prompt code");
+
+      if (topicInput && topicCode) {
+        var topicTpl = topicCode.textContent;
+        var topicDefault = topicInput.getAttribute("value") || "";
+
+        var renderTopic = function () {
+          var sujet = topicInput.value.trim() || topicDefault;
+          topicCode.textContent = topicTpl.split("{{topic}}").join(sujet);
+        };
+
+        topicInput.addEventListener("input", renderTopic);
+        renderTopic();
+      }
     })();
   </script>
 
