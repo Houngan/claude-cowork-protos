@@ -1201,7 +1201,7 @@ Nom de la Skill :
 La Skill doit décrire uniquement le workflow final validé.
 
 Contrainte essentielle :
-la Skill ne doit PAS figer dans son texte les valeurs de priority et de signal. Elle doit lire l'onglet "criteres_priorite" du fichier Excel au début de chaque exécution et s'y conformer. Ainsi les critères pourront évoluer sans réécrire la Skill.
+la Skill ne doit PAS figer dans son texte les valeurs de priority et de signal. Elle doit lire l'onglet "criteres_priorite" du fichier Excel au début de chaque exécution et s'y conformer. Ainsi les critères pourront évoluer sans réécrire la Skill. Si cet onglet est vide ou introuvable, la Skill doit s'arrêter et le signaler, sans jamais improviser de critères ni relancer l'élicitation d'elle-même.
 
 Autres contraintes :
 - ne pas reprendre les anciennes variantes du fil ;
@@ -1302,7 +1302,7 @@ La route doit exécuter les étapes suivantes :
 5. ignorer newsletters, no-reply, notifications automatiques et alertes système ;
 6. ajouter les nouveaux mails utiles avec status = to_analyze ;
 7. détecter les mails probablement non répondus avec status = unanswered ;
-8. lire l'onglet "criteres_priorite" et prioriser selon les critères validés à l'étape 6 ;
+8. lire l'onglet "criteres_priorite" et prioriser selon les critères validés à l'étape 6 ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser de critères ;
 9. renseigner le signal principal avec signal, selon les valeurs validées ;
 10. proposer une réponse uniquement pour les deux niveaux de priorité les plus élevés ;
 11. renseigner human_check selon la règle validée à l'étape 6 ;

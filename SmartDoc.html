@@ -1482,13 +1482,15 @@ Enrichis le registre pour chaque document dont status = classified dans "{{fileN
 Utilise la skill {{skillXlsx}} pour renseigner exactement ce que la profondeur retenue impose, et rien de plus :
 - si j'ai choisi "résumé d'une ligne" : summary seul, en une phrase ;
 - si j'ai choisi "résumé et mots-clés" : summary de 2 à 3 phrases, et tags ;
-- si j'ai choisi "résumé, mots-clés, entités et citation sourcée" : summary de 2 à 3 phrases, tags, les colonnes retenues à la question 7, et source_reference.
+- si j'ai choisi "résumé, mots-clés, entités et citation sourcée" : summary de 2 à 3 phrases, tags, et les colonnes retenues à la question 7.
 
-Précisions sur ces colonnes :
+Deux colonnes se renseignent dans tous les cas, quelle que soit la profondeur retenue :
+- source_reference : nom du fichier et page quand la pagination existe, sinon nom du fichier et section ou extrait repérable. Sans elle, aucune réponse ne pourrait être sourcée à l'étape 10 ;
+- confidence : ton niveau de certitude sur l'indexation de cette ligne.
+
+Précisions sur les autres colonnes :
 - summary : un chapeau analytique qui dit de quoi le document traite réellement ;
-- tags : mots-clés thématiques tirés du contenu réel, pas de vocabulaire générique ;
-- source_reference : nom du fichier et page quand la pagination existe, sinon nom du fichier et section ou extrait repérable ;
-- confidence : ton niveau de certitude sur l'indexation de cette ligne, à renseigner dans tous les cas.
+- tags : mots-clés thématiques tirés du contenu réel, pas de vocabulaire générique.
 
 Règles :
 - ne remplis que les colonnes qui existent déjà dans le registre : n'en crée aucune ;
@@ -1498,7 +1500,9 @@ Règles :
 - ne pas modifier le contenu des documents ;
 - pour cette formation, limite-toi à 20 documents ; en production, traite l'intégralité.
 
-À la fin, indique le nombre de lignes enrichies, les colonnes réellement remplies, et la liste des documents dont l'indexation reste incertaine.</code></pre>
+À la fin, indique le nombre de lignes enrichies, les colonnes réellement remplies, et la liste des documents dont l'indexation reste incertaine.
+
+Soumets-moi ensuite 3 à 5 résumés — les plus représentatifs et ceux dont tu es le moins sûr — pour que je valide ou corrige leur pertinence. Applique mes corrections au registre avant de conclure l'étape.</code></pre>
         </div>
 
     </section>
@@ -1600,7 +1604,7 @@ Ignore les variantes abandonnées. Ne garde que la dernière décision stabilis�
 {{skillName}}
 
 Contrainte essentielle :
-la Skill ne doit PAS figer le plan de classement dans son texte. Elle doit lire l'onglet "plan_de_classement" du registre au début de chaque exécution et s'y conformer. Ainsi le plan pourra évoluer sans réécrire la Skill.
+la Skill ne doit PAS figer le plan de classement dans son texte. Elle doit lire l'onglet "plan_de_classement" du registre au début de chaque exécution et s'y conformer. Ainsi le plan pourra évoluer sans réécrire la Skill. Si cet onglet est vide ou introuvable, la Skill doit s'arrêter et le signaler, sans jamais improviser un plan ni relancer l'élicitation d'elle-même.
 
 Autres contraintes :
 - utiliser {{connector}} comme source ;
@@ -1666,14 +1670,14 @@ traiter les nouveaux documents déposés dans "{{src}}", et maintenir à jour le
 
 La route doit exécuter les étapes suivantes :
 1. vérifier l'accès à "{{src}}", à "{{dst}}" et au registre ;
-2. lire l'onglet "plan_de_classement" et s'y conformer strictement ;
+2. lire l'onglet "plan_de_classement" et s'y conformer strictement ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser un plan ;
 3. détecter uniquement les fichiers nouveaux ou modifiés depuis le dernier passage ;
 4. les inventorier dans le registre avec status = to_analyze ;
 5. vérifier les doublons contre l'ensemble du registre, et pas seulement contre le lot en cours ;
 6. proposer category, proposed_name et target_path selon le plan validé ;
 7. présenter le lot et attendre une validation explicite ;
 8. après validation, {{actionImp}} les documents approuvés vers "{{dst}}", en laissant les originaux intacts dans "{{src}}" ;
-9. indexer les documents classés : summary, tags, colonnes du plan, source_reference ;
+9. indexer les documents classés selon la profondeur retenue dans le plan, source_reference et confidence étant renseignés dans tous les cas ;
 10. mettre à jour le registre ;
 11. produire un rapport court.
 
