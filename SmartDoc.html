@@ -1102,6 +1102,8 @@ Contexte de travail :
 - dossier cible, où le fonds sera rangé : "{{dst}}" ;
 - registre : un fichier Excel "{{fileName}}" dans le répertoire du projet.
 
+Ces deux dossiers sont désignés par leur nom : tu localiseras leur chemin exact à l'étape 2, et c'est ce chemin que tu utiliseras ensuite.
+
 Règles générales :
 - l'IA propose, l'humain dispose : aucune action sur les fichiers sans ma validation explicite ;
 - ne jamais supprimer un fichier ;
@@ -1140,12 +1142,17 @@ Règles générales :
           <pre class="prompt"><code>Vérifie que tu as accès aux éléments nécessaires pour ce projet :
 
 1. {{storage}}, via {{connector}} :
-- trouves-tu le dossier "{{src}}" ? indique combien de fichiers il contient ;
-- si tu ne le trouves pas, dis-le clairement et demande-moi où il se situe avant de continuer ;
-- peux-tu lire le contenu d'un de ces fichiers ?
-- le dossier "{{dst}}" existe-t-il ? s'il n'existe pas, crée-le ;
-- peux-tu y créer un sous-dossier ?
-- peux-tu {{action}} un fichier vers "{{dst}}" ?
+
+Localise d'abord mes deux dossiers. Je te les ai désignés par leur nom : à toi de retrouver où ils se trouvent réellement.
+
+- cherche le dossier "{{src}}" dans le répertoire du projet, puis sous mon dossier utilisateur : Documents, Bureau, Téléchargements ;
+- indique-moi son chemin complet et le nombre de fichiers qu'il contient ;
+- si plusieurs dossiers portent ce nom, liste-les avec leur chemin et demande-moi lequel utiliser ;
+- si tu n'en trouves aucun, dis-le clairement et demande-moi son chemin avant de continuer ;
+- fais de même pour le dossier "{{dst}}" ; s'il n'existe nulle part, crée-le à côté du dossier source et indique-moi son chemin ;
+- retiens ces deux chemins complets : ce sont eux que tu utiliseras pour toute la suite du projet, et non les noms courts ;
+- peux-tu lire le contenu d'un des fichiers du dossier source ?
+- peux-tu créer un sous-dossier dans le dossier cible, et y {{action}} un fichier ?
 
 2. Répertoire du projet :
 - peux-tu créer un fichier dans le répertoire du projet ?
@@ -1765,11 +1772,11 @@ Contraintes de test :
       local: {
         intro: "Deux dossiers de votre poste à désigner",
         title: "⚙️ Vos deux dossiers",
-        hint: "Cliquez sur Parcourir pour choisir chaque dossier. Le chemin s'inscrit dans le champ, où vous pouvez le corriger.",
+        hint: "Cliquez sur Parcourir pour désigner chaque dossier. Claude retrouvera son emplacement exact à l'étape 2.",
         srcLabel: "📥 Dossier source — où sont vos documents",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera",
-        srcPlaceholder: "Ex : C:\\Users\\vous\\Documents\\Factures à trier",
-        dstPlaceholder: "Ex : C:\\Users\\vous\\Documents\\Archives"
+        srcPlaceholder: "Ex : Factures à trier",
+        dstPlaceholder: "Ex : Archives"
       },
       drive: {
         intro: "Deux dossiers Google Drive à désigner",
