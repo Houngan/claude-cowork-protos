@@ -1761,7 +1761,10 @@ Contraintes de test :
       local: {
         intro: "Deux dossiers de votre poste à désigner",
         title: "⚙️ Vos deux dossiers",
-        hint: "Collez le chemin complet de chaque dossier. Sur Windows : Maj + clic droit sur le dossier, puis « Copier en tant que chemin d'accès ». Sur Mac : clic droit en maintenant Option, puis « Copier … comme nom de chemin ».",
+        hint:
+          "Collez le chemin complet de chaque dossier.<br>" +
+          "Sur <strong>Windows</strong> : Maj + clic droit sur le dossier, puis « Copier en tant que chemin d'accès ».<br>" +
+          "Sur <strong>Mac</strong> : clic droit en maintenant Option, puis « Copier … comme nom de chemin ».",
         srcLabel: "📥 Dossier source — où sont vos documents",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera",
         srcPlaceholder: "Ex : C:\\Users\\vous\\Documents\\R&D - Initial",
@@ -1819,7 +1822,9 @@ Contraintes de test :
 
         document.getElementById("setup-intro").textContent = copy.intro;
         document.getElementById("setup-title").textContent = copy.title;
-        document.getElementById("setup-hint").textContent = copy.hint;
+        // texte statique de la page (aucune donnée saisie n'y transite),
+        // en HTML pour les sauts de ligne et la mise en gras
+        document.getElementById("setup-hint").innerHTML = copy.hint;
         document.getElementById("src-label").textContent = copy.srcLabel;
         document.getElementById("dst-label").textContent = copy.dstLabel;
 
