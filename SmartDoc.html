@@ -1362,6 +1362,8 @@ Utilise la skill {{skillXlsx}} pour :
 - inscrire les 8 questions, mes réponses et les valeurs retenues dans l'onglet "plan_de_classement" de "{{fileName}}" ;
 - ajouter à l'onglet "registre" les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes.
 
+Confirme-moi ensuite ce qui a réellement été écrit dans l'onglet : la liste des catégories, l'arborescence, la règle de nommage et les colonnes ajoutées. Précise que c'est ce plan, et lui seul, qui pilotera l'étape 7.
+
 Ne {{actionImp}} aucun fichier.
 Ne renomme rien.
 Ne crée aucun dossier à ce stade.</code></pre>
@@ -1381,9 +1383,16 @@ Ne crée aucun dossier à ce stade.</code></pre>
             <h3>Prompt — Propositions de classement</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Pour chaque ligne du registre "{{fileName}}" dont status = to_analyze, prépare une proposition de classement conforme au plan validé à l'étape 6.
+          <pre class="prompt"><code>Étape préalable, obligatoire :
+Relis l'onglet "plan_de_classement" du registre "{{fileName}}" et rappelle-moi en trois lignes ce que tu y trouves :
+- la liste des catégories autorisées ;
+- l'arborescence à créer dans "{{dst}}" ;
+- la règle de nommage retenue.
 
-Commence par relire l'onglet "plan_de_classement". Ne t'écarte jamais de ce qui y est inscrit.
+Si cet onglet est vide ou introuvable, arrête-toi et dis-le-moi : ne propose aucun classement sans plan validé, et ne rejoue pas l'élicitation de ta propre initiative.
+
+Ensuite seulement :
+Pour chaque ligne du registre "{{fileName}}" dont status = to_analyze, prépare une proposition de classement conforme à ce plan. Ne t'écarte jamais de ce qui y est inscrit.
 
 Utilise la skill {{skillXlsx}} pour renseigner uniquement :
 - category : obligatoirement une des valeurs définies dans le plan validé ;
@@ -1400,7 +1409,7 @@ Règles :
 - ne renomme aucun fichier et ne {{actionImp}} aucun fichier : tout n'est que proposition.
 
 Présente ensuite un tableau dans le chat :
-nom actuel → nom proposé → destination → justification courte → confiance
+nom actuel → catégorie → nom proposé → destination → justification courte → confiance
 
 Enfin, liste séparément les documents que tu n'arrives pas à dater ou à qualifier, et pose-moi 2 à 3 questions ciblées pour les trancher. Attends mes réponses avant de conclure l'étape.</code></pre>
         </div>
