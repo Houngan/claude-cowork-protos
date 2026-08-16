@@ -1347,7 +1347,7 @@ Les 8 questions :
 5. Documents sans date certaine : copiés dans un sous-dossier "À dater", copiés sans date dans leur catégorie, ou pas encore copiés en attendant que la date soit tranchée ?
 6. Doublons et fichiers inutiles : ne copier qu'une seule version dans "{{dst}}", copier toutes les versions en les distinguant, ou ne rien copier et se contenter de les signaler dans le registre ?
 7. Axes que je veux pouvoir interroger plus tard, plusieurs réponses possibles : personnes citées, lieux, concepts, auteur ou organisme, client ou projet, niveau de confidentialité ?
-8. Profondeur d'indexation : résumé d'une ligne, résumé et mots-clés, ou résumé et mots-clés et entités et citation sourcée ?
+8. Profondeur d'indexation : "résumé d'une ligne", "résumé et mots-clés", ou "résumé, mots-clés, entités et citation sourcée" ? Reprends ces libellés tels quels dans le plan : l'étape 9 s'y référera mot pour mot.
 
 Phase 2 — Récapitulatif :
 Présente-moi un récapitulatif clair de mes 8 choix, comprenant :
@@ -1461,7 +1461,7 @@ Règles :
 
     <section class="card" id="step-9">
       <h2>9. 🧠 Indexer en profondeur</h2>
-      <p>Colonnes mises à jour : summary, tags, source_reference, colonnes issues de l'étape 6.</p>
+      <p>L'ampleur de cette étape dépend entièrement de la profondeur d'indexation choisie à l'étape 6.</p>
 
 
         <div class="prompt-card">
@@ -1469,21 +1469,32 @@ Règles :
             <h3>Prompt — Indexation profonde</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Enrichis maintenant le registre pour chaque document dont status = classified dans "{{fileName}}".
+          <pre class="prompt"><code>Étape préalable, obligatoire :
+Relis l'onglet "plan_de_classement" du registre "{{fileName}}" et rappelle-moi en deux lignes :
+- la profondeur d'indexation retenue à la question 8 ;
+- les colonnes supplémentaires retenues à la question 7, telles qu'elles existent réellement dans l'onglet "registre".
 
-Relis d'abord l'onglet "plan_de_classement" : la profondeur d'indexation que j'ai choisie à la question 8 détermine l'ampleur de ce travail.
+Si cet onglet est vide ou introuvable, arrête-toi et dis-le-moi : n'invente aucune profondeur d'indexation et ne rejoue pas l'élicitation de ta propre initiative.
 
-Utilise la skill {{skillXlsx}} pour renseigner :
-- summary : un chapeau analytique de 2 à 3 phrases, qui dit de quoi le document traite réellement ;
+Ensuite seulement :
+Enrichis le registre pour chaque document dont status = classified dans "{{fileName}}".
+
+Utilise la skill {{skillXlsx}} pour renseigner exactement ce que la profondeur retenue impose, et rien de plus :
+- si j'ai choisi "résumé d'une ligne" : summary seul, en une phrase ;
+- si j'ai choisi "résumé et mots-clés" : summary de 2 à 3 phrases, et tags ;
+- si j'ai choisi "résumé, mots-clés, entités et citation sourcée" : summary de 2 à 3 phrases, tags, les colonnes retenues à la question 7, et source_reference.
+
+Précisions sur ces colonnes :
+- summary : un chapeau analytique qui dit de quoi le document traite réellement ;
 - tags : mots-clés thématiques tirés du contenu réel, pas de vocabulaire générique ;
-- les colonnes supplémentaires créées à l'étape 6 : personnes, lieux, concepts, auteur, client ou confidentialité, selon mon choix à la question 7 ;
 - source_reference : nom du fichier et page quand la pagination existe, sinon nom du fichier et section ou extrait repérable ;
-- confidence : ton niveau de certitude sur l'indexation de cette ligne.
+- confidence : ton niveau de certitude sur l'indexation de cette ligne, à renseigner dans tous les cas.
 
 Règles :
+- ne remplis que les colonnes qui existent déjà dans le registre : n'en crée aucune ;
+- ne remplis aucune colonne que la profondeur retenue n'exige pas, même si tu saurais le faire ;
 - ne jamais inventer une information absente : laisser vide ou écrire unknown ;
 - ne jamais déduire une date par rapprochement ; detected_date ne se remplit que si la date est explicite dans le document ou son nom ;
-- ne pas créer de colonnes non prévues ;
 - ne pas modifier le contenu des documents ;
 - pour cette formation, limite-toi à 20 documents ; en production, traite l'intégralité.
 
