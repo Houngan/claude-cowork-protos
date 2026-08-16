@@ -676,41 +676,6 @@ input:focus-visible {
   color: #ef4444;
 }
 
-.path-row {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-}
-
-/* sans min-width:0 l'element flex refuse de retrecir sous son contenu */
-.path-row input[type="text"] {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.btn-browse {
-  appearance: none;
-  flex: 0 0 auto;
-  padding: 0 16px;
-  font-size: 14.5px;
-  font-family: inherit;
-  font-weight: 800;
-  white-space: nowrap;
-  color: var(--black);
-  cursor: pointer;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  background: #ffffff;
-  transition:
-    background 160ms ease,
-    border-color 160ms ease;
-}
-
-.btn-browse:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent-2);
-}
-
 .setup-note {
   margin: 18px 0 0;
   padding: 12px 14px;
@@ -854,14 +819,6 @@ input:focus-visible {
     align-items: stretch;
   }
 
-  /* un chemin complet ne tient pas a cote du bouton sur un ecran etroit */
-  .path-row {
-    flex-direction: column;
-  }
-
-  .btn-browse {
-    padding: 12px 16px;
-  }
 
   .folder-arrow {
     display: none;
@@ -938,7 +895,7 @@ input:focus-visible {
         <a class="storage-card" id="card-local" href="SmartDoc.html?storage=local">
           <div class="storage-logo" id="logo-local"></div>
           <h2 class="storage-name">Dossier local</h2>
-          <p class="storage-desc">Un dossier de votre ordinateur<br>que vous pourrez parcourir</p>
+          <p class="storage-desc">Un dossier de votre ordinateur<br>dont vous collerez le chemin</p>
           <span class="storage-cta">Choisir →</span>
         </a>
         <a class="storage-card" id="card-drive" href="SmartDoc.html?storage=drive">
@@ -964,10 +921,7 @@ input:focus-visible {
         <div class="folder-grid">
           <div class="field">
             <label for="src-input" id="src-label">📥 Dossier source</label>
-            <div class="path-row">
-              <input type="text" id="src-input" placeholder="ex. Factures à trier" spellcheck="false" autocomplete="off">
-              <button class="btn-browse" type="button" id="src-browse" hidden>📂 Parcourir…</button>
-            </div>
+            <input type="text" id="src-input" placeholder="ex. Factures à trier" spellcheck="false" autocomplete="off">
             <p class="field-error" id="src-error" hidden>Indiquez le dossier de départ.</p>
           </div>
 
@@ -975,10 +929,7 @@ input:focus-visible {
 
           <div class="field">
             <label for="dst-input" id="dst-label">🗄️ Dossier cible</label>
-            <div class="path-row">
-              <input type="text" id="dst-input" placeholder="Ex : Archives" spellcheck="false" autocomplete="off">
-              <button class="btn-browse" type="button" id="dst-browse" hidden>📂 Parcourir…</button>
-            </div>
+            <input type="text" id="dst-input" placeholder="Ex : Archives" spellcheck="false" autocomplete="off">
             <p class="field-error" id="dst-error" hidden>Nommez le dossier d'arrivée.</p>
           </div>
         </div>
@@ -1765,7 +1716,7 @@ Contraintes de test :
       local: {
         intro: "Deux dossiers de votre poste à désigner",
         title: "⚙️ Vos deux dossiers",
-        hint: "Indiquez le chemin complet de chaque dossier. Parcourir en remplit le nom, à compléter devant — la barre d'adresse de l'Explorateur affiche le chemin, prêt à copier.",
+        hint: "Collez le chemin complet de chaque dossier. Sur Windows : Maj + clic droit sur le dossier, puis « Copier en tant que chemin d'accès ». Sur Mac : clic droit en maintenant Option, puis « Copier … comme nom de chemin ».",
         srcLabel: "📥 Dossier source — où sont vos documents",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera",
         srcPlaceholder: "Ex : C:\\Users\\vous\\Documents\\R&D - Initial",
@@ -1840,27 +1791,14 @@ Contraintes de test :
         srcInput.value = "";
         dstInput.value = "";
 
-        // Sélecteur de dossier natif : il ne lit aucun fichier, donc aucune
-        // demande d'importation. En contrepartie il ne renvoie que le nom du
-        // dossier — le champ reste modifiable pour y coller un chemin complet.
-        ["src", "dst"].forEach(function (key) {
-          if (storageKey !== "local") return;
-          if (typeof window.showDirectoryPicker !== "function") return;
-
-          var input = document.getElementById(key + "-input");
-          var browse = document.getElementById(key + "-browse");
-
-          browse.hidden = false;
-          browse.addEventListener("click", function () {
-            window
-              .showDirectoryPicker({ id: "smartdoc-" + key })
-              .then(function (handle) {
-                input.value = handle.name;
-                validate(false);
-              })
-              .catch(function () {
-                /* sélection annulée */
-              });
+        // "Copier en tant que chemin d'accès" (Windows) entoure le chemin de
+        // guillemets : on les retire au collage.
+        [srcInput, dstInput].forEach(function (input) {
+          input.addEventListener("input", function () {
+            var v = input.value;
+            if (v.length > 1 && v.charAt(0) === '"' && v.charAt(v.length - 1) === '"') {
+              input.value = v.slice(1, -1);
+            }
           });
         });
 
