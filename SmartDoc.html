@@ -676,13 +676,6 @@ input:focus-visible {
   color: #ef4444;
 }
 
-.field-note {
-  margin: 6px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent-2);
-}
-
 .path-row {
   display: flex;
   align-items: stretch;
@@ -976,7 +969,6 @@ input:focus-visible {
               <button class="btn-browse" type="button" id="src-browse" hidden>📂 Parcourir…</button>
               <input type="file" id="src-picker" webkitdirectory directory multiple hidden>
             </div>
-            <p class="field-note" id="src-note" hidden></p>
             <p class="field-error" id="src-error" hidden>Indiquez le dossier de départ.</p>
           </div>
 
@@ -989,7 +981,6 @@ input:focus-visible {
               <button class="btn-browse" type="button" id="dst-browse" hidden>📂 Parcourir…</button>
               <input type="file" id="dst-picker" webkitdirectory directory multiple hidden>
             </div>
-            <p class="field-note" id="dst-note" hidden></p>
             <p class="field-error" id="dst-error" hidden>Nommez le dossier d'arrivée.</p>
           </div>
         </div>
@@ -1776,7 +1767,7 @@ Contraintes de test :
       local: {
         intro: "Deux dossiers de votre poste à désigner",
         title: "⚙️ Vos deux dossiers",
-        hint: "Utilisez Parcourir, ou collez directement le chemin complet du dossier — sur Windows, la barre d'adresse de l'Explorateur l'affiche.",
+        hint: "Cliquez sur Parcourir pour choisir chaque dossier. Le chemin s'inscrit dans le champ, où vous pouvez le corriger.",
         srcLabel: "📥 Dossier source — où sont vos documents",
         dstLabel: "🗄️ Dossier cible — où Claude les rangera",
         srcPlaceholder: "Ex : C:\\Users\\vous\\Documents\\Factures à trier",
@@ -1851,34 +1842,29 @@ Contraintes de test :
         srcInput.value = "";
         dstInput.value = "";
 
-        // Un navigateur ordinaire ne révèle jamais le chemin absolu d'un dossier.
-        // Seuls les environnements Electron (le navigateur intégré de Cowork)
-        // exposent file.path : on s'en sert pour reconstituer le chemin réel,
-        // et on prévient l'utilisateur quand ce n'est pas possible.
-        function folderPathFromFile(file) {
+        // Chemin du dossier choisi : file.path (chemin absolu, quand
+        // l'environnement le fournit) moins la partie relative du fichier.
+        // À défaut, le nom du dossier.
+        function cheminDuDossier(file) {
           var rel = file.webkitRelativePath || "";
           var full = file.path || "";
-          if (!rel) return "";
-          var rootName = rel.split("/")[0];
-          if (!full) return rootName;
+          var nom = rel.split("/")[0] || "";
+          if (!full || !rel) return nom;
 
           var sep = full.indexOf("\\") !== -1 ? "\\" : "/";
           var relNative = rel.split("/").join(sep);
-          if (full.length <= relNative.length) return rootName;
-          if (full.slice(-relNative.length) !== relNative) return rootName;
+          if (full.slice(-relNative.length) !== relNative) return nom;
 
-          // "C:\...\Documents\" + "Factures à trier"
-          return full.slice(0, full.length - relNative.length) + rootName;
+          return full.slice(0, full.length - relNative.length) + nom;
         }
 
         ["src", "dst"].forEach(function (key) {
-          var input = document.getElementById(key + "-input");
-          var browse = document.getElementById(key + "-browse");
-          var picker = document.getElementById(key + "-picker");
-          var note = document.getElementById(key + "-note");
-
           // Parcourir n'a de sens que sur un dossier de l'ordinateur
           if (storageKey !== "local") return;
+
+          var input = document.getElementById(key + "-input");
+          var picker = document.getElementById(key + "-picker");
+          var browse = document.getElementById(key + "-browse");
 
           browse.hidden = false;
           browse.addEventListener("click", function () {
@@ -1888,19 +1874,7 @@ Contraintes de test :
           picker.addEventListener("change", function () {
             var file = picker.files && picker.files[0];
             if (!file) return;
-
-            var value = folderPathFromFile(file);
-            var complet = value.indexOf("/") !== -1 || value.indexOf("\\") !== -1;
-
-            input.value = value;
-            if (complet) {
-              note.hidden = true;
-            } else {
-              note.textContent =
-                "Votre navigateur ne transmet pas le chemin complet. Complétez-le devant « " +
-                value + " », par exemple C:\\Users\\vous\\Documents\\";
-              note.hidden = false;
-            }
+            input.value = cheminDuDossier(file);
             validate(false);
           });
         });
