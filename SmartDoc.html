@@ -1103,8 +1103,6 @@ Règles générales :
 - travailler par étapes simples, une étape à la fois ;
 - tenir le fichier Excel comme mémoire documentaire ;
 - utiliser des colonnes et des valeurs en anglais dans le fichier Excel ;
-- utiliser la skill {{skillXlsx}} pour créer, lire et modifier le fichier Excel ;
-- utiliser la skill {{skillPdf}} pour générer les rapports PDF ;
 - ne pas créer de {{cloudAlt}} ;
 - ne définir aucun plan de classement pour l'instant : nous le déciderons ensemble à l'étape 6 ;
 - pour cette formation, limiter le traitement à 20 documents ; en production, traiter l'intégralité du dépôt ;
@@ -1119,7 +1117,7 @@ Règles générales :
 
     <section class="card" id="step-2">
       <h2>2. 🔌 Vérifier les accès</h2>
-      <p>Objectif : vérifier {{connector}}, le répertoire projet, {{skillXlsx}} et {{skillPdf}} avant toute action. Si le dossier source est vide, Claude propose de générer un jeu d'essai.</p>
+      <p>Objectif : vérifier {{connector}} et le répertoire projet avant toute action. Si le dossier source est vide, Claude propose de générer un jeu d'essai.</p>
 
 
         <div class="prompt-card">
@@ -1140,14 +1138,6 @@ Règles générales :
 2. Répertoire du projet :
 - peux-tu créer un fichier dans le répertoire du projet ?
 - peux-tu le retrouver et le modifier lors d'un prochain run ?
-
-3. Skill tableur :
-- la skill {{skillXlsx}} est-elle disponible ?
-- peux-tu l'utiliser pour créer, lire et modifier un fichier .xlsx dans le projet ?
-
-4. Skill PDF :
-- la skill {{skillPdf}} est-elle disponible ?
-- peux-tu l'utiliser pour créer un rapport PDF à partir d'un fichier Excel ?
 
 Réponds point par point, et signale clairement ce qui ne fonctionne pas.
 
@@ -1191,7 +1181,7 @@ category = défini à l'étape 6, avec vous</pre>
             <h3>Prompt — Création du registre</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Utilise la skill {{skillXlsx}} pour créer un fichier Excel intitulé "{{fileName}}" dans le répertoire du projet.
+          <pre class="prompt"><code>Crée un fichier Excel intitulé "{{fileName}}" dans le répertoire du projet.
 
 Onglet "registre", avec les colonnes suivantes, en anglais :
 - file_name
@@ -1246,7 +1236,7 @@ Règles :
 
 Pour cette formation, limite-toi à 20 documents. En production, tu traiteras l'intégralité du dépôt.
 
-Utilise la skill {{skillXlsx}} pour ajouter une ligne par fichier dans l'onglet "registre" du fichier "{{fileName}}" :
+Ajoute une ligne par fichier dans l'onglet "registre" du fichier "{{fileName}}" :
 - file_name ;
 - detected_date, uniquement si une date est explicitement présente dans le nom du fichier ou dans le document ;
 - date_source = document / filename / unknown ;
@@ -1297,7 +1287,7 @@ Ne crée pas de {{cloudAlt}}.</code></pre>
 - fichiers illisibles ;
 - fichiers hors périmètre documentaire.
 
-Utilise la skill {{skillXlsx}} pour mettre à jour uniquement, dans "{{fileName}}" :
+Mets à jour uniquement, dans "{{fileName}}" :
 - duplicate_status = unique / exact_duplicate / possible_duplicate ;
 - confidence = high / medium / low ;
 - status = ignored pour les fichiers vides, illisibles ou hors périmètre.
@@ -1358,9 +1348,8 @@ Présente-moi un récapitulatif clair de mes 8 choix, comprenant :
 Demande-moi ensuite une validation explicite. N'écris rien dans le registre avant de l'avoir reçue.
 
 Phase 3 — Enregistrement, après ma validation seulement :
-Utilise la skill {{skillXlsx}} pour :
-- inscrire les 8 questions, mes réponses et les valeurs retenues dans l'onglet "plan_de_classement" de "{{fileName}}" ;
-- ajouter à l'onglet "registre" les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes.
+- inscris les 8 questions, mes réponses et les valeurs retenues dans l'onglet "plan_de_classement" de "{{fileName}}" ;
+- ajoute à l'onglet "registre" les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes.
 
 Confirme-moi ensuite ce qui a réellement été écrit dans l'onglet : la liste des catégories, l'arborescence, la règle de nommage et les colonnes ajoutées. Précise que c'est ce plan, et lui seul, qui pilotera l'étape 7.
 
@@ -1394,7 +1383,7 @@ Si cet onglet est vide ou introuvable, arrête-toi et dis-le-moi : ne propose au
 Ensuite seulement :
 Pour chaque ligne du registre "{{fileName}}" dont status = to_analyze, prépare une proposition de classement conforme à ce plan. Ne t'écarte jamais de ce qui y est inscrit.
 
-Utilise la skill {{skillXlsx}} pour renseigner uniquement :
+Renseigne uniquement :
 - category : obligatoirement une des valeurs définies dans le plan validé ;
 - proposed_name : selon la convention de nommage validée ;
 - target_path : "{{dst}}" suivi de l'arborescence validée ;
@@ -1438,7 +1427,7 @@ Après ma validation :
 - {{actionImp}} vers target_path chaque document approuvé, avec son proposed_name ;
 - applique la règle validée à la question 5 pour les documents sans date ;
 - applique la règle validée à la question 6 pour les doublons et les fichiers inutiles ;
-- utilise la skill {{skillXlsx}} pour passer status = classified sur les documents traités ;
+- passe status = classified sur les documents traités ;
 - passe status = needs_review pour les documents en confidence = low ou que j'ai écartés : ne les copie pas.
 
 Règles :
@@ -1479,7 +1468,7 @@ Si cet onglet est vide ou introuvable, arrête-toi et dis-le-moi : n'invente auc
 Ensuite seulement :
 Enrichis le registre pour chaque document dont status = classified dans "{{fileName}}".
 
-Utilise la skill {{skillXlsx}} pour renseigner exactement ce que la profondeur retenue impose, et rien de plus :
+Renseigne exactement ce que la profondeur retenue impose, et rien de plus :
 - si j'ai choisi "résumé d'une ligne" : summary seul, en une phrase ;
 - si j'ai choisi "résumé et mots-clés" : summary de 2 à 3 phrases, et tags ;
 - si j'ai choisi "résumé, mots-clés, entités et citation sourcée" : summary de 2 à 3 phrases, tags, et les colonnes retenues à la question 7.
@@ -1545,7 +1534,7 @@ Règles :
 
 SECONDE PARTIE — produis le rapport.
 
-Utilise ensuite la skill {{skillPdf}} pour générer un seul rapport PDF, en deux sections.
+Génère ensuite un seul rapport PDF, en deux sections.
 
 Section 1, état du fonds :
 - date du rapport et périmètre analysé ;
@@ -1592,8 +1581,6 @@ Ignore les variantes abandonnées. Ne garde que la dernière décision stabilis�
 - {{storage}} comme stockage, via {{connector}} ;
 - dossier source "{{src}}", dossier cible "{{dst}}" ;
 - registre Excel "{{fileName}}" dans le répertoire du projet ;
-- {{skillXlsx}} pour créer, lire et modifier le registre ;
-- {{skillPdf}} pour les rapports PDF ;
 - plan de classement et convention de nommage tels qu'enregistrés dans l'onglet "plan_de_classement" ;
 - aucune suppression de fichier ;
 - aucun classement sans validation explicite du lot ;
@@ -1608,7 +1595,7 @@ la Skill ne doit PAS figer le plan de classement dans son texte. Elle doit lire 
 
 Autres contraintes :
 - utiliser {{connector}} comme source ;
-- utiliser {{skillXlsx}} pour écrire dans "{{fileName}}" ;
+- écrire uniquement dans "{{fileName}}" ;
 - traiter le dossier source en lecture seule : ne jamais y supprimer, déplacer ni renommer un fichier ;
 - classer uniquement par copie vers "{{dst}}", l'original restant en place ;
 - ne jamais modifier le contenu d'un document source ;
@@ -1717,8 +1704,7 @@ Ensuite, planifie l'exécution récurrente :
 Contraintes de test :
 - ne supprime, ne déplace ni ne renomme aucun fichier de "{{src}}" ;
 - ne retraite pas les documents déjà classés ;
-- ne crée pas de {{cloudAlt}} ;
-- utilise {{skillXlsx}} pour toute écriture dans "{{fileName}}".</code></pre>
+- ne crée pas de {{cloudAlt}}.</code></pre>
         </div>
 
     </section>
@@ -1760,8 +1746,6 @@ Contraintes de test :
         afterAction: "l'original reste toujours dans le dossier source : ne le supprime pas, ne le déplace pas, ne le renomme pas",
         fileName: "Registre documents.xlsx",
         skillName: "classifying-local-documents",
-        skillXlsx: "xlsx-proto",
-        skillPdf: "pdf-proto",
         cloudAlt: "fichier cloud parallèle",
         logo: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dossier local"><path d="M10.2 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.8l-2-2z" fill="#8C6AA8"/><path d="M2 9.4h20V18a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.4z" fill="#CFAFE7"/></svg>`
       },
@@ -1774,8 +1758,6 @@ Contraintes de test :
         afterAction: "l'original reste toujours dans le dossier source : ne le supprime pas, ne le déplace pas, ne le renomme pas",
         fileName: "Registre documents.xlsx",
         skillName: "classifying-drive-documents",
-        skillXlsx: "xlsx-proto",
-        skillPdf: "pdf-proto",
         cloudAlt: "Google Sheet",
         logo: `<svg viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Google Drive"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>`
       }
@@ -1952,8 +1934,6 @@ Contraintes de test :
         "{{afterAction}}": s.afterAction,
         "{{fileName}}": s.fileName,
         "{{skillName}}": s.skillName,
-        "{{skillXlsx}}": s.skillXlsx,
-        "{{skillPdf}}": s.skillPdf,
         "{{cloudAlt}}": s.cloudAlt
       };
 

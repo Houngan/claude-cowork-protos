@@ -812,8 +812,6 @@ Règles générales :
 - traiter uniquement les nouveaux éléments ou les éléments modifiés ;
 - limiter les volumes traités à chaque exécution ;
 - produire un rapport court à chaque run ;
-- utiliser la skill {{skillXlsx}} pour créer, lire et modifier le fichier Excel ;
-- utiliser la skill {{skillPdf}} pour générer les rapports PDF ;
 - ne définir aucun critère de priorité pour l'instant : nous les déciderons ensemble à l'étape 6 ;
 - ne créer la Skill métier qu'après plusieurs étapes testées dans ce fil ;
 - créer la route finale seulement après validation du workflow et de la Skill métier.</code></pre>
@@ -824,8 +822,8 @@ Règles générales :
 
 
     <section class="card" id="step-2">
-      <h2>2. 🔌 Vérifier {{provider}}, le projet et les skills</h2>
-      <p>Objectif : vérifier {{connector}}, le répertoire projet, {{skillXlsx}} et {{skillPdf}} avant toute action.</p>
+      <h2>2. 🔌 Vérifier {{provider}} et le projet</h2>
+      <p>Objectif : vérifier {{connector}} et le répertoire projet avant toute action.</p>
 
 
         <div class="prompt-card">
@@ -844,14 +842,6 @@ Règles générales :
 - peux-tu créer un fichier dans le répertoire du projet ?
 - peux-tu retrouver ce fichier ensuite ?
 - peux-tu le modifier lors d'un prochain run ?
-
-3. Skill tableur :
-- la skill {{skillXlsx}} est-elle disponible ?
-- peux-tu l'utiliser pour créer, lire et modifier un fichier .xlsx dans le projet ?
-
-4. Skill PDF :
-- la skill {{skillPdf}} est-elle disponible ?
-- peux-tu l'utiliser pour créer un rapport PDF à partir d'un fichier Excel ou d'un résumé de run ?
 
 Ne lance pas encore le traitement des mails.
 Ne crée pas encore de brouillon.
@@ -881,7 +871,7 @@ human_check = required / not_required</pre>
             <h3>Prompt — Création du fichier Excel</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Utilise la skill {{skillXlsx}} pour créer un fichier Excel intitulé "{{fileName}}" dans le répertoire du projet.
+          <pre class="prompt"><code>Crée un fichier Excel intitulé "{{fileName}}" dans le répertoire du projet.
 
 Le fichier doit contenir un tableau structuré avec les colonnes suivantes, en anglais :
 - email_id
@@ -927,7 +917,7 @@ Règles :
           </div>
           <pre class="prompt"><code>Utilise {{provider}} via le connecteur {{connector}} pour lire les mails présents dans la boîte de réception.
 
-Utilise la skill {{skillXlsx}} pour remplir le fichier Excel "{{fileName}}" situé dans le répertoire du projet.
+Remplis le fichier Excel "{{fileName}}" situé dans le répertoire du projet.
 
 Pour chaque mail utile, ajoute une ligne avec :
 - email_id si disponible ;
@@ -975,7 +965,7 @@ Ne crée pas de {{cloudAlt}}.
           </div>
           <pre class="prompt"><code>À partir du fichier Excel "{{fileName}}", identifie les fils de discussion où le dernier message vient d'un client ou contact externe, et où aucune réponse sortante n'a été envoyée après ce dernier message.
 
-Utilise la skill {{skillXlsx}} pour mettre à jour uniquement la colonne :
+Mets à jour uniquement la colonne :
 - status
 
 Valeurs autorisées :
@@ -1038,14 +1028,13 @@ Présente-moi un récapitulatif clair de mes 8 choix, comprenant :
 Demande-moi ensuite une validation explicite. N'écris rien dans le fichier avant de l'avoir reçue.
 
 Phase 3 — Enregistrement, après ma validation seulement :
-Utilise la skill {{skillXlsx}} pour :
-- inscrire les 8 questions, mes réponses et les valeurs retenues dans l'onglet "criteres_priorite" de "{{fileName}}" ;
-- ajouter au tableau principal les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes.
+- inscris les 8 questions, mes réponses et les valeurs retenues dans l'onglet "criteres_priorite" de "{{fileName}}" ;
+- ajoute au tableau principal les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes.
 
 Phase 4 — Priorisation :
 Analyse maintenant uniquement les lignes où status = unanswered dans "{{fileName}}", et applique les critères que je viens de valider.
 
-Utilise la skill {{skillXlsx}} pour mettre à jour uniquement :
+Mets à jour uniquement :
 - priority, avec les valeurs validées à la question 5 ;
 - signal, avec les valeurs validées à la question 4 ;
 - human_check, selon la règle validée à la question 8 ;
@@ -1081,7 +1070,7 @@ Maximum 10 propositions.
 
 Ne jamais envoyer d'e-mail automatiquement.
 
-Utilise la skill {{skillXlsx}} pour mettre à jour uniquement :
+Mets à jour uniquement :
 - suggested_reply
 - human_check
 - status
@@ -1104,7 +1093,7 @@ Si possible, crée un {{draftLabel}}, mais ne l'envoie jamais.</code></pre>
 
     <section class="card" id="step-8">
       <h2>8. 📄 Générer le rapport PDF</h2>
-      <p>Objectif : générer un PDF court, lisible et auditable avec {{skillPdf}}.</p>
+      <p>Objectif : générer un PDF court, lisible et auditable.</p>
 
 
         <div class="prompt-card">
@@ -1112,7 +1101,7 @@ Si possible, crée un {{draftLabel}}, mais ne l'envoie jamais.</code></pre>
             <h3>Prompt — Rapport PDF</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>À partir du fichier Excel "{{fileName}}", utilise la skill {{skillPdf}} pour générer un rapport PDF court du run.
+          <pre class="prompt"><code>À partir du fichier Excel "{{fileName}}", génère un rapport PDF court du run.
 
 Le rapport doit contenir :
 - date du run ;
@@ -1159,8 +1148,6 @@ Ne garde que la dernière décision stabilisée :
 - fichier Excel "{{fileName}}" dans le répertoire du projet ;
 - pas de {{cloudAlt}} ;
 - pas d'import manuel ;
-- {{skillXlsx}} pour créer, lire et modifier le fichier Excel ;
-- {{skillPdf}} pour générer les rapports PDF ;
 - critères de priorité tels qu'enregistrés dans l'onglet "criteres_priorite" à l'étape 6 ;
 - pas d'envoi automatique ;
 - création de brouillons uniquement si possible et uniquement pour les deux niveaux de priorité les plus élevés ;
@@ -1169,14 +1156,13 @@ Ne garde que la dernière décision stabilisée :
 Produis une synthèse courte avec :
 1. objectif du workflow ;
 2. connecteurs requis ;
-3. skills outils requises ;
-4. nom du fichier Excel ;
-5. colonnes autorisées ;
-6. valeurs autorisées, y compris les critères de priorité validés à l'étape 6 ;
-7. étapes du workflow ;
-8. règles de sécurité ;
-9. limites de volume ;
-10. cas où Claude doit s'arrêter et demander validation.</code></pre>
+3. nom du fichier Excel ;
+4. colonnes autorisées ;
+5. valeurs autorisées, y compris les critères de priorité validés à l'étape 6 ;
+6. étapes du workflow ;
+7. règles de sécurité ;
+8. limites de volume ;
+9. cas où Claude doit s'arrêter et demander validation.</code></pre>
         </div>
 
     </section>
@@ -1208,8 +1194,8 @@ Autres contraintes :
 - ne pas utiliser de {{cloudAlt}} ;
 - ne pas inclure d'import manuel ;
 - utiliser {{provider}} via {{connector}} ;
-- utiliser {{skillXlsx}} pour écrire dans "{{fileName}}" ;
-- utiliser {{skillPdf}} pour générer le rapport PDF ;
+- écrire uniquement dans "{{fileName}}" ;
+- générer le rapport PDF dans le répertoire du projet ;
 - ne jamais envoyer d'e-mail automatiquement ;
 - ne jamais créer de brouillon sauf pour les deux niveaux de priorité les plus élevés ;
 - ne pas ajouter de colonnes non prévues ;
@@ -1240,8 +1226,8 @@ Vérifie strictement :
 - qu'il ne mentionne pas d'import manuel ;
 - qu'il utilise bien {{provider}} ;
 - qu'il utilise bien {{connector}} ;
-- qu'il utilise bien {{skillXlsx}} pour le fichier Excel ;
-- qu'il utilise bien {{skillPdf}} pour le rapport PDF ;
+- qu'il écrit bien dans "{{fileName}}" ;
+- qu'il génère bien le rapport PDF ;
 - qu'il interdit l'envoi automatique ;
 - qu'il limite les volumes ;
 - qu'il respecte les colonnes autorisées ;
@@ -1266,10 +1252,10 @@ Ne crée pas de brouillon.
 Ne jamais envoyer d'e-mail.
 Ne crée pas de {{cloudAlt}}.
 Génère un rapport court à la fin.
-Génère aussi un rapport PDF avec {{skillPdf}} si le test est concluant.
+Génère aussi un rapport PDF si le test est concluant.
 
 Objectif du test :
-vérifier que le Skill respecte les colonnes, les valeurs autorisées, les limites, les exclusions, le connecteur {{connector}}, {{skillXlsx}}, {{skillPdf}} et les règles de sécurité.</code></pre>
+vérifier que le Skill respecte les colonnes, les valeurs autorisées, les limites, les exclusions, le connecteur {{connector}} et les règles de sécurité.</code></pre>
         </div>
 
     </section>
@@ -1297,7 +1283,7 @@ mettre à jour le fichier Excel "{{fileName}}" dans le répertoire du projet à 
 La route doit exécuter les étapes suivantes :
 1. vérifier l'accès {{provider}} via {{connector}} ;
 2. vérifier l'accès au fichier "{{fileName}}" ;
-3. utiliser {{skillXlsx}} pour lire et mettre à jour le fichier Excel ;
+3. lire et mettre à jour le fichier Excel ;
 4. scanner uniquement les nouveaux mails ou fils modifiés ;
 5. ignorer newsletters, no-reply, notifications automatiques et alertes système ;
 6. ajouter les nouveaux mails utiles avec status = to_analyze ;
@@ -1309,7 +1295,7 @@ La route doit exécuter les étapes suivantes :
 12. ne jamais envoyer d'e-mail ;
 13. ne créer aucun {{cloudAlt}} ;
 14. générer un rapport court dans Claude ;
-15. générer un rapport PDF avec {{skillPdf}} dans le répertoire du projet.
+15. générer un rapport PDF dans le répertoire du projet.
 
 Limites :
 - maximum 50 mails scannés ;
@@ -1342,8 +1328,8 @@ Contraintes de test :
 - ne créer aucun brouillon ;
 - ne jamais envoyer d'e-mail ;
 - ne créer aucun {{cloudAlt}} ;
-- utiliser {{skillXlsx}} pour écrire dans "{{fileName}}" ;
-- utiliser {{skillPdf}} pour générer le rapport PDF uniquement si le test est concluant.
+- écrire uniquement dans "{{fileName}}" ;
+- générer le rapport PDF uniquement si le test est concluant.
 
 Objectif du test :
 vérifier que la route respecte :
@@ -1352,8 +1338,6 @@ vérifier que la route respecte :
 - les limites de volume ;
 - les exclusions ;
 - le connecteur {{connector}} ;
-- {{skillXlsx}} ;
-- {{skillPdf}} ;
 - l'interdiction d'envoi automatique ;
 - l'interdiction de {{cloudAlt}}.</code></pre>
         </div>
@@ -1393,8 +1377,6 @@ vérifier que la route respecte :
         connector: "Microsoft 365",
         fileName: "Base mails Outlook.xlsx",
         skillName: "managing-outlook-inbox-emails",
-        skillXlsx: "xlsx-proto",
-        skillPdf: "pdf-proto",
         cloudAlt: "fichier cloud parallèle",
         draftLabel: "brouillon Outlook",
         logo: `<svg viewBox="0 0 1831.085 1703.335" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Outlook"><path fill="#0A2767" d="M1831.083,894.25c0.1-14.318-7.298-27.644-19.503-35.131h-0.213l-0.767-0.426l-634.492-375.585c-2.74-1.851-5.583-3.543-8.517-5.067c-24.498-12.639-53.599-12.639-78.098,0c-2.934,1.525-5.777,3.216-8.517,5.067L446.486,858.693l-0.766,0.426c-19.392,12.059-25.337,37.556-13.278,56.948c3.553,5.714,8.447,10.474,14.257,13.868l634.492,375.585c2.749,1.835,5.592,3.527,8.517,5.068c24.498,12.639,53.599,12.639,78.098,0c2.925-1.541,5.767-3.232,8.517-5.068l634.492-375.585C1823.49,922.545,1831.228,908.923,1831.083,894.25z"/><path fill="#0364B8" d="M520.453,643.477h416.38v381.674h-416.38V643.477z M1745.917,255.5V80.908c1-43.652-33.552-79.862-77.203-80.908H588.204C544.552,1.046,510,37.256,511,80.908V255.5l638.75,170.333L1745.917,255.5z"/><path fill="#0078D4" d="M511,255.5h425.833v383.25H511V255.5z"/><path fill="#28A8EA" d="M1362.667,255.5H936.833v383.25L1362.667,1022h383.25V638.75L1362.667,255.5z"/><path fill="#0078D4" d="M936.833,638.75h425.833V1022H936.833V638.75z"/><path fill="#0364B8" d="M936.833,1022h425.833v383.25H936.833V1022z"/><path fill="#14447D" d="M520.453,1025.151h416.38v346.969h-416.38V1025.151z"/><path fill="#0078D4" d="M1362.667,1022h383.25v383.25h-383.25V1022z"/><path fill="#28A8EA" d="M514.833,1703.333h1228.316c18.901,0.096,37.335-5.874,52.59-17.033l-697.089-408.331c-2.929-1.47-5.773-3.105-8.517-4.897L447.125,906.088h-0.298l-20.993-11.838v719.914C425.786,1663.364,465.632,1703.286,514.833,1703.333z"/><path fill="#1490DF" d="M1811.58,927.593l-0.809,0.468l-634.492,356.848c-2.768,1.703-5.578,3.321-8.517,4.769c-24.641,12.038-53.457,12.038-78.098,0c-2.918-1.445-5.76-3.037-8.517-4.769L446.657,928.061l-0.766-0.468c-12.25-6.642-19.93-19.409-20.057-33.343v722.384c0.305,48.188,39.616,87.004,87.803,86.7h1229.636c48.188,0.307,87.5-38.509,87.807-86.696V894.25C1831.068,908.067,1823.616,920.807,1811.58,927.593z"/></svg>`
@@ -1404,8 +1386,6 @@ vérifier que la route respecte :
         connector: "Google Workspace",
         fileName: "Base mails Gmail.xlsx",
         skillName: "managing-gmail-inbox-emails",
-        skillXlsx: "xlsx-proto",
-        skillPdf: "pdf-proto",
         cloudAlt: "Google Sheet",
         draftLabel: "brouillon Gmail",
         logo: `<svg viewBox="0 0 512 399.42" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gmail"><g fill="none" fill-rule="evenodd"><g fill-rule="nonzero"><path fill="#4285f4" d="M34.91 448.818h81.454V251L0 163.727V413.91c0 19.287 15.622 34.91 34.91 34.91z"/><path fill="#34a853" d="M395.636 448.818h81.455c19.287 0 34.909-15.622 34.909-34.909V163.727L395.636 251z"/><path fill="#fbbc04" d="M395.636 99.727V251L512 163.727v-46.545c0-43.142-49.25-67.782-83.782-41.891z"/></g><path fill="#ea4335" d="M116.364 251V99.727L256 204.455 395.636 99.727V251L256 355.727z"/><path fill="#c5221f" fill-rule="nonzero" d="M0 117.182v46.545L116.364 251V99.727L83.782 75.291C49.25 49.4 0 74.04 0 117.18z"/></g></svg>`
@@ -1441,8 +1421,6 @@ vérifier que la route respecte :
         "{{connector}}": p.connector,
         "{{fileName}}": p.fileName,
         "{{skillName}}": p.skillName,
-        "{{skillXlsx}}": p.skillXlsx,
-        "{{skillPdf}}": p.skillPdf,
         "{{cloudAlt}}": p.cloudAlt,
         "{{draftLabel}}": p.draftLabel
       };
