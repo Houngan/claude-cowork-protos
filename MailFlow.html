@@ -749,12 +749,6 @@ button:focus-visible {
   <span class="workflow-arrow">→</span>
 
   <div class="workflow-step">
-    <span class="workflow-icon">🔎</span>
-    <span>Détection</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
     <span class="workflow-icon">🚦</span>
     <span>Priorisation</span>
   </div>
@@ -762,13 +756,7 @@ button:focus-visible {
 
   <div class="workflow-step">
     <span class="workflow-icon">✍️</span>
-    <span>Réponses à valider</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">📄</span>
-    <span>Rapport PDF</span>
+    <span>Réponses</span>
   </div>
   <span class="workflow-arrow">→</span>
 
@@ -916,6 +904,7 @@ Règles :
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Utilise {{provider}} via le connecteur {{connector}} pour lire les mails présents dans la boîte de réception.
+Limite-toi aux 50 mails les plus récents.
 
 Remplis le fichier Excel "{{fileName}}" situé dans le répertoire du projet.
 
@@ -1147,7 +1136,7 @@ Ne garde que la dernière décision stabilisée :
 - {{provider}} comme source ;
 - fichier Excel "{{fileName}}" dans le répertoire du projet ;
 - pas de {{cloudAlt}} ;
-- pas d'import manuel ;
+- rapport PDF dans le répertoire du projet ;
 - critères de priorité tels qu'enregistrés dans l'onglet "priority_criteria" à l'étape 6 ;
 - pas d'envoi automatique ;
 - création de brouillons uniquement si possible et uniquement pour les deux niveaux de priorité les plus élevés ;
@@ -1192,7 +1181,6 @@ la Skill ne doit PAS figer dans son texte les valeurs de priority et de signal. 
 Autres contraintes :
 - ne pas reprendre les anciennes variantes du fil ;
 - ne pas utiliser de {{cloudAlt}} ;
-- ne pas inclure d'import manuel ;
 - utiliser {{provider}} via {{connector}} ;
 - écrire uniquement dans "{{fileName}}" ;
 - générer le rapport PDF dans le répertoire du projet ;
@@ -1206,7 +1194,6 @@ Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.
 
 Relis ensuite le SKILL.md que tu viens d'écrire et vérifie strictement :
 - qu'il ne mentionne pas de {{cloudAlt}} ;
-- qu'il ne mentionne pas d'import manuel ;
 - qu'il utilise bien {{provider}} ;
 - qu'il utilise bien {{connector}} ;
 - qu'il écrit bien dans "{{fileName}}" ;

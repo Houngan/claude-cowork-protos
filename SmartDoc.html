@@ -1028,7 +1028,7 @@ input:focus-visible {
 
   <div class="workflow-step">
     <span class="workflow-icon">🔎</span>
-    <span>Inventaire et doublons</span>
+    <span>Inventaire</span>
   </div>
   <span class="workflow-arrow">→</span>
 
@@ -1047,12 +1047,6 @@ input:focus-visible {
   <div class="workflow-step">
     <span class="workflow-icon">🔖</span>
     <span>Indexation</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">📄</span>
-    <span>Rapport PDF</span>
   </div>
   <span class="workflow-arrow">→</span>
 
@@ -1488,11 +1482,9 @@ PREMIÈRE PARTIE — interroge le fonds.
 Réponds aux questions suivantes en citant systématiquement tes sources : nom du fichier, et page quand elle existe.
 
 1. Quels documents du fonds traitent de : {{topic}} ?
-2. Quels thèmes ou concepts reviennent le plus souvent, et à quel moment apparaissent-ils pour la première fois ?
-3. Un thème évolue-t-il, disparaît-il ou se transforme-t-il au fil du temps ?
-4. Quelles personnes, quels auteurs ou quels interlocuteurs reviennent le plus, et lesquels apparaissent souvent ensemble ?
-5. Y a-t-il une période plus dense que les autres dans ce fonds ?
-6. Qu'est-ce que ce fonds ne contient pas, alors qu'on s'y attendrait ?
+2. Quels thèmes reviennent le plus souvent, comment évoluent-ils dans le temps, et y a-t-il une période plus dense que les autres ?
+3. Quelles personnes, quels auteurs ou quels interlocuteurs reviennent le plus, et lesquels apparaissent souvent ensemble ?
+4. Qu'est-ce que ce fonds ne contient pas, alors qu'on s'y attendrait ?
 
 Règles :
 - appuie chaque affirmation sur des lignes précises du registre ;
@@ -1671,7 +1663,7 @@ La tâche planifiée doit exécuter les étapes suivantes :
 5. vérifier les doublons contre l'ensemble du registre, et pas seulement contre le lot en cours ;
 6. proposer category, proposed_name et target_path selon le plan validé ;
 7. présenter le lot et attendre une validation explicite ;
-8. après validation, {{actionImp}} les documents approuvés vers "{{dst}}", en laissant les originaux intacts dans "{{src}}" ;
+8. après validation, {{action}} les documents approuvés vers "{{dst}}", en laissant les originaux intacts dans "{{src}}" ;
 9. indexer les documents classés selon la profondeur retenue dans le plan, source_reference et confidence étant renseignés dans tous les cas ;
 10. mettre à jour le registre ;
 11. produire un rapport court.
@@ -1747,7 +1739,7 @@ Contraintes de test :
     const STORAGES = {
       local: {
         name: "Dossier local",
-        connector: "l'accès aux fichiers de votre ordinateur",
+        connector: "l'accès aux fichiers de l'ordinateur",
         action: "copier",
         actionImp: "copie",
         actionPast: "copiés",
