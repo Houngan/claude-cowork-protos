@@ -808,7 +808,7 @@ Règles générales :
 - travailler par étapes simples ;
 - tenir un fichier Excel comme base de suivi ;
 - ne pas créer de {{cloudAlt}} ;
-- utiliser des colonnes et valeurs en anglais dans le fichier Excel ;
+- dans le fichier Excel, écrire en anglais les noms d'onglets, les noms de colonnes et les codes, c'est-à-dire les valeurs fermées comme status, priority ou signal ; écrire en français les textes libres, comme suggested_reply ;
 - traiter uniquement les nouveaux éléments ou les éléments modifiés ;
 - limiter les volumes traités à chaque exécution ;
 - produire un rapport court à chaque run ;
@@ -873,7 +873,7 @@ human_check = required / not_required</pre>
           </div>
           <pre class="prompt"><code>Crée un fichier Excel intitulé "{{fileName}}" dans le répertoire du projet.
 
-Le fichier doit contenir un tableau structuré avec les colonnes suivantes, en anglais :
+Onglet "emails", avec un tableau structuré et les colonnes suivantes, en anglais :
 - email_id
 - thread_id
 - received_at
@@ -887,10 +887,10 @@ Le fichier doit contenir un tableau structuré avec les colonnes suivantes, en a
 - suggested_reply
 - human_check
 
-Crée également un second onglet, vide, intitulé "criteres_priorite", avec les colonnes :
-question, choix_retenu, valeurs, date_validation
+Crée également un second onglet, vide, intitulé "priority_criteria", avec les colonnes :
+question, selected_option, allowed_values, validated_at
 
-Cet onglet recevra à l'étape 6 les critères de priorité que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées au tableau principal.
+Cet onglet recevra à l'étape 6 les critères de priorité que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées à l'onglet "emails".
 
 Règles :
 - ne pas encore importer les mails ;
@@ -926,7 +926,7 @@ Pour chaque mail utile, ajoute une ligne avec :
 - sender ;
 - subject ;
 - snippet court ;
-- has_attachment = yes/no ;
+- has_attachment = yes / no ;
 - status = to_analyze.
 
 Pour les colonnes non encore analysées, laisse vide :
@@ -1011,16 +1011,16 @@ Les 8 questions :
 1. Qu'est-ce qui rend un mail urgent dans mon activité : un délai de réponse dépassé, un client stratégique, un enjeu financier, ou un blocage opérationnel ?
 2. À partir de quel délai sans réponse un mail devient-il préoccupant : 24 heures, 3 jours, 7 jours, ou cela dépend-il de l'expéditeur ?
 3. Y a-t-il des expéditeurs prioritaires par nature : clients, direction, fournisseurs, candidats, ou aucun ? Appuie-toi sur les expéditeurs réellement présents dans le fichier.
-4. Quels signaux dois-tu détecter dans le contenu : relance, ton de frustration, escalade hiérarchique, mention d'un montant, échéance explicite ? Ces valeurs remplaceront la liste par défaut de la colonne signal.
-5. Combien de niveaux de priorité veux-tu, et sous quels libellés : 3 niveaux, 4 niveaux comme critical / high / medium / low, ou 5 ?
+4. Quels signaux dois-tu détecter dans le contenu : relance, ton de frustration, escalade hiérarchique, mention d'un montant, échéance explicite ? Ces valeurs remplaceront la liste par défaut de la colonne signal, sous forme de codes en anglais, par exemple follow_up ou client_frustration.
+5. Combien de niveaux de priorité veux-tu : 3 niveaux, 4 niveaux comme critical / high / medium / low, ou 5 ? Les libellés sont des codes en anglais.
 6. Quels mails ne doivent jamais être priorisés : newsletters, no-reply, notifications automatiques, fils internes, listes de diffusion ?
 7. Quels axes veux-tu pouvoir interroger plus tard, plusieurs réponses possibles : client, montant, dossier ou affaire, échéance, canal ?
 8. Quand une validation humaine est-elle obligatoire : toujours, seulement pour les deux niveaux les plus élevés, ou jamais pour le niveau le plus bas ?
 
 Phase 2 — Récapitulatif :
 Présente-moi un récapitulatif clair de mes 8 choix, comprenant :
-- la liste définitive des valeurs autorisées de priority, du plus urgent au moins urgent ;
-- la liste définitive des valeurs autorisées de signal ;
+- la liste définitive des codes de priority, en anglais, du plus urgent au moins urgent ;
+- la liste définitive des codes de signal, en anglais ;
 - la règle de délai retenue ;
 - les expéditeurs et les catégories exclus de la priorisation ;
 - la règle de human_check ;
@@ -1028,8 +1028,8 @@ Présente-moi un récapitulatif clair de mes 8 choix, comprenant :
 Demande-moi ensuite une validation explicite. N'écris rien dans le fichier avant de l'avoir reçue.
 
 Phase 3 — Enregistrement, après ma validation seulement :
-- inscris les 8 questions, mes réponses et les valeurs retenues dans l'onglet "criteres_priorite" de "{{fileName}}" ;
-- ajoute au tableau principal les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes.
+- inscris les 8 questions, mes réponses et les valeurs retenues dans l'onglet "priority_criteria" de "{{fileName}}" ;
+- ajoute à l'onglet "emails" les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes, avec des noms en anglais.
 
 Phase 4 — Priorisation :
 Analyse maintenant uniquement les lignes où status = unanswered dans "{{fileName}}", et applique les critères que je viens de valider.
@@ -1064,7 +1064,7 @@ Règles :
             <h3>Prompt — Propositions de réponse</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Pour les lignes où status = unanswered et où priority correspond à l'un des deux niveaux les plus élevés définis à l'étape 6 (onglet "criteres_priorite"), prépare une proposition de réponse courte, professionnelle et factuelle.
+          <pre class="prompt"><code>Pour les lignes où status = unanswered et où priority correspond à l'un des deux niveaux les plus élevés définis à l'étape 6 (onglet "priority_criteria"), prépare une proposition de réponse courte, professionnelle et factuelle.
 
 Maximum 10 propositions.
 
@@ -1148,7 +1148,7 @@ Ne garde que la dernière décision stabilisée :
 - fichier Excel "{{fileName}}" dans le répertoire du projet ;
 - pas de {{cloudAlt}} ;
 - pas d'import manuel ;
-- critères de priorité tels qu'enregistrés dans l'onglet "criteres_priorite" à l'étape 6 ;
+- critères de priorité tels qu'enregistrés dans l'onglet "priority_criteria" à l'étape 6 ;
 - pas d'envoi automatique ;
 - création de brouillons uniquement si possible et uniquement pour les deux niveaux de priorité les plus élevés ;
 - Skill métier créée seulement après validation du workflow.
@@ -1187,7 +1187,7 @@ Nom de la Skill :
 La Skill doit décrire uniquement le workflow final validé.
 
 Contrainte essentielle :
-la Skill ne doit PAS figer dans son texte les valeurs de priority et de signal. Elle doit lire l'onglet "criteres_priorite" du fichier Excel au début de chaque exécution et s'y conformer. Ainsi les critères pourront évoluer sans réécrire la Skill. Si cet onglet est vide ou introuvable, la Skill doit s'arrêter et le signaler, sans jamais improviser de critères ni relancer l'élicitation d'elle-même.
+la Skill ne doit PAS figer dans son texte les valeurs de priority et de signal. Elle doit lire l'onglet "priority_criteria" du fichier Excel au début de chaque exécution et s'y conformer. Ainsi les critères pourront évoluer sans réécrire la Skill. Si cet onglet est vide ou introuvable, la Skill doit s'arrêter et le signaler, sans jamais improviser de critères ni relancer l'élicitation d'elle-même.
 
 Autres contraintes :
 - ne pas reprendre les anciennes variantes du fil ;
@@ -1231,7 +1231,7 @@ Vérifie strictement :
 - qu'il interdit l'envoi automatique ;
 - qu'il limite les volumes ;
 - qu'il respecte les colonnes autorisées ;
-- qu'il lit bien les critères de priorité dans l'onglet "criteres_priorite" au lieu de les figer dans son texte ;
+- qu'il lit bien les critères de priorité dans l'onglet "priority_criteria" au lieu de les figer dans son texte ;
 - qu'il reste concis.
 
 Si une règle est ambiguë, corrige-la.
@@ -1244,18 +1244,18 @@ Ne rajoute pas de secret.</code></pre>
             <h3>Prompt — Test de la Skill</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Utilise le Skill métier {{skillName}}.
+          <pre class="prompt"><code>Utilise la Skill métier {{skillName}}.
 
-Mets à jour la {{fileName}}.
+Mets à jour le fichier "{{fileName}}".
 Traite uniquement les 20 derniers mails {{provider}}.
 Ne crée pas de brouillon.
-Ne jamais envoyer d'e-mail.
+N'envoie jamais d'e-mail.
 Ne crée pas de {{cloudAlt}}.
 Génère un rapport court à la fin.
 Génère aussi un rapport PDF si le test est concluant.
 
 Objectif du test :
-vérifier que le Skill respecte les colonnes, les valeurs autorisées, les limites, les exclusions, le connecteur {{connector}} et les règles de sécurité.</code></pre>
+vérifier que la Skill respecte les colonnes, les valeurs autorisées, les limites, les exclusions, le connecteur {{connector}} et les règles de sécurité.</code></pre>
         </div>
 
     </section>
@@ -1288,7 +1288,7 @@ La tâche planifiée doit exécuter les étapes suivantes :
 5. ignorer newsletters, no-reply, notifications automatiques et alertes système ;
 6. ajouter les nouveaux mails utiles avec status = to_analyze ;
 7. détecter les mails probablement non répondus avec status = unanswered ;
-8. lire l'onglet "criteres_priorite" et prioriser selon les critères validés à l'étape 6 ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser de critères ;
+8. lire l'onglet "priority_criteria" et prioriser selon les critères validés à l'étape 6 ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser de critères ;
 9. renseigner le signal principal avec signal, selon les valeurs validées ;
 10. proposer une réponse uniquement pour les deux niveaux de priorité les plus élevés ;
 11. renseigner human_check selon la règle validée à l'étape 6 ;

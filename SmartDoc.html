@@ -1102,7 +1102,7 @@ Règles générales :
 - toute affirmation sur le fonds doit être sourcée : nom du fichier, et page quand la pagination existe ;
 - travailler par étapes simples, une étape à la fois ;
 - tenir le fichier Excel comme mémoire documentaire ;
-- utiliser des colonnes et des valeurs en anglais dans le fichier Excel ;
+- dans le fichier Excel, écrire en anglais les noms d'onglets, les noms de colonnes et les codes, c'est-à-dire les valeurs fermées comme status, confidence ou la profondeur d'indexation ; écrire en français les textes libres, comme summary ou tags, ainsi que les catégories, qui nomment les dossiers de "{{dst}}" ;
 - ne pas créer de {{cloudAlt}} ;
 - ne définir aucun plan de classement pour l'instant : nous le déciderons ensemble à l'étape 6 ;
 - pour cette formation, limiter le traitement à 20 documents ; en production, traiter l'intégralité du dépôt ;
@@ -1183,7 +1183,7 @@ category = défini à l'étape 6, avec vous</pre>
           </div>
           <pre class="prompt"><code>Crée un fichier Excel intitulé "{{fileName}}" à la racine du dossier cible "{{dst}}".
 
-Onglet "registre", avec les colonnes suivantes, en anglais :
+Onglet "register", avec les colonnes suivantes, en anglais :
 - file_name
 - detected_date
 - date_source
@@ -1204,10 +1204,10 @@ Valeurs autorisées :
 - confidence = high / medium / low
 - category : laissée vide pour l'instant, ses valeurs seront définies à l'étape 6
 
-Crée également un second onglet, vide, intitulé "plan_de_classement", avec les colonnes :
-question, choix_retenu, valeurs, date_validation
+Crée également un second onglet, vide, intitulé "classification_plan", avec les colonnes :
+question, selected_option, allowed_values, validated_at
 
-Cet onglet recevra à l'étape 6 le plan de classement que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées à l'onglet "registre".
+Cet onglet recevra à l'étape 6 le plan de classement que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées à l'onglet "register".
 
 Règles :
 - ne pas encore inventorier les documents ;
@@ -1236,7 +1236,7 @@ Règles :
 
 Pour cette formation, limite-toi à 20 documents. En production, tu traiteras l'intégralité du dépôt.
 
-Ajoute une ligne par fichier dans l'onglet "registre" du fichier "{{fileName}}" :
+Ajoute une ligne par fichier dans l'onglet "register" du fichier "{{fileName}}" :
 - file_name ;
 - detected_date, uniquement si une date est explicitement présente dans le nom du fichier ou dans le document ;
 - date_source = document / filename / unknown ;
@@ -1332,24 +1332,25 @@ Règles de la phase 1 :
 Les 8 questions :
 1. Axe principal de rangement : par nature de document, par thème, par auteur ou émetteur, par période, ou par projet et client ? Cet axe déterminera les dossiers de premier niveau dans "{{dst}}".
 2. Axe secondaire, pour les sous-dossiers : année, thème, auteur, ou aucun sous-niveau ?
-3. Granularité : 3 à 5 catégories larges, 6 à 10 catégories, ou davantage ? Propose le découpage correspondant à partir de ce que tu as vu.
+3. Granularité : 3 à 5 catégories larges, 6 à 10 catégories, ou davantage ? Propose le découpage correspondant à partir de ce que tu as vu. Les catégories sont en français : elles nommeront les dossiers de "{{dst}}".
 4. Convention de nommage des fichiers : YYYY-MM-DD_Auteur_Sujet, ou Sujet-court seul, ou conserver les noms d'origine ? Illustre chaque option sur un fichier réel de l'inventaire.
 5. Documents sans date certaine : copiés dans un sous-dossier "À dater", copiés sans date dans leur catégorie, ou pas encore copiés en attendant que la date soit tranchée ?
 6. Doublons et fichiers inutiles : ne copier qu'une seule version dans "{{dst}}", copier toutes les versions en les distinguant, ou ne rien copier et se contenter de les signaler dans le registre ?
 7. Axes que je veux pouvoir interroger plus tard, plusieurs réponses possibles : personnes citées, lieux, concepts, auteur ou organisme, client ou projet, niveau de confidentialité ?
-8. Profondeur d'indexation : "résumé d'une ligne", "résumé et mots-clés", ou "résumé, mots-clés, entités et citation sourcée" ? Reprends ces libellés tels quels dans le plan : l'étape 9 s'y référera mot pour mot.
+8. Profondeur d'indexation : résumé d'une ligne (code one_line_summary), résumé et mots-clés (code summary_tags), ou résumé, mots-clés, entités et citation sourcée (code full_index) ? Inscris dans le plan le code retenu, tel quel : l'étape 9 s'y référera.
 
 Phase 2 — Récapitulatif :
 Présente-moi un récapitulatif clair de mes 8 choix, comprenant :
 - la liste définitive des valeurs autorisées de category ;
 - l'arborescence exacte qui sera créée dans "{{dst}}" ;
 - la règle de nommage retenue, illustrée sur trois fichiers réels de l'inventaire ;
+- le code de profondeur d'indexation retenu ;
 - la liste des colonnes supplémentaires qui seront ajoutées au registre.
 Demande-moi ensuite une validation explicite. N'écris rien dans le registre avant de l'avoir reçue.
 
 Phase 3 — Enregistrement, après ma validation seulement :
-- inscris les 8 questions, mes réponses et les valeurs retenues dans l'onglet "plan_de_classement" de "{{fileName}}" ;
-- ajoute à l'onglet "registre" les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes.
+- inscris les 8 questions, mes réponses et les valeurs retenues dans l'onglet "classification_plan" de "{{fileName}}" ;
+- ajoute à l'onglet "register" les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes, avec des noms en anglais.
 
 Confirme-moi ensuite ce qui a réellement été écrit dans l'onglet : la liste des catégories, l'arborescence, la règle de nommage et les colonnes ajoutées. Précise que c'est ce plan, et lui seul, qui pilotera l'étape 7.
 
@@ -1373,7 +1374,7 @@ Ne crée aucun dossier à ce stade.</code></pre>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Étape préalable, obligatoire :
-Relis l'onglet "plan_de_classement" du registre "{{fileName}}" et rappelle-moi en trois lignes ce que tu y trouves :
+Relis l'onglet "classification_plan" du registre "{{fileName}}" et rappelle-moi en trois lignes ce que tu y trouves :
 - la liste des catégories autorisées ;
 - l'arborescence à créer dans "{{dst}}" ;
 - la règle de nommage retenue.
@@ -1459,9 +1460,9 @@ Règles :
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Étape préalable, obligatoire :
-Relis l'onglet "plan_de_classement" du registre "{{fileName}}" et rappelle-moi en deux lignes :
-- la profondeur d'indexation retenue à la question 8 ;
-- les colonnes supplémentaires retenues à la question 7, telles qu'elles existent réellement dans l'onglet "registre".
+Relis l'onglet "classification_plan" du registre "{{fileName}}" et rappelle-moi en deux lignes :
+- le code de profondeur d'indexation retenu à la question 8 ;
+- les colonnes supplémentaires retenues à la question 7, telles qu'elles existent réellement dans l'onglet "register".
 
 Si cet onglet est vide ou introuvable, arrête-toi et dis-le-moi : n'invente aucune profondeur d'indexation et ne rejoue pas l'élicitation de ta propre initiative.
 
@@ -1469,9 +1470,9 @@ Ensuite seulement :
 Enrichis le registre pour chaque document dont status = classified dans "{{fileName}}".
 
 Renseigne exactement ce que la profondeur retenue impose, et rien de plus :
-- si j'ai choisi "résumé d'une ligne" : summary seul, en une phrase ;
-- si j'ai choisi "résumé et mots-clés" : summary de 2 à 3 phrases, et tags ;
-- si j'ai choisi "résumé, mots-clés, entités et citation sourcée" : summary de 2 à 3 phrases, tags, et les colonnes retenues à la question 7.
+- one_line_summary : summary seul, en une phrase ;
+- summary_tags : summary de 2 à 3 phrases, et tags ;
+- full_index : summary de 2 à 3 phrases, tags, et les colonnes retenues à la question 7.
 
 Deux colonnes se renseignent dans tous les cas, quelle que soit la profondeur retenue :
 - source_reference : nom du fichier et page quand la pagination existe, sinon nom du fichier et section ou extrait repérable. Sans elle, aucune réponse ne pourrait être sourcée à l'étape 10 ;
@@ -1581,7 +1582,7 @@ Ignore les variantes abandonnées. Ne garde que la dernière décision stabilis�
 - {{storage}} comme stockage, via {{connector}} ;
 - dossier source "{{src}}", dossier cible "{{dst}}" ;
 - registre Excel "{{fileName}}" et rapports PDF à la racine du dossier cible "{{dst}}" ;
-- plan de classement et convention de nommage tels qu'enregistrés dans l'onglet "plan_de_classement" ;
+- plan de classement et convention de nommage tels qu'enregistrés dans l'onglet "classification_plan" ;
 - aucune suppression de fichier ;
 - aucun classement sans validation explicite du lot ;
 - aucune date déduite inscrite dans le registre ;
@@ -1591,7 +1592,7 @@ Ignore les variantes abandonnées. Ne garde que la dernière décision stabilis�
 {{skillName}}
 
 Contrainte essentielle :
-la Skill ne doit PAS figer le plan de classement dans son texte. Elle doit lire l'onglet "plan_de_classement" du registre au début de chaque exécution et s'y conformer. Ainsi le plan pourra évoluer sans réécrire la Skill. Si cet onglet est vide ou introuvable, la Skill doit s'arrêter et le signaler, sans jamais improviser un plan ni relancer l'élicitation d'elle-même.
+la Skill ne doit PAS figer le plan de classement dans son texte. Elle doit lire l'onglet "classification_plan" du registre au début de chaque exécution et s'y conformer. Ainsi le plan pourra évoluer sans réécrire la Skill. Si cet onglet est vide ou introuvable, la Skill doit s'arrêter et le signaler, sans jamais improviser un plan ni relancer l'élicitation d'elle-même.
 
 Autres contraintes :
 - utiliser {{connector}} comme source ;
@@ -1618,7 +1619,7 @@ Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</c
           <pre class="prompt"><code>Je viens de te transmettre un document directement dans cette conversation.
 
 Applique la Skill {{skillName}} à ce seul document :
-1. relis l'onglet "plan_de_classement" du registre "{{fileName}}" ;
+1. relis l'onglet "classification_plan" du registre "{{fileName}}" ;
 2. qualifie le document selon le plan validé : category, proposed_name, et la date uniquement si elle est explicite ;
 3. présente-moi ta proposition et attends ma validation ;
 4. après ma validation, dépose une copie du document dans "{{dst}}" à l'emplacement prévu, avec son nom normalisé ;
@@ -1657,7 +1658,7 @@ traiter les nouveaux documents déposés dans "{{src}}", et maintenir à jour le
 
 La tâche planifiée doit exécuter les étapes suivantes :
 1. vérifier l'accès à "{{src}}", à "{{dst}}" et au registre ;
-2. lire l'onglet "plan_de_classement" et s'y conformer strictement ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser un plan ;
+2. lire l'onglet "classification_plan" et s'y conformer strictement ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser un plan ;
 3. détecter uniquement les fichiers nouveaux ou modifiés depuis le dernier passage ;
 4. les inventorier dans le registre avec status = to_analyze ;
 5. vérifier les doublons contre l'ensemble du registre, et pas seulement contre le lot en cours ;
