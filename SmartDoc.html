@@ -1087,7 +1087,7 @@ Règles générales :
 - dans le fichier Excel, écrire en anglais les noms d'onglets, les noms de colonnes et les codes, c'est-à-dire les valeurs fermées comme status, confidence ou la profondeur d'indexation ; écrire en français les textes libres, comme summary ou tags, ainsi que les catégories, qui nomment les dossiers de "{{dst}}" ;
 - ne pas créer de {{cloudAlt}} ;
 - ne définir aucun plan de classement pour l'instant : nous le déciderons ensemble à l'étape 5 ;
-- pour cette formation, limiter le traitement à 20 documents ; en production, traiter l'intégralité du dépôt ;
+- pour cette formation, limiter le traitement à 20 documents ; le volume de production sera fixé à l'étape 12 ;
 - produire un rapport court à la fin de chaque étape ;
 - ne créer la Skill métier qu'après plusieurs étapes testées dans ce fil ;
 - créer la tâche planifiée seulement après validation du workflow et de la Skill métier.</code></pre>
@@ -1216,7 +1216,7 @@ Règles :
           </div>
           <pre class="prompt"><code>Inventorie le contenu du dossier "{{src}}" via {{connector}}, puis repère les doublons. Aucun fichier ne bouge à cette étape.
 
-Pour cette formation, limite-toi à 20 documents. En production, tu traiteras l'intégralité du dépôt.
+Pour cette formation, limite-toi à 20 documents. Les suivants seront traités par la tâche planifiée de l'étape 12.
 
 Phase 1 — Inventaire et cartographie :
 Ajoute une ligne par fichier dans l'onglet "register" du fichier "{{fileName}}" :
@@ -1438,7 +1438,7 @@ Règles :
 - ne jamais inventer une information absente : laisser vide ou écrire unknown ;
 - ne jamais déduire une date par rapprochement ; detected_date ne se remplit que si la date est explicite dans le document ou son nom ;
 - ne pas modifier le contenu des documents ;
-- pour cette formation, limite-toi à 20 documents ; en production, traite l'intégralité.
+- pour cette formation, limite-toi à 20 documents.
 
 À la fin, indique le nombre de lignes enrichies, les colonnes réellement remplies, et la liste des documents dont l'indexation reste incertaine.
 
@@ -1455,7 +1455,7 @@ Soumets-moi ensuite 3 à 5 résumés — les plus représentatifs et ceux dont t
 
         <div class="inline-field">
           <label for="topic-input">🔎 Sujet à interroger — il s'insère dans la première question du prompt</label>
-          <input type="text" id="topic-input" value="le sujet principal du fonds" spellcheck="false" autocomplete="off">
+          <input type="text" id="topic-input" data-token="{{topic}}" value="le sujet principal du fonds" spellcheck="false" autocomplete="off">
         </div>
 
         <div class="prompt-card">
@@ -1554,7 +1554,10 @@ Produis une synthèse courte avec :
 
     <section class="card" id="step-10">
       <h2>10. 🧩 Créer la Skill métier</h2>
-      <p>Nom proposé : {{skillName}}.</p>
+        <div class="inline-field">
+          <label for="skill-input">🧩 Nom de la Skill — il s'insère dans les prompts des étapes 10, 11 et 12</label>
+          <input type="text" id="skill-input" data-token="{{skillName}}" data-format="skill-name" placeholder="Minuscules, chiffres et tirets — ex. : classement-archives" spellcheck="false" autocomplete="off">
+        </div>
 
 
         <div class="prompt-card">
@@ -1582,7 +1585,7 @@ Autres contraintes :
 - ne jamais inventer une métadonnée ni une date ;
 - sourcer chaque affirmation sur le fonds ;
 - ne pas ajouter de colonnes non prévues ;
-- limiter à 20 documents en test, l'intégralité en production.
+- lire dans l'onglet "classification_plan" le volume maximal par exécution (volume_per_run) ; tant qu'il n'est pas défini, se limiter à 20 documents.
 
 Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.
 
@@ -1627,7 +1630,12 @@ Ne crée pas de {{cloudAlt}}.</code></pre>
 
     <section class="card" id="step-12">
       <h2>12. 🗓️ Planification</h2>
-      <p>Tout document déposé dans "{{src}}" rejoint le fonds et devient interrogeable.</p>
+      <p>Tout document déposé dans "{{src}}" rejoint le fonds et devient interrogeable, au volume et à la fréquence que vous choisissez.</p>
+
+        <div class="inline-field">
+          <label for="volume-input">📏 Volume par exécution — nombre maximal de documents que la tâche planifiée traitera à chaque passage</label>
+          <input type="number" id="volume-input" data-token="{{volume}}" value="20" min="1" step="1" inputmode="numeric" autocomplete="off">
+        </div>
 
 
         <div class="prompt-card">
@@ -1641,12 +1649,16 @@ Cette tâche planifiée doit utiliser la Skill métier :
 {{skillName}}
 
 Objectif de la tâche planifiée :
-traiter les nouveaux documents déposés dans "{{src}}", et maintenir à jour le dossier "{{dst}}" et le registre "{{fileName}}".
+traiter les nouveaux documents déposés dans "{{src}}", ainsi que ceux qui n'ont pas encore été traités, et maintenir à jour le dossier "{{dst}}" et le registre "{{fileName}}".
+
+Volumétrie :
+inscris d'abord dans l'onglet "classification_plan" de "{{fileName}}" une ligne question = volume_per_run, selected_option = {{volume}}, validated_at = date du jour ; si cette ligne existe déjà, mets-la à jour.
+La tâche planifiée lira cette valeur à chaque exécution, sans la figer dans son texte : je pourrai ainsi la modifier plus tard dans l'onglet.
 
 La tâche planifiée doit exécuter les étapes suivantes :
 1. vérifier l'accès à "{{src}}", à "{{dst}}" et au registre ;
 2. lire l'onglet "classification_plan" et s'y conformer strictement ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser un plan ;
-3. détecter uniquement les fichiers nouveaux ou modifiés depuis le dernier passage ;
+3. détecter les fichiers de "{{src}}" absents du registre ou modifiés depuis le dernier passage, dans la limite de volume_per_run ; le reliquat sera traité au passage suivant ;
 4. les inventorier dans le registre avec status = to_analyze ;
 5. vérifier les doublons contre l'ensemble du registre, et pas seulement contre le lot en cours ;
 6. proposer category, proposed_name et target_path selon le plan validé ;
@@ -1657,7 +1669,7 @@ La tâche planifiée doit exécuter les étapes suivantes :
 11. produire un rapport court.
 
 Limites :
-- maximum 20 documents par exécution pour cette formation, l'intégralité en production ;
+- au plus volume_per_run documents par exécution, valeur lue dans l'onglet "classification_plan" ;
 - ne pas retraiter les documents déjà classés : c'est le registre qui fait foi, puisque les originaux restent dans "{{src}}" ;
 - ne jamais supprimer, déplacer ni renommer un fichier du dossier source ;
 - demander une validation humaine en cas d'ambiguïté.
@@ -1690,6 +1702,7 @@ Contraintes de test :
 
 Si le test est concluant, fixe ensuite la fréquence d'exécution :
 - propose-moi une fréquence adaptée au rythme réel de dépôt, quotidienne ou hebdomadaire ;
+- compare la valeur volume_per_run de l'onglet "classification_plan" au volume réellement observé pendant le test : si elle est trop basse pour la fréquence proposée ou inutilement haute, signale-le et propose un ajustement ; ne modifie l'onglet qu'avec mon accord ;
 - à chaque passage, la tâche planifiée détecte les nouveaux documents, prépare les propositions et me présente un rapport ;
 - la tâche planifiée ne classe jamais un document sans ma validation ;
 - si aucun nouveau document n'est détecté, la tâche planifiée le signale en une ligne et s'arrête.</code></pre>
@@ -1921,7 +1934,6 @@ Si le test est concluant, fixe ensuite la fréquence d'exécution :
         "{{actionPast}}": s.actionPast,
         "{{afterAction}}": s.afterAction,
         "{{fileName}}": s.fileName,
-        "{{skillName}}": s.skillName,
         "{{cloudAlt}}": s.cloudAlt
       };
 
@@ -1951,23 +1963,48 @@ Si le test est concluant, fixe ensuite la fréquence d'exécution :
         pre.textContent = applyTemplate(pre.textContent);
       });
 
-      // Étape 8 : le sujet interrogé se règle au-dessus du prompt.
-      // On garde le texte templaté comme gabarit pour le rejouer à chaque frappe.
-      var topicInput = document.getElementById("topic-input");
-      var topicCode = document.querySelector("#step-8 pre.prompt code");
+      // Étapes 8, 10 et 12 : certaines valeurs se règlent au-dessus du prompt.
+      // On garde chaque prompt templaté comme gabarit pour le rejouer à chaque frappe :
+      // un même prompt peut dépendre de plusieurs champs (nom de la Skill et volume à l'étape 12).
+      var skillInput = document.getElementById("skill-input");
+      if (skillInput) skillInput.setAttribute("value", s.skillName);
 
-      if (topicInput && topicCode) {
-        var topicTpl = topicCode.textContent;
-        var topicDefault = topicInput.getAttribute("value") || "";
+      var fields = Array.prototype.slice.call(document.querySelectorAll(".inline-field input[data-token]"));
+      var fieldCodes = Array.prototype.filter.call(document.querySelectorAll("pre.prompt code"), function (code) {
+        return fields.some(function (input) {
+          return code.textContent.indexOf(input.getAttribute("data-token")) !== -1;
+        });
+      });
+      var fieldTemplates = fieldCodes.map(function (code) { return code.textContent; });
 
-        var renderTopic = function () {
-          var sujet = topicInput.value.trim() || topicDefault;
-          topicCode.textContent = topicTpl.split("{{topic}}").join(sujet);
-        };
-
-        topicInput.addEventListener("input", renderTopic);
-        renderTopic();
+      // un nom de Skill s'écrit en minuscules, chiffres et tirets
+      function toSkillName(text) {
+        return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 64);
       }
+
+      function fieldValue(input) {
+        var value = input.value.trim();
+        // un volume doit rester un entier positif, sinon on reprend la valeur par défaut
+        if (input.type === "number" && !/^[1-9][0-9]*$/.test(value)) value = "";
+        if (input.getAttribute("data-format") === "skill-name") value = toSkillName(value);
+        return value || input.getAttribute("value") || "";
+      }
+
+      function renderFields() {
+        fieldCodes.forEach(function (code, i) {
+          var text = fieldTemplates[i];
+          fields.forEach(function (input) {
+            text = text.split(input.getAttribute("data-token")).join(fieldValue(input));
+          });
+          code.textContent = text;
+        });
+      }
+
+      fields.forEach(function (input) {
+        input.addEventListener("input", renderFields);
+      });
+      renderFields();
     })();
   </script>
 

@@ -274,6 +274,42 @@ strong {
   box-shadow: inset 0 0 0 1px rgba(5, 7, 13, 0.02);
 }
 
+.inline-field {
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+}
+
+.inline-field label {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--black);
+}
+
+.inline-field input {
+  width: 100%;
+  padding: 11px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.inline-field input:focus {
+  outline: none;
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 /* WORKFLOW / FLUX CIBLE */
 
 .workflow {
@@ -1175,7 +1211,10 @@ Produis une synthèse courte avec :
 
     <section class="card" id="step-10">
       <h2>10. 🧩 Créer la Skill métier</h2>
-      <p>Nom proposé : {{skillName}}.</p>
+        <div class="inline-field">
+          <label for="skill-input">🧩 Nom de la Skill — il s'insère dans les prompts des étapes 10, 11 et 12</label>
+          <input type="text" id="skill-input" data-token="{{skillName}}" data-format="skill-name" placeholder="Minuscules, chiffres et tirets — ex. : tri-mails-clients" spellcheck="false" autocomplete="off">
+        </div>
 
 
         <div class="prompt-card">
@@ -1203,7 +1242,7 @@ Autres contraintes :
 - ne jamais créer de brouillon sauf pour les deux niveaux de priorité les plus élevés ;
 - ne pas ajouter de colonnes non prévues ;
 - ne pas inventer de données manquantes ;
-- limiter le traitement à 50 mails scannés, 30 analysés, 10 propositions.
+- lire dans l'onglet "priority_criteria" le volume maximal par exécution (volume_per_run) ; tant qu'il n'est pas défini, se limiter à 50 mails ; dans tous les cas, 10 propositions de réponse au plus.
 
 Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.
 
@@ -1214,7 +1253,7 @@ Relis ensuite le SKILL.md que tu viens d'écrire et vérifie strictement :
 - qu'il écrit bien dans "{{fileName}}" ;
 - qu'il génère bien le rapport PDF ;
 - qu'il interdit l'envoi automatique ;
-- qu'il limite les volumes ;
+- qu'il lit le volume par exécution dans l'onglet "priority_criteria" au lieu de le figer ;
 - qu'il respecte les colonnes autorisées ;
 - qu'il lit bien les critères de priorité dans l'onglet "priority_criteria" au lieu de les figer dans son texte ;
 - qu'il reste concis.
@@ -1256,7 +1295,12 @@ vérifier que la Skill respecte les colonnes, les valeurs autorisées, les limit
 
     <section class="card" id="step-12">
       <h2>12. 🗓️ Planification</h2>
-      <p>La tâche planifiée rejoue le workflow validé, à la fréquence que vous choisissez.</p>
+      <p>La tâche planifiée rejoue le workflow validé, au volume et à la fréquence que vous choisissez.</p>
+
+        <div class="inline-field">
+          <label for="volume-input">📏 Volume par exécution — nombre maximal de mails que la tâche planifiée traitera à chaque passage</label>
+          <input type="number" id="volume-input" data-token="{{volume}}" value="50" min="1" step="1" inputmode="numeric" autocomplete="off">
+        </div>
 
 
         <div class="prompt-card">
@@ -1272,11 +1316,15 @@ Cette tâche planifiée doit utiliser la Skill métier :
 Objectif de la tâche planifiée :
 mettre à jour le fichier Excel "{{fileName}}" dans le répertoire du projet à partir des nouveaux mails {{provider}} ou des fils modifiés.
 
+Volumétrie :
+inscris d'abord dans l'onglet "priority_criteria" de "{{fileName}}" une ligne question = volume_per_run, selected_option = {{volume}}, validated_at = date du jour ; si cette ligne existe déjà, mets-la à jour.
+La tâche planifiée lira cette valeur à chaque exécution, sans la figer dans son texte : je pourrai ainsi la modifier plus tard dans l'onglet.
+
 La tâche planifiée doit exécuter les étapes suivantes :
 1. vérifier l'accès {{provider}} via {{connector}} ;
 2. vérifier l'accès au fichier "{{fileName}}" ;
 3. lire et mettre à jour le fichier Excel ;
-4. scanner uniquement les nouveaux mails ou fils modifiés ;
+4. scanner uniquement les nouveaux mails ou fils modifiés, dans la limite de volume_per_run ; le reliquat sera traité au passage suivant ;
 5. ignorer newsletters, no-reply, notifications automatiques et alertes système ;
 6. ajouter les nouveaux mails utiles avec status = to_analyze ;
 7. détecter les mails probablement non répondus avec status = unanswered ;
@@ -1290,8 +1338,7 @@ La tâche planifiée doit exécuter les étapes suivantes :
 15. générer un rapport PDF dans le répertoire du projet.
 
 Limites :
-- maximum 50 mails scannés ;
-- maximum 30 mails analysés ;
+- au plus volume_per_run mails scannés et analysés, valeur lue dans l'onglet "priority_criteria" ;
 - maximum 10 propositions de réponse ;
 - ne pas retraiter tout l'historique ;
 - demander validation humaine en cas d'ambiguïté.
@@ -1335,6 +1382,7 @@ vérifier que la tâche planifiée respecte :
 
 Si le test est concluant, fixe ensuite la fréquence d'exécution :
 - propose-moi une fréquence adaptée au volume réel de mails, quotidienne ou hebdomadaire ;
+- compare la valeur volume_per_run de l'onglet "priority_criteria" au volume réellement observé pendant le test : si elle est trop basse pour la fréquence proposée ou inutilement haute, signale-le et propose un ajustement ; ne modifie l'onglet qu'avec mon accord ;
 - à chaque passage, la tâche planifiée traite les nouveaux mails, prépare les propositions et me présente un rapport ;
 - la tâche planifiée n'envoie jamais d'e-mail ;
 - si aucun nouveau mail n'est détecté, la tâche planifiée le signale en une ligne et s'arrête.</code></pre>
@@ -1418,7 +1466,6 @@ Si le test est concluant, fixe ensuite la fréquence d'exécution :
         "{{provider}}": p.name,
         "{{connector}}": p.connector,
         "{{fileName}}": p.fileName,
-        "{{skillName}}": p.skillName,
         "{{cloudAlt}}": p.cloudAlt,
         "{{draftLabel}}": p.draftLabel
       };
@@ -1448,6 +1495,49 @@ Si le test est concluant, fixe ensuite la fréquence d'exécution :
       document.querySelectorAll("pre.plain").forEach(function (pre) {
         pre.textContent = applyTemplate(pre.textContent);
       });
+
+      // Étapes 8, 10 et 12 : certaines valeurs se règlent au-dessus du prompt.
+      // On garde chaque prompt templaté comme gabarit pour le rejouer à chaque frappe :
+      // un même prompt peut dépendre de plusieurs champs (nom de la Skill et volume à l'étape 12).
+      var skillInput = document.getElementById("skill-input");
+      if (skillInput) skillInput.setAttribute("value", p.skillName);
+
+      var fields = Array.prototype.slice.call(document.querySelectorAll(".inline-field input[data-token]"));
+      var fieldCodes = Array.prototype.filter.call(document.querySelectorAll("pre.prompt code"), function (code) {
+        return fields.some(function (input) {
+          return code.textContent.indexOf(input.getAttribute("data-token")) !== -1;
+        });
+      });
+      var fieldTemplates = fieldCodes.map(function (code) { return code.textContent; });
+
+      // un nom de Skill s'écrit en minuscules, chiffres et tirets
+      function toSkillName(text) {
+        return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 64);
+      }
+
+      function fieldValue(input) {
+        var value = input.value.trim();
+        // un volume doit rester un entier positif, sinon on reprend la valeur par défaut
+        if (input.type === "number" && !/^[1-9][0-9]*$/.test(value)) value = "";
+        if (input.getAttribute("data-format") === "skill-name") value = toSkillName(value);
+        return value || input.getAttribute("value") || "";
+      }
+
+      function renderFields() {
+        fieldCodes.forEach(function (code, i) {
+          var text = fieldTemplates[i];
+          fields.forEach(function (input) {
+            text = text.split(input.getAttribute("data-token")).join(fieldValue(input));
+          });
+          code.textContent = text;
+        });
+      }
+
+      fields.forEach(function (input) {
+        input.addEventListener("input", renderFields);
+      });
+      renderFields();
     })();
   </script>
 
