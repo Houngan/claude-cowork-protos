@@ -725,7 +725,7 @@ button:focus-visible {
       <a href="#step-9">9. Synthèse</a>
       <a href="#step-10">10. Skill</a>
       <a href="#step-11">11. Test</a>
-      <a href="#step-12">12. Route</a>
+      <a href="#step-12">12. Planification</a>
     </div>
   </nav>
 
@@ -780,7 +780,7 @@ button:focus-visible {
 
   <div class="workflow-step">
     <span class="workflow-icon">🛣️</span>
-    <span>Route finale</span>
+    <span>Planification</span>
   </div>
   <br/>
   </div><p><b> Règle centrale : Claude ne doit jamais envoyer d'e-mail automatiquement.</b></p>
@@ -814,7 +814,7 @@ Règles générales :
 - produire un rapport court à chaque run ;
 - ne définir aucun critère de priorité pour l'instant : nous les déciderons ensemble à l'étape 6 ;
 - ne créer la Skill métier qu'après plusieurs étapes testées dans ce fil ;
-- créer la route finale seulement après validation du workflow et de la Skill métier.</code></pre>
+- créer la tâche planifiée seulement après validation du workflow et de la Skill métier.</code></pre>
         </div>
 
     </section>
@@ -1263,24 +1263,24 @@ vérifier que le Skill respecte les colonnes, les valeurs autorisées, les limit
 
 
     <section class="card" id="step-12">
-      <h2>12. 🛣️ Créer la route finale</h2>
-      <p>La route rejoue le workflow validé.</p>
+      <h2>12. 🗓️ Planification</h2>
+      <p>La tâche planifiée rejoue le workflow validé, à la fréquence que vous choisissez.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Création de la route finale</h3>
+            <h3>Prompt — Création de la tâche planifiée</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Crée une route opérationnelle pour le projet "Proto Claude MailFlow".
+          <pre class="prompt"><code>Crée une tâche planifiée pour le projet "Proto Claude MailFlow".
 
-Cette route doit utiliser la Skill métier :
+Cette tâche planifiée doit utiliser la Skill métier :
 {{skillName}}
 
-Objectif de la route :
+Objectif de la tâche planifiée :
 mettre à jour le fichier Excel "{{fileName}}" dans le répertoire du projet à partir des nouveaux mails {{provider}} ou des fils modifiés.
 
-La route doit exécuter les étapes suivantes :
+La tâche planifiée doit exécuter les étapes suivantes :
 1. vérifier l'accès {{provider}} via {{connector}} ;
 2. vérifier l'accès au fichier "{{fileName}}" ;
 3. lire et mettre à jour le fichier Excel ;
@@ -1304,7 +1304,7 @@ Limites :
 - ne pas retraiter tout l'historique ;
 - demander validation humaine en cas d'ambiguïté.
 
-À la fin de chaque exécution, la route doit indiquer :
+À la fin de chaque exécution, la tâche planifiée doit indiquer :
 - nombre de mails scannés ;
 - nombre de mails ajoutés ;
 - nombre de mails ignorés ;
@@ -1318,10 +1318,10 @@ Limites :
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Test de la route finale</h3>
+            <h3>Prompt — Test de la tâche planifiée et choix de la fréquence</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Teste la route {{skillName}} sur un périmètre réduit.
+          <pre class="prompt"><code>Teste la tâche planifiée sur un périmètre réduit.
 
 Contraintes de test :
 - traiter uniquement les 20 derniers mails {{provider}} ;
@@ -1332,14 +1332,20 @@ Contraintes de test :
 - générer le rapport PDF uniquement si le test est concluant.
 
 Objectif du test :
-vérifier que la route respecte :
+vérifier que la tâche planifiée respecte :
 - les colonnes autorisées ;
 - les valeurs autorisées ;
 - les limites de volume ;
 - les exclusions ;
 - le connecteur {{connector}} ;
 - l'interdiction d'envoi automatique ;
-- l'interdiction de {{cloudAlt}}.</code></pre>
+- l'interdiction de {{cloudAlt}}.
+
+Si le test est concluant, fixe ensuite la fréquence d'exécution :
+- propose-moi une fréquence adaptée au volume réel de mails, quotidienne ou hebdomadaire ;
+- à chaque passage, la tâche planifiée traite les nouveaux mails, prépare les propositions et me présente un rapport ;
+- la tâche planifiée n'envoie jamais d'e-mail ;
+- si aucun nouveau mail n'est détecté, la tâche planifiée le signale en une ligne et s'arrête.</code></pre>
         </div>
 
     </section>
@@ -1359,7 +1365,7 @@ vérifier que la route respecte :
 9. Synthétiser le workflow final depuis le fil réel.
 10. Créer la Skill métier.
 11. Relire et tester la Skill.
-12. Créer et tester la route finale.</pre>
+12. Créer la tâche planifiée, la tester et fixer sa fréquence.</pre>
 
 
     </section>

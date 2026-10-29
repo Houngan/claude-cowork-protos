@@ -992,7 +992,7 @@ input:focus-visible {
       <a href="#step-9">9. Indexation</a>
       <a href="#step-10">10. Interroger</a>
       <a href="#step-11">11. Skill</a>
-      <a href="#step-12">12. Route</a>
+      <a href="#step-12">12. Planification</a>
     </div>
   </nav>
 
@@ -1064,7 +1064,7 @@ input:focus-visible {
 
   <div class="workflow-step">
     <span class="workflow-icon">🛣️</span>
-    <span>Route incrémentale</span>
+    <span>Planification</span>
   </div>
   <br/>
   </div><p><b> Règle centrale : l'IA propose, l'humain dispose. Le dossier source n'est jamais modifié — Claude y lit les documents et en copie une version rangée dans le dossier cible, sans rien supprimer, déplacer ni renommer à la source, et en sourçant chacune de ses réponses.</b></p>
@@ -1108,7 +1108,7 @@ Règles générales :
 - pour cette formation, limiter le traitement à 20 documents ; en production, traiter l'intégralité du dépôt ;
 - produire un rapport court à la fin de chaque étape ;
 - ne créer la Skill métier qu'après plusieurs étapes testées dans ce fil ;
-- créer la route finale seulement après validation du workflow et de la Skill métier.</code></pre>
+- créer la tâche planifiée seulement après validation du workflow et de la Skill métier.</code></pre>
         </div>
 
     </section>
@@ -1638,24 +1638,24 @@ Ne crée pas de {{cloudAlt}}.</code></pre>
 
 
     <section class="card" id="step-12">
-      <h2>12. 🛣️ Créer la route incrémentale</h2>
+      <h2>12. 🗓️ Planification</h2>
       <p>Tout document déposé dans "{{src}}" rejoint le fonds et devient interrogeable.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — 12a. Création de la route</h3>
+            <h3>Prompt — 12a. Création de la tâche planifiée</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Crée une route opérationnelle pour le projet "Proto Claude SmartDoc".
+          <pre class="prompt"><code>Crée une tâche planifiée pour le projet "Proto Claude SmartDoc".
 
-Cette route doit utiliser la Skill métier :
+Cette tâche planifiée doit utiliser la Skill métier :
 {{skillName}}
 
-Objectif de la route :
+Objectif de la tâche planifiée :
 traiter les nouveaux documents déposés dans "{{src}}", et maintenir à jour le dossier "{{dst}}" et le registre "{{fileName}}".
 
-La route doit exécuter les étapes suivantes :
+La tâche planifiée doit exécuter les étapes suivantes :
 1. vérifier l'accès à "{{src}}", à "{{dst}}" et au registre ;
 2. lire l'onglet "plan_de_classement" et s'y conformer strictement ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser un plan ;
 3. détecter uniquement les fichiers nouveaux ou modifiés depuis le dernier passage ;
@@ -1674,7 +1674,7 @@ Limites :
 - ne jamais supprimer, déplacer ni renommer un fichier du dossier source ;
 - demander une validation humaine en cas d'ambiguïté.
 
-À la fin de chaque exécution, la route doit indiquer :
+À la fin de chaque exécution, la tâche planifiée doit indiquer :
 - nombre de nouveaux documents détectés ;
 - nombre de documents classés et leur répartition par category ;
 - doublons détectés ;
@@ -1685,21 +1685,21 @@ Limites :
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — 12b. Test de la route et mise en routine</h3>
+            <h3>Prompt — 12b. Test de la tâche planifiée et choix de la fréquence</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Testons la route sur un cas réel.
+          <pre class="prompt"><code>Testons la tâche planifiée sur un cas réel.
 
 1. Je viens de déposer un ou plusieurs documents dans "{{src}}".
-2. Lance la route : détecte-les, qualifie-les selon le plan validé, propose, attends ma validation, puis classe-les et indexe-les.
+2. Lance la tâche planifiée : détecte-les, qualifie-les selon le plan validé, propose, attends ma validation, puis classe-les et indexe-les.
 3. Confirme-moi ce qui a changé : fichiers rangés, lignes ajoutées au registre, catégories concernées.
 4. Puis pose-toi cette question et réponds-y en citant tes sources : "que sais-je maintenant sur ce fonds que je ne pouvais pas dire avant cet ajout ?"
 
-Ensuite, planifie l'exécution récurrente :
+Ensuite, fixe la fréquence d'exécution :
 - propose-moi une fréquence adaptée au rythme réel de dépôt, quotidienne ou hebdomadaire ;
-- à chaque passage, la routine détecte les nouveaux documents, prépare les propositions et me présente un rapport ;
-- la routine ne classe jamais un document sans ma validation ;
-- si aucun nouveau document n'est détecté, la routine le signale en une ligne et s'arrête.
+- à chaque passage, la tâche planifiée détecte les nouveaux documents, prépare les propositions et me présente un rapport ;
+- la tâche planifiée ne classe jamais un document sans ma validation ;
+- si aucun nouveau document n'est détecté, la tâche planifiée le signale en une ligne et s'arrête.
 
 Contraintes de test :
 - ne supprime, ne déplace ni ne renomme aucun fichier de "{{src}}" ;
@@ -1724,7 +1724,7 @@ Contraintes de test :
 9. Indexer en profondeur : résumés, tags, entités, sources.
 10. Interroger le fonds et générer le rapport PDF.
 11. Créer la Skill métier et la tester sur un document déposé dans le chat.
-12. Créer la route incrémentale et la mettre en routine.</pre>
+12. Créer la tâche planifiée, la tester et fixer sa fréquence.</pre>
 
 
     </section>
