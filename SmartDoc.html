@@ -972,7 +972,7 @@ input:focus-visible {
           </div>
         </div>
 
-        <p class="setup-note">Ces deux dossiers ne servent qu'à vos documents. Les fichiers que Claude produira pendant la formation iront dans le répertoire du projet.</p>
+        <p class="setup-note">Claude ne modifie jamais le dossier source. Le dossier cible recevra les copies classées, ainsi que le registre Excel et le rapport PDF produits pendant la formation.</p>
 
         <button class="btn-start" type="button" id="start-btn" disabled>Commencer la formation →</button>
       </div>
@@ -1089,7 +1089,7 @@ Contexte de travail :
 - stockage : {{storage}}, via {{connector}} ;
 - dossier source, où arrivent les documents en vrac : "{{src}}" ;
 - dossier cible, où le fonds sera rangé : "{{dst}}" ;
-- registre : un fichier Excel "{{fileName}}" dans le répertoire du projet.
+- registre : un fichier Excel "{{fileName}}" à la racine du dossier cible "{{dst}}".
 
 Règles générales :
 - l'IA propose, l'humain dispose : aucune action sur les fichiers sans ma validation explicite ;
@@ -1117,7 +1117,7 @@ Règles générales :
 
     <section class="card" id="step-2">
       <h2>2. 🔌 Vérifier les accès</h2>
-      <p>Objectif : vérifier {{connector}} et le répertoire projet avant toute action. Si le dossier source est vide, Claude propose de générer un jeu d'essai.</p>
+      <p>Objectif : vérifier {{connector}}, le dossier source et le dossier cible avant toute action. Si le dossier source est vide, Claude propose de générer un jeu d'essai.</p>
 
 
         <div class="prompt-card">
@@ -1135,8 +1135,8 @@ Règles générales :
 - peux-tu y créer un sous-dossier ?
 - peux-tu {{action}} un fichier vers "{{dst}}" ?
 
-2. Répertoire du projet :
-- peux-tu créer un fichier dans le répertoire du projet ?
+2. Registre et rapports dans "{{dst}}" :
+- peux-tu créer un fichier .xlsx à la racine de "{{dst}}" et le conserver au format .xlsx ?
 - peux-tu le retrouver et le modifier lors d'un prochain run ?
 
 Réponds point par point, et signale clairement ce qui ne fonctionne pas.
@@ -1164,7 +1164,7 @@ Ne modifie rien sans confirmation.</code></pre>
 
     <section class="card" id="step-3">
       <h2>3. 📊 Créer le registre</h2>
-      <p>Fichier cible : {{fileName}}, dans le répertoire du projet.</p>
+      <p>Fichier cible : {{fileName}}, à la racine du dossier cible.</p>
 <pre class='plain'>Colonnes du registre :
 file_name, detected_date, date_source, duplicate_status, category,
 proposed_name, target_path, summary, tags, source_reference, status, confidence</pre>
@@ -1181,7 +1181,7 @@ category = défini à l'étape 6, avec vous</pre>
             <h3>Prompt — Création du registre</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Crée un fichier Excel intitulé "{{fileName}}" dans le répertoire du projet.
+          <pre class="prompt"><code>Crée un fichier Excel intitulé "{{fileName}}" à la racine du dossier cible "{{dst}}".
 
 Onglet "registre", avec les colonnes suivantes, en anglais :
 - file_name
@@ -1214,7 +1214,7 @@ Règles :
 - créer seulement la structure du fichier ;
 - ne pas ajouter de colonnes non prévues ;
 - ne pas créer de {{cloudAlt}} ;
-- vérifier que le fichier est bien sauvegardé dans le répertoire du projet ;
+- vérifier que le fichier est bien sauvegardé à la racine de "{{dst}}", au format .xlsx ;
 - indiquer le chemin du fichier créé.</code></pre>
         </div>
 
@@ -1558,7 +1558,7 @@ Règles :
 - chaque affirmation renvoie aux documents qui la fondent, par leur nom de fichier ;
 - les documents sans date certaine figurent à part, jamais placés arbitrairement dans une chronologie ;
 - signaler les données insuffisantes plutôt que compléter par des contenus inventés ;
-- sauvegarder le PDF dans le répertoire du projet et indiquer son chemin.</code></pre>
+- sauvegarder le PDF à la racine de "{{dst}}" et indiquer son chemin.</code></pre>
         </div>
 
     </section>
@@ -1580,7 +1580,7 @@ Règles :
 Ignore les variantes abandonnées. Ne garde que la dernière décision stabilisée :
 - {{storage}} comme stockage, via {{connector}} ;
 - dossier source "{{src}}", dossier cible "{{dst}}" ;
-- registre Excel "{{fileName}}" dans le répertoire du projet ;
+- registre Excel "{{fileName}}" et rapports PDF à la racine du dossier cible "{{dst}}" ;
 - plan de classement et convention de nommage tels qu'enregistrés dans l'onglet "plan_de_classement" ;
 - aucune suppression de fichier ;
 - aucun classement sans validation explicite du lot ;
