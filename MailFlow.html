@@ -718,10 +718,10 @@ button:focus-visible {
       <a href="#step-2">2. Accès</a>
       <a href="#step-3">3. Registre</a>
       <a href="#step-4">4. Import</a>
-      <a href="#step-5">5. Détection</a>
+      <a href="#step-5">5. Critères</a>
       <a href="#step-6">6. Priorisation</a>
       <a href="#step-7">7. Réponses</a>
-      <a href="#step-8">8. Rapport PDF</a>
+      <a href="#step-8">8. Rapport</a>
       <a href="#step-9">9. Synthèse</a>
       <a href="#step-10">10. Skill</a>
       <a href="#step-11">11. Test</a>
@@ -733,7 +733,7 @@ button:focus-visible {
 
     <section class="card" id="intro">
       <h2>🎯 Objectif</h2>
-      <p>Créer une base de suivi des mails {{provider}} dans un registre Excel du projet.</p>
+      <p>Repérer les mails {{provider}} restés sans réponse, les prioriser et préparer des réponses à valider — avec un registre Excel comme base de suivi.</p>
 <p>Flux cible :</p>
 <div class="workflow">
   <div class="workflow-step">
@@ -749,8 +749,8 @@ button:focus-visible {
   <span class="workflow-arrow">→</span>
 
   <div class="workflow-step">
-    <span class="workflow-icon">🚦</span>
-    <span>Priorisation</span>
+    <span class="workflow-icon">🧭</span>
+    <span>Règles de priorisation</span>
   </div>
   <span class="workflow-arrow">→</span>
 
@@ -762,7 +762,7 @@ button:focus-visible {
 
   <div class="workflow-step">
     <span class="workflow-icon">🧩</span>
-    <span>Skill métier</span>
+    <span>Skill</span>
   </div>
   <span class="workflow-arrow">→</span>
 
@@ -771,7 +771,7 @@ button:focus-visible {
     <span>Planification</span>
   </div>
   <br/>
-  </div><p><b> Règle centrale : Claude ne doit jamais envoyer d'e-mail automatiquement.</b></p>
+  </div><p><b> Règle centrale : l'IA propose, l'humain dispose. Claude n'envoie jamais d'e-mail automatiquement — il prépare des réponses que vous validez et envoyez vous-même.</b></p>
 
 
     </section>
@@ -800,7 +800,7 @@ Règles générales :
 - traiter uniquement les nouveaux éléments ou les éléments modifiés ;
 - limiter les volumes traités à chaque exécution ;
 - produire un rapport court à chaque run ;
-- ne définir aucun critère de priorité pour l'instant : nous les déciderons ensemble à l'étape 6 ;
+- ne définir aucun critère de priorité pour l'instant : nous les déciderons ensemble à l'étape 5 ;
 - ne créer la Skill métier qu'après plusieurs étapes testées dans ce fil ;
 - créer la tâche planifiée seulement après validation du workflow et de la Skill métier.</code></pre>
         </div>
@@ -810,7 +810,7 @@ Règles générales :
 
 
     <section class="card" id="step-2">
-      <h2>2. 🔌 Vérifier {{provider}} et le projet</h2>
+      <h2>2. 🔌 Vérifier les accès</h2>
       <p>Objectif : vérifier {{connector}} et le répertoire projet avant toute action.</p>
 
 
@@ -847,8 +847,8 @@ Ne modifie rien sans confirmation.</code></pre>
 <pre class='plain'>Colonnes du registre :
 email_id, thread_id, received_at, sender, subject, snippet, has_attachment, status, priority, signal, suggested_reply, human_check</pre>
 <pre class='plain'>Valeurs autorisées :
-status = to_analyze / unanswered / draft_proposed / done / ignored
-priority = critical / high / medium / low        ← valeurs par défaut, redéfinies avec vous à l'étape 6
+status = to_analyze / unanswered / draft_proposed / ignored
+priority = critical / high / medium / low        ← valeurs par défaut, redéfinies avec vous à l'étape 5
 signal = urgency / client_frustration / budget_issue / operational_blocker / sales_request / follow_up / none        ← idem
 has_attachment = yes / no
 human_check = required / not_required</pre>
@@ -878,7 +878,7 @@ Onglet "emails", avec un tableau structuré et les colonnes suivantes, en anglai
 Crée également un second onglet, vide, intitulé "priority_criteria", avec les colonnes :
 question, selected_option, allowed_values, validated_at
 
-Cet onglet recevra à l'étape 6 les critères de priorité que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées à l'onglet "emails".
+Cet onglet recevra à l'étape 5 les critères de priorité que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées à l'onglet "emails".
 
 Règles :
 - ne pas encore importer les mails ;
@@ -894,16 +894,19 @@ Règles :
 
 
     <section class="card" id="step-4">
-      <h2>4. 📥 Importer {{provider}} dans le registre</h2>
-      <p>Objectif : lire {{provider}} via {{connector}} et écrire les mails utiles dans le fichier Excel.</p>
+      <h2>4. 📥 Importer {{provider}} et détecter les mails non répondus</h2>
+      <p>Objectif : lire {{provider}} via {{connector}}, écrire les mails utiles dans le registre et repérer ceux qui attendent une réponse, sans rien envoyer ni modifier.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Import {{provider}} vers le registre</h3>
+            <h3>Prompt — Import et détection</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Utilise {{provider}} via le connecteur {{connector}} pour lire les mails présents dans la boîte de réception.
+          <pre class="prompt"><code>Importe les mails {{provider}} dans le registre, puis repère ceux qui n'ont pas reçu de réponse. Aucun mail n'est envoyé ni modifié à cette étape.
+
+Phase 1 — Import :
+Utilise {{provider}} via le connecteur {{connector}} pour lire les mails présents dans la boîte de réception.
 Limite-toi aux 50 mails les plus récents.
 
 Remplis le fichier Excel "{{fileName}}" situé dans le répertoire du projet.
@@ -924,35 +927,10 @@ Pour les colonnes non encore analysées, laisse vide :
 - suggested_reply ;
 - human_check.
 
-Ne rédige aucune réponse.
-Ne classe pas encore les mails.
-Ne crée aucun brouillon.
 Ignore les newsletters, no-reply et notifications automatiques si tu les identifies clairement.
-Ne crée pas de {{cloudAlt}}.
 
-À la fin, indique :
-- chemin du fichier Excel ;
-- nombre de mails ajoutés ;
-- nombre de mails ignorés ;
-- limites rencontrées ;
-- erreurs éventuelles.</code></pre>
-        </div>
-
-    </section>
-
-
-
-    <section class="card" id="step-5">
-      <h2>5. 🔎 Détecter les mails non répondus</h2>
-      <p>Colonne mise à jour : status.</p>
-
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Détection des mails non répondus</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>À partir du fichier Excel "{{fileName}}", identifie les fils de discussion où le dernier message vient d'un client ou contact externe, et où aucune réponse sortante n'a été envoyée après ce dernier message.
+Phase 2 — Détection des mails non répondus :
+Sur ce même lot, identifie les fils de discussion où le dernier message vient d'un client ou contact externe, et où aucune réponse sortante n'a été envoyée après ce dernier message.
 
 Mets à jour uniquement la colonne :
 - status
@@ -962,31 +940,40 @@ Valeurs autorisées :
 - ignored
 - to_analyze
 
-Ne crée pas de nouvelles colonnes.
-Ne génère pas de brouillon.
-Ne rédige pas encore de réponse.
-Ne modifie pas les mails dans {{provider}}.
-Ne crée pas de {{cloudAlt}}.</code></pre>
+Règles :
+- ne rédige aucune réponse et ne crée aucun brouillon ;
+- ne priorise pas encore les mails : les critères seront décidés à l'étape suivante ;
+- ne crée pas de nouvelles colonnes ;
+- ne modifie pas les mails dans {{provider}} ;
+- ne crée pas de {{cloudAlt}}.
+
+À la fin, indique :
+- chemin du fichier Excel ;
+- nombre de mails ajoutés ;
+- nombre de mails ignorés ;
+- nombre de mails avec status = unanswered ;
+- limites rencontrées ;
+- erreurs éventuelles.</code></pre>
         </div>
 
     </section>
 
 
 
-    <section class="card" id="step-6">
-      <h2>6. 🚦 Définir les critères et prioriser</h2>
-      <p>Claude pose huit questions construites sur vos mails réels, vous choisissez, et vos critères pilotent la priorisation puis tout le reste du workflow.</p>
+    <section class="card" id="step-5">
+      <h2>5. 🧭 Définir les critères de priorité</h2>
+      <p>Le cœur du dispositif : Claude pose huit questions construites sur vos mails réels, vous choisissez, et vos critères pilotent tout le reste de la formation.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Élicitation en 8 questions, puis priorisation</h3>
+            <h3>Prompt — Élicitation en 8 questions</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Nous allons d'abord définir ensemble mes critères de priorité, puis tu prioriseras les mails.
+          <pre class="prompt"><code>Nous allons définir ensemble mes critères de priorité. Ne priorise aucun mail avant d'avoir mes réponses.
 
 Phase 1 — Élicitation, obligatoire :
-À partir des mails que tu viens d'importer dans "{{fileName}}", pose-moi les 8 questions ci-dessous.
+À partir des mails que tu viens d'importer et d'analyser dans "{{fileName}}", pose-moi les 8 questions ci-dessous.
 
 Règles de la phase 1 :
 - utilise ton interface de choix cliquables, par groupes de 4 questions ;
@@ -1020,12 +1007,41 @@ Phase 3 — Enregistrement, après ma validation seulement :
 - inscris les 8 questions, mes réponses et les valeurs retenues dans l'onglet "priority_criteria" de "{{fileName}}" ;
 - ajoute à l'onglet "emails" les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes, avec des noms en anglais.
 
-Phase 4 — Priorisation :
-Analyse maintenant uniquement les lignes où status = unanswered dans "{{fileName}}", et applique les critères que je viens de valider.
+Confirme-moi ensuite ce qui a réellement été écrit dans l'onglet : les codes de priority et de signal, la règle de délai, les exclusions, la règle de human_check et les colonnes ajoutées. Précise que ce sont ces critères, et eux seuls, qui piloteront l'étape 6.
+
+Ne priorise aucun mail à ce stade.
+Ne rédige aucune réponse.
+Ne crée pas de {{cloudAlt}}.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-6">
+      <h2>6. 🚦 Prioriser les mails</h2>
+      <p>Claude applique aux mails non répondus les critères validés à l'étape 5, et rien d'autre.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Priorisation</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>Phase 1 — Relecture des critères, obligatoire :
+Relis l'onglet "priority_criteria" du registre "{{fileName}}" et rappelle-moi en trois lignes ce que tu y trouves :
+- les codes de priority, du plus urgent au moins urgent ;
+- les codes de signal ;
+- la règle de human_check.
+
+Si cet onglet est vide ou introuvable, arrête-toi et dis-le-moi : ne priorise aucun mail sans critères validés, et ne rejoue pas l'élicitation de ta propre initiative.
+
+Phase 2 — Priorisation :
+Analyse uniquement les lignes où status = unanswered dans "{{fileName}}", et applique strictement ces critères. Ne t'écarte jamais de ce qui est inscrit dans l'onglet.
 
 Mets à jour uniquement :
-- priority, avec les valeurs validées à la question 5 ;
-- signal, avec les valeurs validées à la question 4 ;
+- priority, avec les codes validés à la question 5 ;
+- signal, avec les codes validés à la question 4 ;
 - human_check, selon la règle validée à la question 8 ;
 - les colonnes supplémentaires créées à la question 7, quand l'information est présente dans le mail.
 
@@ -1045,7 +1061,7 @@ Règles :
 
     <section class="card" id="step-7">
       <h2>7. ✍️ Proposer des réponses à valider</h2>
-      <p>Uniquement pour status = unanswered et les deux niveaux de priorité les plus élevés définis à l'étape 6.</p>
+      <p>Uniquement pour status = unanswered et les deux niveaux de priorité les plus élevés définis à l'étape 5.</p>
 
 
         <div class="prompt-card">
@@ -1053,7 +1069,7 @@ Règles :
             <h3>Prompt — Propositions de réponse</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Pour les lignes où status = unanswered et où priority correspond à l'un des deux niveaux les plus élevés définis à l'étape 6 (onglet "priority_criteria"), prépare une proposition de réponse courte, professionnelle et factuelle.
+          <pre class="prompt"><code>Pour les lignes où status = unanswered et où priority correspond à l'un des deux niveaux les plus élevés définis à l'étape 5 (onglet "priority_criteria"), prépare une proposition de réponse courte, professionnelle et factuelle.
 
 Maximum 10 propositions.
 
@@ -1098,7 +1114,7 @@ Le rapport doit contenir :
 - nombre de mails ajoutés ;
 - nombre de mails ignorés ;
 - nombre de mails avec status = unanswered ;
-- répartition par niveau de priorité, selon les niveaux définis à l'étape 6 ;
+- répartition par niveau de priorité, selon les niveaux définis à l'étape 5 ;
 - principaux signaux détectés ;
 - 3 exemples anonymisés parmi les cas les plus prioritaires ;
 - propositions de réponse à valider ;
@@ -1134,20 +1150,19 @@ Ignore les variantes abandonnées.
 
 Ne garde que la dernière décision stabilisée :
 - {{provider}} comme source ;
-- fichier Excel "{{fileName}}" dans le répertoire du projet ;
+- registre Excel "{{fileName}}" et rapport PDF dans le répertoire du projet ;
 - pas de {{cloudAlt}} ;
-- rapport PDF dans le répertoire du projet ;
-- critères de priorité tels qu'enregistrés dans l'onglet "priority_criteria" à l'étape 6 ;
+- critères de priorité tels qu'enregistrés dans l'onglet "priority_criteria" à l'étape 5 ;
 - pas d'envoi automatique ;
 - création de brouillons uniquement si possible et uniquement pour les deux niveaux de priorité les plus élevés ;
 - Skill métier créée seulement après validation du workflow.
 
 Produis une synthèse courte avec :
 1. objectif du workflow ;
-2. connecteurs requis ;
-3. nom du fichier Excel ;
+2. connecteur requis ;
+3. nom et emplacement du registre ;
 4. colonnes autorisées ;
-5. valeurs autorisées, y compris les critères de priorité validés à l'étape 6 ;
+5. valeurs autorisées, y compris les critères de priorité validés à l'étape 5 ;
 6. étapes du workflow ;
 7. règles de sécurité ;
 8. limites de volume ;
@@ -1265,10 +1280,10 @@ La tâche planifiée doit exécuter les étapes suivantes :
 5. ignorer newsletters, no-reply, notifications automatiques et alertes système ;
 6. ajouter les nouveaux mails utiles avec status = to_analyze ;
 7. détecter les mails probablement non répondus avec status = unanswered ;
-8. lire l'onglet "priority_criteria" et prioriser selon les critères validés à l'étape 6 ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser de critères ;
+8. lire l'onglet "priority_criteria" et prioriser selon les critères validés à l'étape 5 ; s'il est vide ou introuvable, s'arrêter et le signaler, sans jamais improviser de critères ;
 9. renseigner le signal principal avec signal, selon les valeurs validées ;
 10. proposer une réponse uniquement pour les deux niveaux de priorité les plus élevés ;
-11. renseigner human_check selon la règle validée à l'étape 6 ;
+11. renseigner human_check selon la règle validée à l'étape 5 ;
 12. ne jamais envoyer d'e-mail ;
 13. ne créer aucun {{cloudAlt}} ;
 14. générer un rapport court dans Claude ;
@@ -1334,9 +1349,9 @@ Si le test est concluant, fixe ensuite la fréquence d'exécution :
       <pre class='plain'>1. Créer le projet.
 2. Vérifier les accès.
 3. Créer le registre Excel.
-4. Importer {{provider}}.
-5. Détecter les mails non répondus.
-6. Définir les critères de priorité en 8 questions, puis prioriser.
+4. Importer {{provider}} et détecter les mails non répondus.
+5. Définir les critères de priorité en 8 questions.
+6. Prioriser les mails selon ces critères.
 7. Proposer des réponses.
 8. Générer le rapport PDF.
 9. Synthétiser le workflow final depuis le fil réel.

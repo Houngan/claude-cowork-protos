@@ -988,7 +988,7 @@ input:focus-visible {
       <a href="#step-5">5. Plan</a>
       <a href="#step-6">6. Classement</a>
       <a href="#step-7">7. Indexation</a>
-      <a href="#step-8">8. Rapport PDF</a>
+      <a href="#step-8">8. Rapport</a>
       <a href="#step-9">9. Synthèse</a>
       <a href="#step-10">10. Skill</a>
       <a href="#step-11">11. Test</a>
@@ -1027,20 +1027,8 @@ input:focus-visible {
   <span class="workflow-arrow">→</span>
 
   <div class="workflow-step">
-    <span class="workflow-icon">🔎</span>
-    <span>Inventaire</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
     <span class="workflow-icon">🗂️</span>
     <span>Plan de classement</span>
-  </div>
-  <span class="workflow-arrow">→</span>
-
-  <div class="workflow-step">
-    <span class="workflow-icon">🏷️</span>
-    <span>Classement</span>
   </div>
   <span class="workflow-arrow">→</span>
 
@@ -1052,7 +1040,7 @@ input:focus-visible {
 
   <div class="workflow-step">
     <span class="workflow-icon">🧩</span>
-    <span>Skill métier</span>
+    <span>Skill</span>
   </div>
   <span class="workflow-arrow">→</span>
 
@@ -1695,16 +1683,16 @@ Limites :
 3. Confirme-moi ce qui a changé : fichiers rangés, lignes ajoutées au registre, catégories concernées.
 4. Puis pose-toi cette question et réponds-y en citant tes sources : "que sais-je maintenant sur ce fonds que je ne pouvais pas dire avant cet ajout ?"
 
-Ensuite, fixe la fréquence d'exécution :
-- propose-moi une fréquence adaptée au rythme réel de dépôt, quotidienne ou hebdomadaire ;
-- à chaque passage, la tâche planifiée détecte les nouveaux documents, prépare les propositions et me présente un rapport ;
-- la tâche planifiée ne classe jamais un document sans ma validation ;
-- si aucun nouveau document n'est détecté, la tâche planifiée le signale en une ligne et s'arrête.
-
 Contraintes de test :
 - ne supprime, ne déplace ni ne renomme aucun fichier de "{{src}}" ;
 - ne retraite pas les documents déjà classés ;
-- ne crée pas de {{cloudAlt}}.</code></pre>
+- ne crée pas de {{cloudAlt}}.
+
+Si le test est concluant, fixe ensuite la fréquence d'exécution :
+- propose-moi une fréquence adaptée au rythme réel de dépôt, quotidienne ou hebdomadaire ;
+- à chaque passage, la tâche planifiée détecte les nouveaux documents, prépare les propositions et me présente un rapport ;
+- la tâche planifiée ne classe jamais un document sans ma validation ;
+- si aucun nouveau document n'est détecté, la tâche planifiée le signale en une ligne et s'arrête.</code></pre>
         </div>
 
     </section>
