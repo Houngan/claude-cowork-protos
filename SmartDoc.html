@@ -954,7 +954,7 @@ input:focus-visible {
 
       <div class="setup-card">
         <h2 id="setup-title">⚙️ Vos deux dossiers</h2>
-        <p class="hint" id="setup-hint">Ces deux noms seront recopiés tels quels dans les douze prompts de la formation.</p>
+        <p class="hint" id="setup-hint">Ces deux noms seront recopiés tels quels dans les prompts de la formation.</p>
 
         <div class="folder-grid">
           <div class="field">
@@ -985,13 +985,13 @@ input:focus-visible {
       <a href="#step-2">2. Accès</a>
       <a href="#step-3">3. Registre</a>
       <a href="#step-4">4. Inventaire</a>
-      <a href="#step-5">5. Doublons</a>
-      <a href="#step-6">6. Plan</a>
-      <a href="#step-7">7. Classement</a>
-      <a href="#step-8">8. Rangement</a>
-      <a href="#step-9">9. Indexation</a>
-      <a href="#step-10">10. Interroger</a>
-      <a href="#step-11">11. Skill</a>
+      <a href="#step-5">5. Plan</a>
+      <a href="#step-6">6. Classement</a>
+      <a href="#step-7">7. Indexation</a>
+      <a href="#step-8">8. Rapport PDF</a>
+      <a href="#step-9">9. Synthèse</a>
+      <a href="#step-10">10. Skill</a>
+      <a href="#step-11">11. Test</a>
       <a href="#step-12">12. Planification</a>
     </div>
   </nav>
@@ -1057,6 +1057,12 @@ input:focus-visible {
   <span class="workflow-arrow">→</span>
 
   <div class="workflow-step">
+    <span class="workflow-icon">📄</span>
+    <span>Rapport PDF</span>
+  </div>
+  <span class="workflow-arrow">→</span>
+
+  <div class="workflow-step">
     <span class="workflow-icon">🧩</span>
     <span>Skill métier</span>
   </div>
@@ -1104,7 +1110,7 @@ Règles générales :
 - tenir le fichier Excel comme mémoire documentaire ;
 - dans le fichier Excel, écrire en anglais les noms d'onglets, les noms de colonnes et les codes, c'est-à-dire les valeurs fermées comme status, confidence ou la profondeur d'indexation ; écrire en français les textes libres, comme summary ou tags, ainsi que les catégories, qui nomment les dossiers de "{{dst}}" ;
 - ne pas créer de {{cloudAlt}} ;
-- ne définir aucun plan de classement pour l'instant : nous le déciderons ensemble à l'étape 6 ;
+- ne définir aucun plan de classement pour l'instant : nous le déciderons ensemble à l'étape 5 ;
 - pour cette formation, limiter le traitement à 20 documents ; en production, traiter l'intégralité du dépôt ;
 - produire un rapport court à la fin de chaque étape ;
 - ne créer la Skill métier qu'après plusieurs étapes testées dans ce fil ;
@@ -1173,7 +1179,7 @@ date_source = document / filename / unknown
 duplicate_status = unique / exact_duplicate / possible_duplicate
 status = to_analyze / proposed / classified / needs_review / ignored
 confidence = high / medium / low
-category = défini à l'étape 6, avec vous</pre>
+category = défini à l'étape 5, avec vous</pre>
 
 
         <div class="prompt-card">
@@ -1202,12 +1208,12 @@ Valeurs autorisées :
 - duplicate_status = unique / exact_duplicate / possible_duplicate
 - status = to_analyze / proposed / classified / needs_review / ignored
 - confidence = high / medium / low
-- category : laissée vide pour l'instant, ses valeurs seront définies à l'étape 6
+- category : laissée vide pour l'instant, ses valeurs seront définies à l'étape 5
 
 Crée également un second onglet, vide, intitulé "classification_plan", avec les colonnes :
 question, selected_option, allowed_values, validated_at
 
-Cet onglet recevra à l'étape 6 le plan de classement que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées à l'onglet "register".
+Cet onglet recevra à l'étape 5 le plan de classement que nous déciderons ensemble ; d'autres colonnes pourront alors être ajoutées à l'onglet "register".
 
 Règles :
 - ne pas encore inventorier les documents ;
@@ -1223,26 +1229,27 @@ Règles :
 
 
     <section class="card" id="step-4">
-      <h2>4. 🔎 Inventorier le fonds</h2>
-      <p>Objectif : cartographier "{{src}}" et créer une ligne par document, sans rien déranger.</p>
+      <h2>4. 🔎 Inventorier le fonds et repérer les doublons</h2>
+      <p>Objectif : cartographier "{{src}}", créer une ligne par document et repérer doublons et fichiers inutiles, sans rien déranger.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Inventaire et cartographie</h3>
+            <h3>Prompt — Inventaire, cartographie et doublons</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Inventorie le contenu du dossier "{{src}}" via {{connector}}.
+          <pre class="prompt"><code>Inventorie le contenu du dossier "{{src}}" via {{connector}}, puis repère les doublons. Aucun fichier ne bouge à cette étape.
 
 Pour cette formation, limite-toi à 20 documents. En production, tu traiteras l'intégralité du dépôt.
 
+Phase 1 — Inventaire et cartographie :
 Ajoute une ligne par fichier dans l'onglet "register" du fichier "{{fileName}}" :
 - file_name ;
 - detected_date, uniquement si une date est explicitement présente dans le nom du fichier ou dans le document ;
 - date_source = document / filename / unknown ;
 - status = to_analyze.
 
-Laisse vides pour l'instant : duplicate_status, category, proposed_name, target_path, summary, tags, source_reference, confidence.
+Laisse vides pour l'instant : category, proposed_name, target_path, summary, tags, source_reference. duplicate_status et confidence seront renseignés à la phase 2.
 
 Produis ensuite une cartographie du fonds dans le chat :
 - nombre total de fichiers ;
@@ -1253,27 +1260,8 @@ Produis ensuite une cartographie du fonds dans le chat :
 - volume total ;
 - anomalies repérées : fichiers vides, illisibles, hors périmètre.
 
-Ne {{actionImp}} aucun fichier.
-Ne renomme rien.
-Ne propose aucun plan de classement à ce stade.
-Ne crée pas de {{cloudAlt}}.</code></pre>
-        </div>
-
-    </section>
-
-
-
-    <section class="card" id="step-5">
-      <h2>5. 🔍 Détecter les doublons</h2>
-      <p>Colonnes mises à jour : duplicate_status, confidence, status.</p>
-
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Doublons et fichiers inutiles</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Sur le même lot de fichiers que l'inventaire, identifie :
+Phase 2 — Doublons et fichiers inutiles :
+Sur ce même lot, identifie :
 
 1. Les doublons exacts :
 - fichiers identiques par nom et par contenu ;
@@ -1297,17 +1285,19 @@ Présente ensuite la liste des cas détectés, regroupés par paire ou par group
 - le motif du rapprochement ;
 - ton niveau de confiance.
 
-Ne supprime aucun fichier.
-Ne {{actionImp}} aucun fichier.
-Le sort des doublons sera décidé à l'étape suivante, pas maintenant.</code></pre>
+Règles :
+- ne supprime aucun fichier ;
+- ne {{actionImp}} aucun fichier et ne renomme rien ;
+- ne propose aucun plan de classement : le sort des doublons sera décidé à l'étape suivante ;
+- ne crée pas de {{cloudAlt}}.</code></pre>
         </div>
 
     </section>
 
 
 
-    <section class="card" id="step-6">
-      <h2>6. 🗂️ Décider le plan de classement</h2>
+    <section class="card" id="step-5">
+      <h2>5. 🗂️ Décider le plan de classement</h2>
       <p>Le cœur du dispositif : Claude pose huit questions construites sur vos fichiers réels, vous choisissez, et le plan retenu pilote tout le reste de la formation.</p>
 
 
@@ -1337,7 +1327,7 @@ Les 8 questions :
 5. Documents sans date certaine : copiés dans un sous-dossier "À dater", copiés sans date dans leur catégorie, ou pas encore copiés en attendant que la date soit tranchée ?
 6. Doublons et fichiers inutiles : ne copier qu'une seule version dans "{{dst}}", copier toutes les versions en les distinguant, ou ne rien copier et se contenter de les signaler dans le registre ?
 7. Axes que je veux pouvoir interroger plus tard, plusieurs réponses possibles : personnes citées, lieux, concepts, auteur ou organisme, client ou projet, niveau de confidentialité ?
-8. Profondeur d'indexation : résumé d'une ligne (code one_line_summary), résumé et mots-clés (code summary_tags), ou résumé, mots-clés, entités et citation sourcée (code full_index) ? Inscris dans le plan le code retenu, tel quel : l'étape 9 s'y référera.
+8. Profondeur d'indexation : résumé d'une ligne (code one_line_summary), résumé et mots-clés (code summary_tags), ou résumé, mots-clés, entités et citation sourcée (code full_index) ? Inscris dans le plan le code retenu, tel quel : l'étape 7 s'y référera.
 
 Phase 2 — Récapitulatif :
 Présente-moi un récapitulatif clair de mes 8 choix, comprenant :
@@ -1352,7 +1342,7 @@ Phase 3 — Enregistrement, après ma validation seulement :
 - inscris les 8 questions, mes réponses et les valeurs retenues dans l'onglet "classification_plan" de "{{fileName}}" ;
 - ajoute à l'onglet "register" les colonnes correspondant à ma réponse à la question 7, dans la limite de 5 colonnes, avec des noms en anglais.
 
-Confirme-moi ensuite ce qui a réellement été écrit dans l'onglet : la liste des catégories, l'arborescence, la règle de nommage et les colonnes ajoutées. Précise que c'est ce plan, et lui seul, qui pilotera l'étape 7.
+Confirme-moi ensuite ce qui a réellement été écrit dans l'onglet : la liste des catégories, l'arborescence, la règle de nommage et les colonnes ajoutées. Précise que c'est ce plan, et lui seul, qui pilotera l'étape 6.
 
 Ne {{actionImp}} aucun fichier.
 Ne renomme rien.
@@ -1363,17 +1353,17 @@ Ne crée aucun dossier à ce stade.</code></pre>
 
 
 
-    <section class="card" id="step-7">
-      <h2>7. 🏷️ Proposer le classement</h2>
-      <p>Colonnes mises à jour : category, proposed_name, target_path, confidence, status.</p>
+    <section class="card" id="step-6">
+      <h2>6. 🏷️ Classer et ranger le fonds</h2>
+      <p>Claude propose un classement conforme au plan, puis range le fonds dans "{{dst}}" : la seule étape où les fichiers bougent réellement, et uniquement après votre validation du lot.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Propositions de classement</h3>
+            <h3>Prompt — Proposition, validation et rangement</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Étape préalable, obligatoire :
+          <pre class="prompt"><code>Phase 1 — Relecture du plan, obligatoire :
 Relis l'onglet "classification_plan" du registre "{{fileName}}" et rappelle-moi en trois lignes ce que tu y trouves :
 - la liste des catégories autorisées ;
 - l'arborescence à créer dans "{{dst}}" ;
@@ -1381,7 +1371,7 @@ Relis l'onglet "classification_plan" du registre "{{fileName}}" et rappelle-moi 
 
 Si cet onglet est vide ou introuvable, arrête-toi et dis-le-moi : ne propose aucun classement sans plan validé, et ne rejoue pas l'élicitation de ta propre initiative.
 
-Ensuite seulement :
+Phase 2 — Proposition de classement :
 Pour chaque ligne du registre "{{fileName}}" dont status = to_analyze, prépare une proposition de classement conforme à ce plan. Ne t'écarte jamais de ce qui y est inscrit.
 
 Renseigne uniquement :
@@ -1391,7 +1381,7 @@ Renseigne uniquement :
 - confidence = high / medium / low ;
 - status = proposed.
 
-Règles :
+Règles de la phase 2 :
 - n'utilise une date dans le nom que si elle est explicitement présente dans le document ou dans le nom du fichier ;
 - applique aux documents sans date la règle validée à la question 5 ;
 - applique aux doublons la règle validée à la question 6 ;
@@ -1401,29 +1391,13 @@ Règles :
 Présente ensuite un tableau dans le chat :
 nom actuel → catégorie → nom proposé → destination → justification courte → confiance
 
-Enfin, liste séparément les documents que tu n'arrives pas à dater ou à qualifier, et pose-moi 2 à 3 questions ciblées pour les trancher. Attends mes réponses avant de conclure l'étape.</code></pre>
-        </div>
+Liste enfin séparément les documents que tu n'arrives pas à dater ou à qualifier, et pose-moi 2 à 3 questions ciblées pour les trancher.
 
-    </section>
+Phase 3 — Validation du lot, point d'arrêt obligatoire :
+Rappelle-moi le lot : nombre de documents en status = proposed, répartition par category, nombre de cas en confidence = low.
+Puis arrête-toi. Attends mes réponses aux questions et ma validation explicite du lot. Sans validation de ma part, ne touche à aucun fichier.
 
-
-
-    <section class="card" id="step-8">
-      <h2>8. ✅ Ranger le fonds</h2>
-      <p>La seule étape où les fichiers bougent réellement — et uniquement après votre validation.</p>
-
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Application du lot validé</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Applique le lot de classement, après ma validation explicite.
-
-1. Rappelle-moi d'abord le lot : nombre de documents en status = proposed, répartition par category, nombre de cas en confidence = low.
-2. Attends que je valide explicitement. Sans validation de ma part, ne touche à aucun fichier.
-
-Après ma validation :
+Phase 4 — Rangement, après ma validation seulement :
 - crée dans "{{dst}}" les sous-dossiers de l'arborescence validée ;
 - {{actionImp}} vers target_path chaque document approuvé, avec son proposed_name ;
 - applique la règle validée à la question 5 pour les documents sans date ;
@@ -1431,7 +1405,7 @@ Après ma validation :
 - passe status = classified sur les documents traités ;
 - passe status = needs_review pour les documents en confidence = low ou que j'ai écartés : ne les copie pas.
 
-Règles :
+Règles de la phase 4 :
 - le dossier source "{{src}}" ne doit être modifié en aucune façon : rien de supprimé, rien de déplacé, rien de renommé ;
 - le renommage ne s'applique qu'à la COPIE déposée dans "{{dst}}" ;
 - ne modifie jamais le contenu d'un document ;
@@ -1449,9 +1423,9 @@ Règles :
 
 
 
-    <section class="card" id="step-9">
-      <h2>9. 🧠 Indexer en profondeur</h2>
-      <p>L'ampleur de cette étape dépend entièrement de la profondeur d'indexation choisie à l'étape 6.</p>
+    <section class="card" id="step-7">
+      <h2>7. 🔖 Indexer en profondeur</h2>
+      <p>L'ampleur de cette étape dépend entièrement de la profondeur d'indexation choisie à l'étape 5.</p>
 
 
         <div class="prompt-card">
@@ -1475,7 +1449,7 @@ Renseigne exactement ce que la profondeur retenue impose, et rien de plus :
 - full_index : summary de 2 à 3 phrases, tags, et les colonnes retenues à la question 7.
 
 Deux colonnes se renseignent dans tous les cas, quelle que soit la profondeur retenue :
-- source_reference : nom du fichier et page quand la pagination existe, sinon nom du fichier et section ou extrait repérable. Sans elle, aucune réponse ne pourrait être sourcée à l'étape 10 ;
+- source_reference : nom du fichier et page quand la pagination existe, sinon nom du fichier et section ou extrait repérable. Sans elle, aucune réponse ne pourrait être sourcée à l'étape 8 ;
 - confidence : ton niveau de certitude sur l'indexation de cette ligne.
 
 Précisions sur les autres colonnes :
@@ -1499,8 +1473,8 @@ Soumets-moi ensuite 3 à 5 résumés — les plus représentatifs et ceux dont t
 
 
 
-    <section class="card" id="step-10">
-      <h2>10. 💬 Interroger le fonds</h2>
+    <section class="card" id="step-8">
+      <h2>8. 💬 Interroger le fonds et générer le rapport PDF</h2>
       <p>Le registre devient la mémoire de Claude, et le rapport PDF restitue à la fois l'état du fonds et ce qu'il contient.</p>
 
         <div class="inline-field">
@@ -1566,17 +1540,17 @@ Règles :
 
 
 
-    <section class="card" id="step-11">
-      <h2>11. 🧩 Créer et tester la Skill</h2>
-      <p>Nom proposé : {{skillName}}. Le test se fait sur un document déposé directement dans la conversation.</p>
+    <section class="card" id="step-9">
+      <h2>9. 🧠 Synthétiser le workflow final depuis le fil réel</h2>
+      <p>But : nettoyer le fil avant création de Skill.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — 11a. Synthèse et création de la Skill</h3>
+            <h3>Prompt — Synthèse du workflow final</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
-          <pre class="prompt"><code>Relis ce fil de discussion et produis d'abord une synthèse du workflow final réellement validé.
+          <pre class="prompt"><code>Relis ce fil de discussion et produis une synthèse du workflow final réellement validé.
 
 Ignore les variantes abandonnées. Ne garde que la dernière décision stabilisée :
 - {{storage}} comme stockage, via {{connector}} ;
@@ -1588,8 +1562,38 @@ Ignore les variantes abandonnées. Ne garde que la dernière décision stabilis�
 - aucune date déduite inscrite dans le registre ;
 - pas de {{cloudAlt}}.
 
-À partir de cette synthèse, crée une Skill Claude métier nommée :
+Produis une synthèse courte avec :
+1. objectif du workflow ;
+2. connecteur requis ;
+3. nom et emplacement du registre ;
+4. colonnes autorisées ;
+5. valeurs autorisées, y compris le plan de classement validé à l'étape 5 ;
+6. étapes du workflow ;
+7. règles de sécurité ;
+8. limites de volume ;
+9. cas où Claude doit s'arrêter et demander validation.</code></pre>
+        </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-10">
+      <h2>10. 🧩 Créer la Skill métier</h2>
+      <p>Nom proposé : {{skillName}}.</p>
+
+
+        <div class="prompt-card">
+          <div class="prompt-head">
+            <h3>Prompt — Création et relecture de la Skill métier</h3>
+            <button class="copy-btn" type="button">Copier</button>
+          </div>
+          <pre class="prompt"><code>À partir de la synthèse validée ci-dessus, crée une Skill Claude métier.
+
+Nom de la Skill :
 {{skillName}}
+
+La Skill doit décrire uniquement le workflow final validé.
 
 Contrainte essentielle :
 la Skill ne doit PAS figer le plan de classement dans son texte. Elle doit lire l'onglet "classification_plan" du registre au début de chaque exécution et s'y conformer. Ainsi le plan pourra évoluer sans réécrire la Skill. Si cet onglet est vide ou introuvable, la Skill doit s'arrêter et le signaler, sans jamais improviser un plan ni relancer l'élicitation d'elle-même.
@@ -1606,14 +1610,23 @@ Autres contraintes :
 - ne pas ajouter de colonnes non prévues ;
 - limiter à 20 documents en test, l'intégralité en production.
 
-Relis ensuite le SKILL.md que tu viens d'écrire et vérifie strictement qu'il respecte chacun de ces points, en particulier la lecture du plan dans le registre. Si une règle est ambiguë, corrige-la.
+Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.
 
-Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</code></pre>
+Relis ensuite le SKILL.md que tu viens d'écrire et vérifie strictement qu'il respecte chacun de ces points, en particulier la lecture du plan dans le registre. Si une règle est ambiguë, corrige-la. Ne rajoute ni script ni secret.</code></pre>
         </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-11">
+      <h2>11. 🧪 Tester la Skill</h2>
+      <p>Le test se fait sur un document déposé directement dans la conversation.</p>
+
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — 11b. Test sur un document déposé dans le chat</h3>
+            <h3>Prompt — Test sur un document déposé dans le chat</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Je viens de te transmettre un document directement dans cette conversation.
@@ -1623,7 +1636,7 @@ Applique la Skill {{skillName}} à ce seul document :
 2. qualifie le document selon le plan validé : category, proposed_name, et la date uniquement si elle est explicite ;
 3. présente-moi ta proposition et attends ma validation ;
 4. après ma validation, dépose une copie du document dans "{{dst}}" à l'emplacement prévu, avec son nom normalisé ;
-5. crée sa ligne dans le registre et indexe-le comme à l'étape 9 ;
+5. crée sa ligne dans le registre et indexe-le comme à l'étape 7 ;
 6. dis-moi enfin ce que ce document ajoute au fonds : ce qu'il confirme, ce qu'il nuance, ce qu'il apporte de nouveau par rapport aux documents déjà classés.
 
 Objectif du test :
@@ -1645,7 +1658,7 @@ Ne crée pas de {{cloudAlt}}.</code></pre>
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — 12a. Création de la tâche planifiée</h3>
+            <h3>Prompt — Création de la tâche planifiée</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Crée une tâche planifiée pour le projet "Proto Claude SmartDoc".
@@ -1686,7 +1699,7 @@ Limites :
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — 12b. Test de la tâche planifiée et choix de la fréquence</h3>
+            <h3>Prompt — Test de la tâche planifiée et choix de la fréquence</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Testons la tâche planifiée sur un cas réel.
@@ -1717,14 +1730,14 @@ Contraintes de test :
       <pre class='plain'>1. Créer le projet.
 2. Vérifier les accès (et générer un jeu d'essai si besoin).
 3. Créer le registre Excel.
-4. Inventorier "{{src}}" et cartographier le fonds.
-5. Détecter les doublons et les fichiers inutiles.
-6. Décider le plan de classement en 8 questions.
-7. Proposer nom normalisé et destination pour chaque document.
-8. Ranger le fonds dans "{{dst}}" après validation.
-9. Indexer en profondeur : résumés, tags, entités, sources.
-10. Interroger le fonds et générer le rapport PDF.
-11. Créer la Skill métier et la tester sur un document déposé dans le chat.
+4. Inventorier "{{src}}", cartographier le fonds et repérer les doublons.
+5. Décider le plan de classement en 8 questions.
+6. Proposer le classement, puis ranger le fonds dans "{{dst}}" après validation.
+7. Indexer en profondeur : résumés, tags, entités, sources.
+8. Interroger le fonds et générer le rapport PDF.
+9. Synthétiser le workflow final depuis le fil réel.
+10. Créer et relire la Skill métier.
+11. Tester la Skill sur un document déposé dans le chat.
 12. Créer la tâche planifiée, la tester et fixer sa fréquence.</pre>
 
 
@@ -1964,10 +1977,10 @@ Contraintes de test :
         pre.textContent = applyTemplate(pre.textContent);
       });
 
-      // Étape 10 : le sujet interrogé se règle au-dessus du prompt.
+      // Étape 8 : le sujet interrogé se règle au-dessus du prompt.
       // On garde le texte templaté comme gabarit pour le rejouer à chaque frappe.
       var topicInput = document.getElementById("topic-input");
-      var topicCode = document.querySelector("#step-10 pre.prompt code");
+      var topicCode = document.querySelector("#step-8 pre.prompt code");
 
       if (topicInput && topicCode) {
         var topicTpl = topicCode.textContent;

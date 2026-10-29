@@ -721,7 +721,7 @@ button:focus-visible {
       <a href="#step-5">5. Détection</a>
       <a href="#step-6">6. Critères</a>
       <a href="#step-7">7. Réponses</a>
-      <a href="#step-8">8. PDF</a>
+      <a href="#step-8">8. Rapport PDF</a>
       <a href="#step-9">9. Synthèse</a>
       <a href="#step-10">10. Skill</a>
       <a href="#step-11">11. Test</a>
@@ -906,13 +906,13 @@ Règles :
 
 
     <section class="card" id="step-4">
-      <h2>4. 📥 Importer {{provider}} dans Excel</h2>
+      <h2>4. 📥 Importer {{provider}} dans le registre</h2>
       <p>Objectif : lire {{provider}} via {{connector}} et écrire les mails utiles dans le fichier Excel.</p>
 
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Import {{provider}} vers Excel</h3>
+            <h3>Prompt — Import {{provider}} vers le registre</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Utilise {{provider}} via le connecteur {{connector}} pour lire les mails présents dans la boîte de réception.
@@ -1176,7 +1176,7 @@ Produis une synthèse courte avec :
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Création de la Skill métier</h3>
+            <h3>Prompt — Création et relecture de la Skill métier</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>À partir de la synthèse validée ci-dessus, crée une Skill Claude métier.
@@ -1202,26 +1202,9 @@ Autres contraintes :
 - ne pas inventer de données manquantes ;
 - limiter le traitement à 50 mails scannés, 30 analysés, 10 propositions.
 
-Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.</code></pre>
-        </div>
+Crée un SKILL.md concis, auditable, sans script, sans clé API, sans secret.
 
-    </section>
-
-
-
-    <section class="card" id="step-11">
-      <h2>11. 🧪 Relire et tester la Skill</h2>
-      <p>Objectif : vérifier que la Skill respecte le workflow final.</p>
-
-
-        <div class="prompt-card">
-          <div class="prompt-head">
-            <h3>Prompt — Relecture critique de la Skill</h3>
-            <button class="copy-btn" type="button">Copier</button>
-          </div>
-          <pre class="prompt"><code>Relis le SKILL.md que tu viens de créer.
-
-Vérifie strictement :
+Relis ensuite le SKILL.md que tu viens d'écrire et vérifie strictement :
 - qu'il ne mentionne pas de {{cloudAlt}} ;
 - qu'il ne mentionne pas d'import manuel ;
 - qu'il utilise bien {{provider}} ;
@@ -1234,10 +1217,17 @@ Vérifie strictement :
 - qu'il lit bien les critères de priorité dans l'onglet "priority_criteria" au lieu de les figer dans son texte ;
 - qu'il reste concis.
 
-Si une règle est ambiguë, corrige-la.
-Ne rajoute pas de script.
-Ne rajoute pas de secret.</code></pre>
+Si une règle est ambiguë, corrige-la. Ne rajoute ni script ni secret.</code></pre>
         </div>
+
+    </section>
+
+
+
+    <section class="card" id="step-11">
+      <h2>11. 🧪 Tester la Skill</h2>
+      <p>Objectif : vérifier que la Skill respecte le workflow final.</p>
+
 
         <div class="prompt-card">
           <div class="prompt-head">
@@ -1361,10 +1351,10 @@ Si le test est concluant, fixe ensuite la fréquence d'exécution :
 5. Détecter les mails non répondus.
 6. Définir les critères de priorité en 8 questions, puis prioriser.
 7. Proposer des réponses.
-8. Générer le PDF.
+8. Générer le rapport PDF.
 9. Synthétiser le workflow final depuis le fil réel.
-10. Créer la Skill métier.
-11. Relire et tester la Skill.
+10. Créer et relire la Skill métier.
+11. Tester la Skill.
 12. Créer la tâche planifiée, la tester et fixer sa fréquence.</pre>
 
 
