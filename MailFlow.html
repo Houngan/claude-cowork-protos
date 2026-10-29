@@ -716,7 +716,7 @@ button:focus-visible {
     <div class="wrap nav-grid">
       <a href="#step-1">1. Projet</a>
       <a href="#step-2">2. Accès</a>
-      <a href="#step-3">3. Excel</a>
+      <a href="#step-3">3. Registre</a>
       <a href="#step-4">4. Import</a>
       <a href="#step-5">5. Détection</a>
       <a href="#step-6">6. Critères</a>
@@ -733,7 +733,7 @@ button:focus-visible {
 
     <section class="card" id="intro">
       <h2>🎯 Objectif</h2>
-      <p>Créer une base de suivi des mails {{provider}} dans un fichier Excel du projet.</p>
+      <p>Créer une base de suivi des mails {{provider}} dans un registre Excel du projet.</p>
 <p>Flux cible :</p>
 <div class="workflow">
   <div class="workflow-step">
@@ -806,7 +806,7 @@ Règles générales :
 - ne jamais envoyer d'e-mail automatiquement ;
 - ne jamais promettre une action non validée par un humain ;
 - travailler par étapes simples ;
-- tenir un fichier Excel comme base de suivi ;
+- tenir un registre Excel comme base de suivi ;
 - ne pas créer de {{cloudAlt}} ;
 - dans le fichier Excel, écrire en anglais les noms d'onglets, les noms de colonnes et les codes, c'est-à-dire les valeurs fermées comme status, priority ou signal ; écrire en français les textes libres, comme suggested_reply ;
 - traiter uniquement les nouveaux éléments ou les éléments modifiés ;
@@ -854,9 +854,9 @@ Ne modifie rien sans confirmation.</code></pre>
 
 
     <section class="card" id="step-3">
-      <h2>3. 📊 Créer le fichier Excel</h2>
-      <p>Fichier cible : {{fileName}}</p>
-<pre class='plain'>Colonnes minimales :
+      <h2>3. 📊 Créer le registre</h2>
+      <p>Fichier cible : {{fileName}}, dans le répertoire du projet.</p>
+<pre class='plain'>Colonnes du registre :
 email_id, thread_id, received_at, sender, subject, snippet, has_attachment, status, priority, signal, suggested_reply, human_check</pre>
 <pre class='plain'>Valeurs autorisées :
 status = to_analyze / unanswered / draft_proposed / done / ignored
@@ -868,7 +868,7 @@ human_check = required / not_required</pre>
 
         <div class="prompt-card">
           <div class="prompt-head">
-            <h3>Prompt — Création du fichier Excel</h3>
+            <h3>Prompt — Création du registre</h3>
             <button class="copy-btn" type="button">Copier</button>
           </div>
           <pre class="prompt"><code>Crée un fichier Excel intitulé "{{fileName}}" dans le répertoire du projet.
@@ -1356,7 +1356,7 @@ Si le test est concluant, fixe ensuite la fréquence d'exécution :
       <h2>✅ Synthèse finale</h2>
       <pre class='plain'>1. Créer le projet.
 2. Vérifier les accès.
-3. Créer le fichier Excel.
+3. Créer le registre Excel.
 4. Importer {{provider}}.
 5. Détecter les mails non répondus.
 6. Définir les critères de priorité en 8 questions, puis prioriser.
